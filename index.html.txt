@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schott-academia-algebra 🚀</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #f59e0b;
+            --success: #22c55e;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+        }
+
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text);
+            margin: 0;
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container { 
+            background: var(--card); 
+            padding: 30px; 
+            border-radius: 28px; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
+            max-width: 600px; 
+            width: 90%; 
+            position: relative;
+        }
+
+        /* Vistas */
+        .view { display: none; animation: fadeIn 0.5s ease; }
+        .view.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Menú Principal */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
+        .menu-btn {
+            background: #334155;
+            border: 2px solid #475569;
+            padding: 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            text-align: center;
+            transition: 0.3s;
+        }
+        .menu-btn:hover { border-color: var(--primary); background: #3b82f622; transform: scale(1.05); }
+        .menu-btn i { font-size: 3rem; display: block; margin-bottom: 10px; }
+
+        /* Lecciones */
+        .lesson-card { background: #334155; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--accent); }
+        .math-box { background: #0f172a; padding: 10px; border-radius: 8px; font-family: monospace; color: var(--accent); font-size: 1.2rem; text-align: center; margin: 10px 0; }
+
+        /* Estilos del Quiz (Basados en tu anterior código) */
+        .option { background: #334155; padding: 15px; margin: 10px 0; border-radius: 12px; cursor: pointer; transition: 0.2s; border: 2px solid transparent; }
+        .option:hover { background: #475569; }
+        .selected-correct { background: #065f46 !important; border-color: var(--success) !important; }
+        .selected-wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
+
+        .btn-main { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-back { background: transparent; color: #94a3b8; border: none; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <div id="view-menu" class="view active">
+            <h1 style="text-align: center; font-size: 2.5rem; margin-bottom: 0;">🚀 Álgebra Kids</h1>
+            <p style="text-align: center; color: #94a3b8;">¿Qué aventura eliges hoy?</p>
+            
+            <div class="menu-grid">
+                <div class="menu-btn" onclick="showView('view-learn')">
+                    <span>📖</span>
+                    <h3>Aprender</h3>
+                    <p style="font-size: 0.8rem;">Entiende los secretos de las letras</p>
+                </div>
+                <div class="menu-btn" onclick="startQuiz()">
+                    <span>🎮</span>
+                    <h3>Jugar</h3>
+                    <p style="font-size: 0.8rem;">¡Gana puntos y demuestra tu poder!</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="view-learn" class="view">
+            <button class="btn-back" onclick="showView('view-menu')">← Volver al Menú</button>
+            <h2>📖 ¿Qué es el Lenguaje Algebraico?</h2>
+            
+            <div class="lesson-card">
+                <h3>1. La Letra Misteriosa 🕵️‍♂️</h3>
+                <p>En álgebra, una letra como <b>"x"</b> es solo una <b>caja vacía</b> donde podemos guardar cualquier número.</p>
+                <div class="math-box">Un número cualquiera = x</div>
+            </div>
+
+            <div class="lesson-card" style="border-left-color: var(--primary);">
+                <h3>2. Los Dobles y Triples 🔢</h3>
+                <p>Si quieres decir "dos veces un número", simplemente pegas el número a la letra:</p>
+                <div class="math-box">El doble de un número = 2x</div>
+            </div>
+
+            <button class="btn-main" onclick="startQuiz()">¡Estoy listo para el Desafío! ➔</button>
+        </div>
+
+        <div id="view-quiz" class="view">
+            <button class="btn-back" onclick="showView('view-menu')">← Rendirse</button>
+            <div id="progress-container" style="height: 10px; background: #334155; border-radius: 5px; margin-bottom: 20px;">
+                <div id="progress-bar" style="height: 100%; background: var(--primary); width: 0%; border-radius: 5px; transition: 0.5s;"></div>
+            </div>
+            <div id="question" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 20px;"></div>
+            <div id="options"></div>
+            <button id="next-btn" class="btn-main" style="display:none;" onclick="nextQuestion()">Siguiente Pregunta ➔</button>
+        </div>
+
+        <div id="view-results" class="view">
+            <h2 id="result-title" style="text-align: center;"></h2>
+            <div id="score-display" style="font-size: 4rem; text-align: center; font-weight: bold; color: var(--accent);">0</div>
+            <div id="feedback-area" style="margin-top: 20px;"></div>
+            <button class="btn-main" onclick="showView('view-menu')">Volver al Inicio 🏠</button>
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+            { q: "¿Cómo se escribe 'un número aumentado en 5'?", a: ["x - 5", "x + 5", "5x", "x / 5"], c: 1, r: "Aumentar significa sumar (+)." },
+            { q: "Si 'x' es tu edad, ¿cómo escribirías la edad que tendrás en 3 años?", a: ["x + 3", "3x", "x - 3", "3 - x"], c: 0, r: "El futuro siempre es sumando años." },
+            { q: "Traduce: 'El triple de un número'", a: ["x + 3", "x³", "3x", "3 - x"], c: 2, r: "Triple es multiplicar por 3, y en álgebra se ponen juntos." }
+        ];
+
+        let current = 0;
+        let score = 0;
+
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        function startQuiz() {
+            current = 0;
+            score = 0;
+            showView('view-quiz');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[current];
+            document.getElementById('question').innerText = q.q;
+            const optDiv = document.getElementById('options');
+            optDiv.innerHTML = '';
+            
+            q.a.forEach((opt, i) => {
+                const b = document.createElement('div');
+                b.className = 'option';
+                b.innerText = opt;
+                b.onclick = () => check(i, b);
+                optDiv.appendChild(b);
+            });
+            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('progress-bar').style.width = (current / questions.length * 100) + "%";
+        }
+
+        function check(idx, el) {
+            const q = questions[current];
+            if(idx === q.c) {
+                score++;
+                el.classList.add('selected-correct');
+                confetti({ particleCount: 40, spread: 60 });
+            } else {
+                el.classList.add('selected-wrong');
+                document.querySelectorAll('.option')[q.c].classList.add('selected-correct');
+            }
+            document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            current++;
+            if(current < questions.length) loadQuestion();
+            else showFinalResults();
+        }
+
+        function showFinalResults() {
+            showView('view-results');
+            document.getElementById('score-display').innerText = score + "/" + questions.length;
+            document.getElementById('result-title').innerText = score > 1 ? "¡Excelente Trabajo! 🏆" : "¡Sigue practicando! 💪";
+        }
+    </script>
+</body>
+</html>
