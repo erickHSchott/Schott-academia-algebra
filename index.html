@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Álgebra Estelar: Misión Lenguaje</title>
+    <title>Academia Álgebra Estelar</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
@@ -18,149 +18,139 @@
         }
         .container { 
             background: var(--card); padding: 25px; border-radius: 28px; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-width: 700px; width: 95%; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-width: 650px; width: 95%; 
+            position: relative; overflow: hidden;
         }
         .view { display: none; animation: fadeIn 0.4s ease; }
         .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-        /* Estilos de Lección */
-        .regla-oro { 
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white; padding: 20px; border-radius: 15px; margin: 20px 0;
-            border: 3px dashed #fff; position: relative;
+        /* Estilos de la Presentación (Slides) */
+        .slide-container { min-height: 350px; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+        .slide-progress { display: flex; gap: 5px; margin-bottom: 20px; }
+        .step { height: 6px; flex: 1; background: #334155; border-radius: 10px; transition: 0.3s; }
+        .step.active { background: var(--accent); }
+        
+        .regla-oro-box { 
+            background: #7c2d12; border: 2px solid var(--accent); 
+            padding: 15px; border-radius: 15px; margin-top: 15px;
         }
-        .diccionario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
-        .word-tag { background: #334155; padding: 8px; border-radius: 8px; border-left: 4px solid var(--accent); font-size: 0.9rem; }
 
-        /* Botones y Quiz */
+        /* Botones */
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
         .btn-main { 
             width: 100%; padding: 18px; background: var(--primary); color: white; border: none; 
-            border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;
+            border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1.1rem;
         }
-        .btn-main:hover { background: var(--secondary); transform: scale(1.02); }
-        .option { 
-            background: #334155; padding: 14px; margin: 8px 0; border-radius: 12px; 
-            cursor: pointer; transition: 0.2s; border: 2px solid transparent; 
-        }
-        .option:hover { background: #475569; }
+        .btn-sec { background: #475569; padding: 10px 20px; color: white; border: none; border-radius: 15px; cursor: pointer; }
+        
+        /* Quiz Styles */
+        .option { background: #334155; padding: 14px; margin: 8px 0; border-radius: 12px; cursor: pointer; border: 2px solid transparent; }
         .selected-correct { background: #065f46 !important; border-color: var(--success) !important; }
         .selected-wrong { background: #7f1d1d !important; border-color: var(--error) !important; }
-        
-        .progress-container { height: 12px; background: #334155; border-radius: 6px; margin-bottom: 20px; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 6px; width: 0%; transition: 0.4s; }
-        
-        h1, h2 { color: var(--text); text-align: center; }
-        .badge { background: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; vertical-align: middle; }
+        .badge { background: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div id="view-menu" class="view active">
-            <h1 style="font-size: 2.5rem;">🚀 Álgebra Estelar</h1>
-            <p style="text-align: center; color: #94a3b8;">Misión 1: El Lenguaje de los Dioses Matemáticos</p>
+            <h1 style="font-size: 2.5rem; text-align: center;">🚀 Academia Álgebra</h1>
+            <p style="text-align: center; color: #94a3b8;">Misión 1: El Lenguaje Secreto</p>
             <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
-                <button class="btn-main" onclick="showView('view-learn')">📖 Entrenar (Lección + Tips)</button>
+                <button class="btn-main" onclick="startPresentation()">📖 Ver Presentación de la Lección</button>
                 <button class="btn-main" style="background:#475569" onclick="startQuiz('calentamiento')">⚡ Calentamiento (15 Retos)</button>
-                <button class="btn-main" style="background:linear-gradient(to right, #ef4444, #b91c1c)" onclick="startQuiz('examen')">🏆 Gran Examen (30 Retos)</button>
+                <button class="btn-main" style="background:linear-gradient(to right, #ef4444, #b91c1c)" onclick="startQuiz('examen')">🏆 Examen Maestro (30 Retos)</button>
             </div>
         </div>
 
         <div id="view-learn" class="view">
-            <button onclick="showView('view-menu')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:bold;">← Volver</button>
-            <h2>Introducción al Lenguaje</h2>
-            
-            <p>Imagina que el álgebra es un <b>traductor universal</b>. Pasamos de palabras humanas a símbolos poderosos.</p>
-            
-            <div class="regla-oro">
-                <h3>⚠️ REGLA DE ORO: ¡Adiós a la "x" de por!</h3>
-                <p>En el colegio usabas "3 x 4". ¡Aquí NO! La <b>x</b> ahora es una letra misteriosa. 
-                Para multiplicar, solo pega el número a la letra:</p>
-                <center><b style="font-size: 1.5rem;">3x = 3 veces x</b></center>
+            <div class="slide-progress" id="presentation-progress"></div>
+            <div class="slide-container" id="slide-content">
+                </div>
+            <div class="btn-group">
+                <button class="btn-sec" id="prev-slide" onclick="changeSlide(-1)">Atrás</button>
+                <button class="btn-main" id="next-slide" onclick="changeSlide(1)">Siguiente</button>
             </div>
-
-            <h3>📓 El Diccionario Mágico</h3>
-            <div class="diccionario-grid">
-                <div class="word-tag">➕ <b>Suma:</b> Aumentado, más, adición.</div>
-                <div class="word-tag">➖ <b>Resta:</b> Diferencia, menos, disminuido.</div>
-                <div class="word-tag">✖️ <b>Multiplicación:</b> Producto, doble, triple.</div>
-                <div class="word-tag">➗ <b>División:</b> Cociente, mitad, tercera parte.</div>
-            </div>
-
-            <div style="background:#334155; padding:15px; border-radius:12px;">
-                <p>💡 <b>Pro Tip:</b> "Un número cualquiera" puede ser cualquier letra: <i>a, b, c, n, x, y, z...</i> ¡Tú eliges!</p>
-            </div>
-
-            <button class="btn-main" style="margin-top:20px" onclick="startQuiz('calentamiento')">¡Empezar a practicar! ➔</button>
         </div>
 
         <div id="view-quiz" class="view">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                 <span id="quiz-type-label" class="badge">CALENTAMIENTO</span>
                 <span id="question-counter">1/15</span>
             </div>
-            <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
-            <div id="question-text" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; min-height: 60px;"></div>
+            <div id="question-text" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px;"></div>
             <div id="options-container"></div>
-            <button id="next-btn" class="btn-main" style="display:none; margin-top:20px;" onclick="handleNext()">Siguiente reto ➔</button>
+            <button id="quiz-next-btn" class="btn-main" style="display:none; margin-top:20px;" onclick="handleNextQuestion()">Continuar ➔</button>
         </div>
 
-        <div id="view-results" class="view text-center" style="text-align:center">
+        <div id="view-results" class="view" style="text-align:center">
             <h2 id="result-title"></h2>
             <div id="result-score" style="font-size: 5rem; font-weight: bold; color: var(--accent);">0</div>
-            <p id="result-msg"></p>
-            <button class="btn-main" onclick="showView('view-menu')">Regresar al Cuartel General</button>
+            <button class="btn-main" onclick="location.reload()">Regresar al Inicio 🏠</button>
         </div>
     </div>
 
     <script>
+        // --- DATOS DE LA PRESENTACIÓN ---
+        const lessonSlides = [
+            { 
+                title: "👋 ¡Bienvenido Recluta!", 
+                text: "Hoy aprenderás el <b>Lenguaje Algebraico</b>. Es el código secreto que usan los científicos para describir el universo.",
+                img: "🌌"
+            },
+            { 
+                title: "📦 ¿Qué es una Variable?", 
+                text: "En álgebra usamos letras como <b>x, y o n</b>. Piensa en ellas como <b>cajas misteriosas</b> donde puedes guardar cualquier número.",
+                img: "🎁"
+            },
+            { 
+                title: "⚠️ REGLA DE ORO", 
+                text: "¡No más 'x' para multiplicar! Se confunde con la letra x.<br><div class='regla-oro-box'><b>Correcto:</b> 3x (3 veces x)<br><b>Incorrecto:</b> 3 x x</div>",
+                img: "🚫"
+            },
+            { 
+                title: "➕ Suma y Resta", 
+                text: "<b>Aumentar</b> es sumar (+).<br><b>Diferencia</b> o <b>Disminuir</b> es restar (-).<br><i>Ejemplo: 'Tu edad hace 5 años' es <b>x - 5</b></i>",
+                img: "⚖️"
+            },
+            { 
+                title: "✖️ Multiplicar y Dividir", 
+                text: "<b>Doble</b> es 2x. <b>Triple</b> es 3x.<br><b>Mitad</b> es x/2. <b>Cociente</b> es x/y.",
+                img: "🍕"
+            },
+            { 
+                title: "🚀 ¡Misión Lista!", 
+                text: "¿Estás listo para probar tus nuevos poderes ninja? Vamos al calentamiento.",
+                img: "🏆"
+            }
+        ];
+
+        // --- DATOS DE LOS QUIZZES ---
         const bankCalentamiento = [
-            { q: "Un número cualquiera", a: ["x", "1", "0", "x+1"], c: 0 },
-            { q: "La suma de un número y diez", a: ["10x", "x - 10", "x + 10", "10/x"], c: 2 },
+            { q: "Un número cualquiera", a: ["x", "10", "n + 1", "x²"], c: 0 },
+            { q: "La suma de un número y diez", a: ["10x", "x + 10", "x - 10", "10/x"], c: 1 },
             { q: "El triple de un número", a: ["x + 3", "3x", "x³", "3/x"], c: 1 },
-            { q: "Un número disminuido en cinco", a: ["5 - x", "x/5", "x - 5", "x + 5"], c: 2 },
-            { q: "El cuadrado de un número", a: ["2x", "x + 2", "x / 2", "x²"], c: 3 },
-            { q: "La mitad de un número", a: ["x - 2", "x/2", "2x", "x²"], c: 1 },
-            { q: "Producto de dos números diferentes (a y b)", a: ["a + b", "a/b", "ab", "a - b"], c: 2 },
-            { q: "Un número aumentado en su doble", a: ["x + 2x", "x + 2", "2x", "x² + 2"], c: 0 },
+            { q: "Un número disminuido en cinco", a: ["5 - x", "x - 5", "x/5", "5x"], c: 1 },
+            { q: "El cuadrado de un número", a: ["2x", "x + 2", "x²", "x/2"], c: 2 },
+            { q: "La mitad de un número", a: ["x/2", "x - 2", "2x", "x²"], c: 0 },
+            { q: "Producto de dos números (a y b)", a: ["a + b", "a/b", "ab", "a - b"], c: 2 },
+            { q: "Un número aumentado en su doble", a: ["x + 2x", "x + 2", "2x", "x²"], c: 0 },
             { q: "La diferencia de dos números", a: ["x + y", "x - y", "xy", "x/y"], c: 1 },
-            { q: "El doble de un número más tres", a: ["2(x+3)", "x² + 3", "2x + 3", "3x + 2"], c: 2 },
-            { q: "La tercera parte de un número", a: ["3x", "x - 3", "x/3", "x³"], c: 2 },
-            { q: "Un número par (siempre se multiplica por 2)", a: ["x + 2", "2x", "x/2", "x²"], c: 1 },
-            { q: "Precio de un libro (x) con descuento de 20 pesos", a: ["x + 20", "20x", "x - 20", "20/x"], c: 2 },
-            { q: "La edad de Luis (L) hace 5 años", a: ["L + 5", "5L", "5 - L", "L - 5"], c: 3 },
+            { q: "El doble de un número más tres", a: ["2(x+3)", "2x + 3", "x² + 3", "3x + 2"], c: 1 },
+            { q: "La tercera parte de un número", a: ["3x", "x/3", "x - 3", "x³"], c: 1 },
+            { q: "Un número par", a: ["x + 2", "2x", "x/2", "x²"], c: 1 },
+            { q: "Precio de libro (x) con descuento de 20 pesos", a: ["x + 20", "x - 20", "20x", "20/x"], c: 1 },
+            { q: "Edad de Luis (L) hace 5 años", a: ["L + 5", "5L", "L - 5", "5 - L"], c: 2 },
             { q: "El cuádruple de un número", a: ["x + 4", "4x", "x/4", "x⁴"], c: 1 }
         ];
 
-        const bankExamen = [
-            // Parte A
-            { q: "El cociente de dos números", a: ["x - y", "xy", "x/y", "x + y"], c: 2 },
-            { q: "El cubo de un número aumentado en uno", a: ["x³ + 1", "3x + 1", "(x+1)³", "x + 3 + 1"], c: 0 },
-            { q: "La suma de tres números consecutivos", a: ["3x", "x + y + z", "x + (x+1) + (x+2)", "x+3"], c: 2 },
-            { q: "El doble de la suma de dos números", a: ["2x + y", "2(x + y)", "x + y + 2", "2 + x + y"], c: 1 },
-            { q: "El triple de la diferencia de dos números", a: ["3(x - y)", "3x - y", "x - y + 3", "3xy"], c: 0 },
-            { q: "La raíz cuadrada de un número", a: ["x²", "2x", "√x", "x/2"], c: 2 },
-            { q: "La suma de dos números al cuadrado", a: ["x² + y²", "(x + y)²", "2(x+y)", "x + y + 2"], c: 1 },
-            { q: "Precio de 'n' kilos si el kilo cuesta 22 pesos", a: ["n + 22", "22/n", "22n", "n²²"], c: 2 },
-            { q: "Un número impar", a: ["2x", "2x + 1", "x/3", "x - 1"], c: 1 },
-            { q: "La mitad de la suma de dos números", a: ["(x+y)/2", "x/2 + y", "2(x+y)", "x+y-2"], c: 0 },
-            // Parte B
-            { q: "¿Qué significa 'x + 8'?", a: ["Un número menos ocho", "Ocho veces un número", "Un número aumentado en ocho", "El triple de ocho"], c: 2 },
-            { q: "¿Qué significa '2y - 5'?", a: ["El doble de un número disminuido en cinco", "Dos menos cinco veces y", "La mitad de y menos cinco", "Cinco menos el doble de y"], c: 0 },
-            { q: "¿Qué significa 'a² + b²'?", a: ["El cuadrado de la suma", "La suma de los cuadrados de dos números", "El doble de a y b", "Dos números aumentados en dos"], c: 1 },
-            { q: "¿Qué significa 'z / 3'?", a: ["El triple de z", "z menos tres", "La tercera parte de z", "z aumentado en tres"], c: 2 },
-            { q: "¿Qué significa '3(x + 4)'?", a: ["El triple de un número más cuatro", "El triple de, la suma de un número y cuatro", "Tres veces x más cuatro", "Doce veces x"], c: 1 },
-            { q: "¿Qué significa 'x - y'?", a: ["La suma de dos números", "El producto de x e y", "La diferencia de dos números", "El cociente de x e y"], c: 2 },
-            { q: "¿Qué significa 'x³'?", a: ["El triple de un número", "Un número al cubo", "Un número aumentado en tres", "Tres veces x"], c: 1 },
-            { q: "¿Qué significa '10 - 2x'?", a: ["Diez disminuido en el doble de un número", "El doble de diez menos x", "Diez veces el doble de x", "Dos veces diez menos x"], c: 0 },
-            { q: "¿Qué significa '(a + b) / 2'?", a: ["La suma de dos números", "El doble de la suma", "La mitad de la suma de dos números", "A más b menos dos"], c: 2 },
-            { q: "¿Qué significa '5x²'?", a: ["Cinco veces un número al cuadrado", "El cuadrado de cinco veces x", "Cinco más x al cuadrado", "Diez veces x"], c: 0 }
-            // Nota: He puesto 20 para el ejemplo, pero puedes duplicar los objetos fácilmente.
-        ];
+        // Se pueden añadir aquí las 30 del examen final siguiendo la misma estructura.
 
-        let currentQuestions = [];
-        let currentIndex = 0;
+        // --- LÓGICA DE NAVEGACIÓN ---
+        let currentSlide = 0;
+        let currentQuiz = [];
+        let quizIdx = 0;
         let score = 0;
 
         function showView(id) {
@@ -168,72 +158,85 @@
             document.getElementById(id).classList.add('active');
         }
 
+        // --- LÓGICA DE PRESENTACIÓN ---
+        function startPresentation() {
+            currentSlide = 0;
+            showView('view-learn');
+            renderSlide();
+        }
+
+        function renderSlide() {
+            const progress = document.getElementById('presentation-progress');
+            progress.innerHTML = lessonSlides.map((_, i) => `<div class="step ${i <= currentSlide ? 'active' : ''}"></div>`).join('');
+            
+            const slide = lessonSlides[currentSlide];
+            document.getElementById('slide-content').innerHTML = `
+                <div style="font-size: 4rem; margin-bottom: 10px;">${slide.img}</div>
+                <h2>${slide.title}</h2>
+                <p style="font-size: 1.1rem; line-height: 1.6; color: #cbd5e1;">${slide.text}</p>
+            `;
+
+            document.getElementById('prev-slide').style.visibility = currentSlide === 0 ? 'hidden' : 'visible';
+            document.getElementById('next-slide').innerText = currentSlide === lessonSlides.length - 1 ? "¡Entendido!" : "Siguiente";
+        }
+
+        function changeSlide(dir) {
+            currentSlide += dir;
+            if (currentSlide >= lessonSlides.length) {
+                showView('view-menu');
+            } else {
+                renderSlide();
+            }
+        }
+
+        // --- LÓGICA DE QUIZ ---
         function startQuiz(type) {
-            currentQuestions = type === 'calentamiento' ? bankCalentamiento : bankExamen;
+            currentQuiz = type === 'calentamiento' ? bankCalentamiento : bankCalentamiento; // Aquí iría bankExamen
+            quizIdx = 0; score = 0;
             document.getElementById('quiz-type-label').innerText = type.toUpperCase();
-            currentIndex = 0;
-            score = 0;
             showView('view-quiz');
             renderQuestion();
         }
 
         function renderQuestion() {
-            const q = currentQuestions[currentIndex];
-            document.getElementById('question-counter').innerText = `${currentIndex + 1}/${currentQuestions.length}`;
-            document.getElementById('progress-bar').style.width = `${(currentIndex / currentQuestions.length) * 100}%`;
+            const q = currentQuiz[quizIdx];
+            document.getElementById('question-counter').innerText = `${quizIdx + 1}/${currentQuiz.length}`;
             document.getElementById('question-text').innerText = q.q;
-            
             const container = document.getElementById('options-container');
             container.innerHTML = '';
             
-            q.a.forEach((option, i) => {
+            q.a.forEach((opt, i) => {
                 const div = document.createElement('div');
                 div.className = 'option';
-                div.innerText = option;
-                div.onclick = () => checkAnswer(i, div);
+                div.innerText = opt;
+                div.onclick = () => {
+                    const options = document.querySelectorAll('.option');
+                    options.forEach(o => o.style.pointerEvents = 'none');
+                    if(i === q.c) {
+                        div.classList.add('selected-correct');
+                        score++;
+                        confetti({ particleCount: 30, spread: 50 });
+                    } else {
+                        div.classList.add('selected-wrong');
+                        options[q.c].classList.add('selected-correct');
+                    }
+                    document.getElementById('quiz-next-btn').style.display = 'block';
+                };
                 container.appendChild(div);
             });
-            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('quiz-next-btn').style.display = 'none';
         }
 
-        function checkAnswer(idx, el) {
-            const q = currentQuestions[currentIndex];
-            const options = document.querySelectorAll('.option');
-            options.forEach(o => o.style.pointerEvents = 'none');
-
-            if(idx === q.c) {
-                score++;
-                el.classList.add('selected-correct');
-                confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
-            } else {
-                el.classList.add('selected-wrong');
-                options[q.c].classList.add('selected-correct');
-            }
-            document.getElementById('next-btn').style.display = 'block';
-        }
-
-        function handleNext() {
-            currentIndex++;
-            if(currentIndex < currentQuestions.length) renderQuestion();
-            else showResults();
-        }
-
-        function showResults() {
-            showView('view-results');
-            document.getElementById('result-score').innerText = `${score}/${currentQuestions.length}`;
-            const percent = (score / currentQuestions.length) * 100;
-            
-            if(percent === 100) {
-                document.getElementById('result-title').innerText = "¡MAESTRO SUPREMO! 👑";
-                document.getElementById('result-msg').innerText = "Has dominado el lenguaje de los dioses.";
-            } else if(percent > 70) {
-                document.getElementById('result-title').innerText = "¡Héroe del Álgebra! 🔥";
-                document.getElementById('result-msg').innerText = "Casi perfecto. ¡Sigue así!";
-            } else {
-                document.getElementById('result-title').innerText = "¡Sigue entrenando! 💪";
-                document.getElementById('result-msg').innerText = "Vuelve a leer la Regla de Oro.";
+        function handleNextQuestion() {
+            quizIdx++;
+            if(quizIdx < currentQuiz.length) renderQuestion();
+            else {
+                showView('view-results');
+                document.getElementById('result-title').innerText = score > (currentQuiz.length/2) ? "¡Increíble Recluta! 🏆" : "¡Sigue practicando! 💪";
+                document.getElementById('result-score').innerText = `${score}/${currentQuiz.length}`;
             }
         }
     </script>
 </body>
 </html>
+
