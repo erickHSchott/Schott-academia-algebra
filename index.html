@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academia Álgebra Estelar 🌌</title>
+    <link rel="icon" href="data:,"> 
+    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
@@ -68,7 +70,7 @@
 
     <div class="container">
         <div class="header">
-            <img src="https://github.com/erickHSchott/Schott-academia-algebra/blob/main/pose1.png" class="mascot-mini" alt="Mascota">
+            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-mini" alt="Mascota">
             <div>
                 <h2 style="margin:0; font-size: 1.2rem;">Álgebra Estelar</h2>
                 <div id="streak-counter">🔥 Racha: 0</div>
@@ -112,7 +114,7 @@
         </div>
 
         <div id="view-results" class="view" style="text-align: center;">
-            <img src="https://github.com/erickHSchott/Schott-academia-algebra/blob/main/pose5.png" style="width: 150px;">
+            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" style="width: 150px;">
             <h1 id="res-title">¡Misión Cumplida!</h1>
             <div style="font-size: 4rem; font-weight: bold; color: var(--accent);" id="res-score">0</div>
             <p id="res-msg"></p>
@@ -121,16 +123,14 @@
     </div>
 
     <script>
-        // --- BASE DE DATOS DE PREGUNTAS (IDs únicos para el algoritmo) ---
+        // --- BASE DE DATOS DE PREGUNTAS ---
         const questions = [
             { id: "c1", q: "Un número cualquiera", a: ["x", "1", "0", "n+1"], c: 0, bank: "calentamiento" },
             { id: "c2", q: "La suma de un número y diez", a: ["10x", "x-10", "x+10", "10/x"], c: 2, bank: "calentamiento" },
             { id: "c3", q: "El triple de un número", a: ["x+3", "x³", "3x", "3-x"], c: 2, bank: "calentamiento" },
-            // ... (Agrega aquí el resto de tus 45 preguntas con IDs únicos: c4, c5... e1, e2...)
             { id: "e1", q: "El cociente de dos números", a: ["x-y", "xy", "x/y", "x+y"], c: 2, bank: "examen" }
         ];
 
-        // --- LÓGICA DE APRENDIZAJE ADAPTATIVO ---
         let mastery = JSON.parse(localStorage.getItem('algebraMastery')) || {};
 
         function saveError(id) {
@@ -149,10 +149,11 @@
         function resetMastery() { localStorage.clear(); location.reload(); }
 
         // --- LÓGICA DE PRESENTACIÓN ---
+        // URLs Corregidas a RAW
         const slides = [
-            { t: "¡Bienvenido Recluta!", d: "Soy tu guía en esta misión espacial. El álgebra es el idioma de las estrellas.", i: "https://github.com/erickHSchott/Schott-academia-algebra/blob/main/pose2.png" },
-            { t: "¿Qué es una Variable?", d: "Es una <b>caja misteriosa</b> (como x, n o y) donde guardamos números.", i: "https://github.com/erickHSchott/Schott-academia-algebra/blob/main/pose3.png" },
-            { t: "La Regla de Oro", d: "⚠️ ¡No uses la 'x' para multiplicar! Se confunde. Escribe <b>3x</b> para decir 3 veces x.", i: "https://github.com/erickHSchott/Schott-academia-algebra/blob/main/pose4.png" }
+            { t: "¡Bienvenido Recluta!", d: "Soy tu guía en esta misión espacial. El álgebra es el idioma de las estrellas.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose2.png" },
+            { t: "¿Qué es una Variable?", d: "Es una <b>caja misteriosa</b> (como x, n o y) donde guardamos números.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose3.png" },
+            { t: "La Regla de Oro", d: "⚠️ ¡No uses la 'x' para multiplicar! Se confunde. Escribe <b>3x</b> para decir 3 veces x.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png" }
         ];
         let currentSlide = 0;
 
@@ -185,14 +186,13 @@
         }
 
         function startQuiz(bankType) {
-            // ALGORITMO: Filtrar banco + Priorizar errores de LocalStorage
             let pool = questions.filter(q => q.bank === bankType || bankType === 'examen');
             pool.sort((a, b) => {
                 let errA = mastery[a.id]?.errors || 0;
                 let errB = mastery[b.id]?.errors || 0;
-                return errB - errA; // Las de más errores van primero
+                return errB - errA;
             });
-            activeQuiz = pool.slice(0, 15); // Tomamos 15 para no agotar
+            activeQuiz = pool.slice(0, 15);
             qIndex = 0; score = 0;
             showView('view-quiz');
             renderQuestion();
@@ -244,11 +244,12 @@
             const img = document.getElementById('mascot-feedback');
             const txt = document.getElementById('feedback-text');
             
+            // Sustitución de placeholders por URLs reales
             if (isCorrect) {
-                img.src = "REEMPLAZA_CON_URL_POSE_5";
+                img.src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png";
                 txt.innerHTML = "<b style='color:var(--success)'>¡Excelente!</b> El código es correcto.";
             } else {
-                img.src = "REEMPLAZA_CON_URL_POSE_4";
+                img.src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png";
                 txt.innerHTML = "<b style='color:var(--error)'>¡Casi!</b> El Axolote guardará esta para repasarla.";
             }
         }
@@ -267,4 +268,5 @@
     </script>
 </body>
 </html>
+
 
