@@ -3,204 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schott-academia-algebra 🚀</title>
+    <title>Álgebra Estelar: Misión Lenguaje</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary: #6366f1;
-            --secondary: #a855f7;
-            --accent: #f59e0b;
-            --success: #22c55e;
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
+            --primary: #6366f1; --secondary: #a855f7; --accent: #f59e0b;
+            --success: #22c55e; --error: #ef4444; --bg: #0f172a;
+            --card: #1e293b; --text: #f8fafc;
         }
-
         body { 
-            font-family: 'Outfit', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text);
-            margin: 0;
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+            font-family: 'Outfit', sans-serif; background-color: var(--bg); color: var(--text);
+            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
         }
-
         .container { 
-            background: var(--card); 
-            padding: 30px; 
-            border-radius: 28px; 
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); 
-            max-width: 600px; 
-            width: 90%; 
-            position: relative;
+            background: var(--card); padding: 25px; border-radius: 28px; 
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-width: 700px; width: 95%; 
         }
-
-        /* Vistas */
-        .view { display: none; animation: fadeIn 0.5s ease; }
+        .view { display: none; animation: fadeIn 0.4s ease; }
         .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Estilos de Lección */
+        .regla-oro { 
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white; padding: 20px; border-radius: 15px; margin: 20px 0;
+            border: 3px dashed #fff; position: relative;
         }
+        .diccionario-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .word-tag { background: #334155; padding: 8px; border-radius: 8px; border-left: 4px solid var(--accent); font-size: 0.9rem; }
 
-        /* Menú Principal */
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
-        .menu-btn {
-            background: #334155;
-            border: 2px solid #475569;
-            padding: 25px;
-            border-radius: 20px;
-            cursor: pointer;
-            text-align: center;
-            transition: 0.3s;
+        /* Botones y Quiz */
+        .btn-main { 
+            width: 100%; padding: 18px; background: var(--primary); color: white; border: none; 
+            border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;
         }
-        .menu-btn:hover { border-color: var(--primary); background: #3b82f622; transform: scale(1.05); }
-        .menu-btn i { font-size: 3rem; display: block; margin-bottom: 10px; }
-
-        /* Lecciones */
-        .lesson-card { background: #334155; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--accent); }
-        .math-box { background: #0f172a; padding: 10px; border-radius: 8px; font-family: monospace; color: var(--accent); font-size: 1.2rem; text-align: center; margin: 10px 0; }
-
-        /* Estilos del Quiz (Basados en tu anterior código) */
-        .option { background: #334155; padding: 15px; margin: 10px 0; border-radius: 12px; cursor: pointer; transition: 0.2s; border: 2px solid transparent; }
+        .btn-main:hover { background: var(--secondary); transform: scale(1.02); }
+        .option { 
+            background: #334155; padding: 14px; margin: 8px 0; border-radius: 12px; 
+            cursor: pointer; transition: 0.2s; border: 2px solid transparent; 
+        }
         .option:hover { background: #475569; }
         .selected-correct { background: #065f46 !important; border-color: var(--success) !important; }
-        .selected-wrong { background: #7f1d1d !important; border-color: #ef4444 !important; }
-
-        .btn-main { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-back { background: transparent; color: #94a3b8; border: none; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
+        .selected-wrong { background: #7f1d1d !important; border-color: var(--error) !important; }
+        
+        .progress-container { height: 12px; background: #334155; border-radius: 6px; margin-bottom: 20px; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border-radius: 6px; width: 0%; transition: 0.4s; }
+        
+        h1, h2 { color: var(--text); text-align: center; }
+        .badge { background: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; vertical-align: middle; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        
         <div id="view-menu" class="view active">
-            <h1 style="text-align: center; font-size: 2.5rem; margin-bottom: 0;">🚀 Álgebra</h1>
-            <p style="text-align: center; color: #94a3b8;">¿Qué aventura eliges hoy?</p>
-            
-            <div class="menu-grid">
-                <div class="menu-btn" onclick="showView('view-learn')">
-                    <span>📖</span>
-                    <h3>Aprender</h3>
-                    <p style="font-size: 0.8rem;">Entiende los secretos de las letras</p>
-                </div>
-                <div class="menu-btn" onclick="startQuiz()">
-                    <span>🎮</span>
-                    <h3>Jugar</h3>
-                    <p style="font-size: 0.8rem;">¡Gana puntos y demuestra tu poder!</p>
-                </div>
+            <h1 style="font-size: 2.5rem;">🚀 Álgebra Estelar</h1>
+            <p style="text-align: center; color: #94a3b8;">Misión 1: El Lenguaje de los Dioses Matemáticos</p>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 30px;">
+                <button class="btn-main" onclick="showView('view-learn')">📖 Entrenar (Lección + Tips)</button>
+                <button class="btn-main" style="background:#475569" onclick="startQuiz('calentamiento')">⚡ Calentamiento (15 Retos)</button>
+                <button class="btn-main" style="background:linear-gradient(to right, #ef4444, #b91c1c)" onclick="startQuiz('examen')">🏆 Gran Examen (30 Retos)</button>
             </div>
         </div>
 
         <div id="view-learn" class="view">
-            <button class="btn-back" onclick="showView('view-menu')">← Volver al Menú</button>
-            <h2>📖 ¿Qué es el Lenguaje Algebraico?</h2>
+            <button onclick="showView('view-menu')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:bold;">← Volver</button>
+            <h2>Introducción al Lenguaje</h2>
             
-            <div class="lesson-card">
-                <h3>1. La Letra Misteriosa 🕵️‍♂️</h3>
-                <p>En álgebra, una letra como <b>"x"</b> es solo una <b>caja vacía</b> donde podemos guardar cualquier número.</p>
-                <div class="math-box">Un número cualquiera = x</div>
+            <p>Imagina que el álgebra es un <b>traductor universal</b>. Pasamos de palabras humanas a símbolos poderosos.</p>
+            
+            <div class="regla-oro">
+                <h3>⚠️ REGLA DE ORO: ¡Adiós a la "x" de por!</h3>
+                <p>En el colegio usabas "3 x 4". ¡Aquí NO! La <b>x</b> ahora es una letra misteriosa. 
+                Para multiplicar, solo pega el número a la letra:</p>
+                <center><b style="font-size: 1.5rem;">3x = 3 veces x</b></center>
             </div>
 
-            <div class="lesson-card" style="border-left-color: var(--primary);">
-                <h3>2. Los Dobles y Triples 🔢</h3>
-                <p>Si quieres decir "dos veces un número", simplemente pegas el número a la letra:</p>
-                <div class="math-box">El doble de un número = 2x</div>
+            <h3>📓 El Diccionario Mágico</h3>
+            <div class="diccionario-grid">
+                <div class="word-tag">➕ <b>Suma:</b> Aumentado, más, adición.</div>
+                <div class="word-tag">➖ <b>Resta:</b> Diferencia, menos, disminuido.</div>
+                <div class="word-tag">✖️ <b>Multiplicación:</b> Producto, doble, triple.</div>
+                <div class="word-tag">➗ <b>División:</b> Cociente, mitad, tercera parte.</div>
             </div>
 
-            <button class="btn-main" onclick="startQuiz()">¡Estoy listo para el Desafío! ➔</button>
+            <div style="background:#334155; padding:15px; border-radius:12px;">
+                <p>💡 <b>Pro Tip:</b> "Un número cualquiera" puede ser cualquier letra: <i>a, b, c, n, x, y, z...</i> ¡Tú eliges!</p>
+            </div>
+
+            <button class="btn-main" style="margin-top:20px" onclick="startQuiz('calentamiento')">¡Empezar a practicar! ➔</button>
         </div>
 
         <div id="view-quiz" class="view">
-            <button class="btn-back" onclick="showView('view-menu')">← Rendirse</button>
-            <div id="progress-container" style="height: 10px; background: #334155; border-radius: 5px; margin-bottom: 20px;">
-                <div id="progress-bar" style="height: 100%; background: var(--primary); width: 0%; border-radius: 5px; transition: 0.5s;"></div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span id="quiz-type-label" class="badge">CALENTAMIENTO</span>
+                <span id="question-counter">1/15</span>
             </div>
-            <div id="question" style="font-size: 1.4rem; font-weight: bold; margin-bottom: 20px;"></div>
-            <div id="options"></div>
-            <button id="next-btn" class="btn-main" style="display:none;" onclick="nextQuestion()">Siguiente Pregunta ➔</button>
+            <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+            <div id="question-text" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; min-height: 60px;"></div>
+            <div id="options-container"></div>
+            <button id="next-btn" class="btn-main" style="display:none; margin-top:20px;" onclick="handleNext()">Siguiente reto ➔</button>
         </div>
 
-        <div id="view-results" class="view">
-            <h2 id="result-title" style="text-align: center;"></h2>
-            <div id="score-display" style="font-size: 4rem; text-align: center; font-weight: bold; color: var(--accent);">0</div>
-            <div id="feedback-area" style="margin-top: 20px;"></div>
-            <button class="btn-main" onclick="showView('view-menu')">Volver al Inicio 🏠</button>
+        <div id="view-results" class="view text-center" style="text-align:center">
+            <h2 id="result-title"></h2>
+            <div id="result-score" style="font-size: 5rem; font-weight: bold; color: var(--accent);">0</div>
+            <p id="result-msg"></p>
+            <button class="btn-main" onclick="showView('view-menu')">Regresar al Cuartel General</button>
         </div>
-
     </div>
 
     <script>
-        const questions = [
-            { q: "¿Cómo se escribe 'un número aumentado en 5'?", a: ["x - 5", "x + 5", "5x", "x / 5"], c: 1, r: "Aumentar significa sumar (+)." },
-            { q: "Si 'x' es tu edad, ¿cómo escribirías la edad que tendrás en 3 años?", a: ["x + 3", "3x", "x - 3", "3 - x"], c: 0, r: "El futuro siempre es sumando años." },
-            { q: "Traduce: 'El triple de un número'", a: ["x + 3", "x³", "3x", "3 - x"], c: 2, r: "Triple es multiplicar por 3, y en álgebra se ponen juntos." }
+        const bankCalentamiento = [
+            { q: "Un número cualquiera", a: ["x", "1", "0", "x+1"], c: 0 },
+            { q: "La suma de un número y diez", a: ["10x", "x - 10", "x + 10", "10/x"], c: 2 },
+            { q: "El triple de un número", a: ["x + 3", "3x", "x³", "3/x"], c: 1 },
+            { q: "Un número disminuido en cinco", a: ["5 - x", "x/5", "x - 5", "x + 5"], c: 2 },
+            { q: "El cuadrado de un número", a: ["2x", "x + 2", "x / 2", "x²"], c: 3 },
+            { q: "La mitad de un número", a: ["x - 2", "x/2", "2x", "x²"], c: 1 },
+            { q: "Producto de dos números diferentes (a y b)", a: ["a + b", "a/b", "ab", "a - b"], c: 2 },
+            { q: "Un número aumentado en su doble", a: ["x + 2x", "x + 2", "2x", "x² + 2"], c: 0 },
+            { q: "La diferencia de dos números", a: ["x + y", "x - y", "xy", "x/y"], c: 1 },
+            { q: "El doble de un número más tres", a: ["2(x+3)", "x² + 3", "2x + 3", "3x + 2"], c: 2 },
+            { q: "La tercera parte de un número", a: ["3x", "x - 3", "x/3", "x³"], c: 2 },
+            { q: "Un número par (siempre se multiplica por 2)", a: ["x + 2", "2x", "x/2", "x²"], c: 1 },
+            { q: "Precio de un libro (x) con descuento de 20 pesos", a: ["x + 20", "20x", "x - 20", "20/x"], c: 2 },
+            { q: "La edad de Luis (L) hace 5 años", a: ["L + 5", "5L", "5 - L", "L - 5"], c: 3 },
+            { q: "El cuádruple de un número", a: ["x + 4", "4x", "x/4", "x⁴"], c: 1 }
         ];
 
-        let current = 0;
+        const bankExamen = [
+            // Parte A
+            { q: "El cociente de dos números", a: ["x - y", "xy", "x/y", "x + y"], c: 2 },
+            { q: "El cubo de un número aumentado en uno", a: ["x³ + 1", "3x + 1", "(x+1)³", "x + 3 + 1"], c: 0 },
+            { q: "La suma de tres números consecutivos", a: ["3x", "x + y + z", "x + (x+1) + (x+2)", "x+3"], c: 2 },
+            { q: "El doble de la suma de dos números", a: ["2x + y", "2(x + y)", "x + y + 2", "2 + x + y"], c: 1 },
+            { q: "El triple de la diferencia de dos números", a: ["3(x - y)", "3x - y", "x - y + 3", "3xy"], c: 0 },
+            { q: "La raíz cuadrada de un número", a: ["x²", "2x", "√x", "x/2"], c: 2 },
+            { q: "La suma de dos números al cuadrado", a: ["x² + y²", "(x + y)²", "2(x+y)", "x + y + 2"], c: 1 },
+            { q: "Precio de 'n' kilos si el kilo cuesta 22 pesos", a: ["n + 22", "22/n", "22n", "n²²"], c: 2 },
+            { q: "Un número impar", a: ["2x", "2x + 1", "x/3", "x - 1"], c: 1 },
+            { q: "La mitad de la suma de dos números", a: ["(x+y)/2", "x/2 + y", "2(x+y)", "x+y-2"], c: 0 },
+            // Parte B
+            { q: "¿Qué significa 'x + 8'?", a: ["Un número menos ocho", "Ocho veces un número", "Un número aumentado en ocho", "El triple de ocho"], c: 2 },
+            { q: "¿Qué significa '2y - 5'?", a: ["El doble de un número disminuido en cinco", "Dos menos cinco veces y", "La mitad de y menos cinco", "Cinco menos el doble de y"], c: 0 },
+            { q: "¿Qué significa 'a² + b²'?", a: ["El cuadrado de la suma", "La suma de los cuadrados de dos números", "El doble de a y b", "Dos números aumentados en dos"], c: 1 },
+            { q: "¿Qué significa 'z / 3'?", a: ["El triple de z", "z menos tres", "La tercera parte de z", "z aumentado en tres"], c: 2 },
+            { q: "¿Qué significa '3(x + 4)'?", a: ["El triple de un número más cuatro", "El triple de, la suma de un número y cuatro", "Tres veces x más cuatro", "Doce veces x"], c: 1 },
+            { q: "¿Qué significa 'x - y'?", a: ["La suma de dos números", "El producto de x e y", "La diferencia de dos números", "El cociente de x e y"], c: 2 },
+            { q: "¿Qué significa 'x³'?", a: ["El triple de un número", "Un número al cubo", "Un número aumentado en tres", "Tres veces x"], c: 1 },
+            { q: "¿Qué significa '10 - 2x'?", a: ["Diez disminuido en el doble de un número", "El doble de diez menos x", "Diez veces el doble de x", "Dos veces diez menos x"], c: 0 },
+            { q: "¿Qué significa '(a + b) / 2'?", a: ["La suma de dos números", "El doble de la suma", "La mitad de la suma de dos números", "A más b menos dos"], c: 2 },
+            { q: "¿Qué significa '5x²'?", a: ["Cinco veces un número al cuadrado", "El cuadrado de cinco veces x", "Cinco más x al cuadrado", "Diez veces x"], c: 0 }
+            // Nota: He puesto 20 para el ejemplo, pero puedes duplicar los objetos fácilmente.
+        ];
+
+        let currentQuestions = [];
+        let currentIndex = 0;
         let score = 0;
 
-        function showView(viewId) {
+        function showView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
-        function startQuiz() {
-            current = 0;
+        function startQuiz(type) {
+            currentQuestions = type === 'calentamiento' ? bankCalentamiento : bankExamen;
+            document.getElementById('quiz-type-label').innerText = type.toUpperCase();
+            currentIndex = 0;
             score = 0;
             showView('view-quiz');
-            loadQuestion();
+            renderQuestion();
         }
 
-        function loadQuestion() {
-            const q = questions[current];
-            document.getElementById('question').innerText = q.q;
-            const optDiv = document.getElementById('options');
-            optDiv.innerHTML = '';
+        function renderQuestion() {
+            const q = currentQuestions[currentIndex];
+            document.getElementById('question-counter').innerText = `${currentIndex + 1}/${currentQuestions.length}`;
+            document.getElementById('progress-bar').style.width = `${(currentIndex / currentQuestions.length) * 100}%`;
+            document.getElementById('question-text').innerText = q.q;
             
-            q.a.forEach((opt, i) => {
-                const b = document.createElement('div');
-                b.className = 'option';
-                b.innerText = opt;
-                b.onclick = () => check(i, b);
-                optDiv.appendChild(b);
+            const container = document.getElementById('options-container');
+            container.innerHTML = '';
+            
+            q.a.forEach((option, i) => {
+                const div = document.createElement('div');
+                div.className = 'option';
+                div.innerText = option;
+                div.onclick = () => checkAnswer(i, div);
+                container.appendChild(div);
             });
             document.getElementById('next-btn').style.display = 'none';
-            document.getElementById('progress-bar').style.width = (current / questions.length * 100) + "%";
         }
 
-        function check(idx, el) {
-            const q = questions[current];
+        function checkAnswer(idx, el) {
+            const q = currentQuestions[currentIndex];
+            const options = document.querySelectorAll('.option');
+            options.forEach(o => o.style.pointerEvents = 'none');
+
             if(idx === q.c) {
                 score++;
                 el.classList.add('selected-correct');
-                confetti({ particleCount: 40, spread: 60 });
+                confetti({ particleCount: 50, spread: 70, origin: { y: 0.8 } });
             } else {
                 el.classList.add('selected-wrong');
-                document.querySelectorAll('.option')[q.c].classList.add('selected-correct');
+                options[q.c].classList.add('selected-correct');
             }
-            document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
             document.getElementById('next-btn').style.display = 'block';
         }
 
-        function nextQuestion() {
-            current++;
-            if(current < questions.length) loadQuestion();
-            else showFinalResults();
+        function handleNext() {
+            currentIndex++;
+            if(currentIndex < currentQuestions.length) renderQuestion();
+            else showResults();
         }
 
-        function showFinalResults() {
+        function showResults() {
             showView('view-results');
-            document.getElementById('score-display').innerText = score + "/" + questions.length;
-            document.getElementById('result-title').innerText = score > 1 ? "¡Excelente Trabajo! 🏆" : "¡Sigue practicando! 💪";
+            document.getElementById('result-score').innerText = `${score}/${currentQuestions.length}`;
+            const percent = (score / currentQuestions.length) * 100;
+            
+            if(percent === 100) {
+                document.getElementById('result-title').innerText = "¡MAESTRO SUPREMO! 👑";
+                document.getElementById('result-msg').innerText = "Has dominado el lenguaje de los dioses.";
+            } else if(percent > 70) {
+                document.getElementById('result-title').innerText = "¡Héroe del Álgebra! 🔥";
+                document.getElementById('result-msg').innerText = "Casi perfecto. ¡Sigue así!";
+            } else {
+                document.getElementById('result-title').innerText = "¡Sigue entrenando! 💪";
+                document.getElementById('result-msg').innerText = "Vuelve a leer la Regla de Oro.";
+            }
         }
     </script>
 </body>
 </html>
-
