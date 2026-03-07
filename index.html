@@ -3,270 +3,327 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academia Álgebra Estelar 🌌</title>
-    <link rel="icon" href="data:,"> 
-    
+    <title>Protocolo Álgebra Estelar 🌌</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary: #9F73DA; /* Púrpura Axolote */
-            --secondary: #35BBB2; /* Teal Axolote */
-            --accent: #f59e0b; /* Naranja Alerta */
-            --bg: #0f172a;
-            --card: #1e293b;
-            --text: #f8fafc;
-            --success: #22c55e;
-            --error: #ef4444;
+            --primary: #9F73DA; --secondary: #35BBB2; --accent: #f59e0b;
+            --bg: #0f172a; --card: #1e293b; --text: #f8fafc;
+            --success: #22c55e; --error: #ef4444; --shield: #3b82f6;
         }
 
         body { 
             font-family: 'Outfit', sans-serif; background-color: var(--bg); color: var(--text);
             margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            overflow-x: hidden;
         }
 
         .container { 
             background: var(--card); padding: 25px; border-radius: 28px; 
             box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); max-width: 600px; width: 92%; 
-            position: relative;
         }
 
-        /* --- UI COMPONENTS --- */
+        /* --- ESCUDO CON LUCES Y BRILLO --- */
+        .shield-container { 
+            width: 120px; height: 12px; background: #334155; border-radius: 20px; 
+            margin-top: 5px; overflow: hidden; border: 1px solid #475569; position: relative;
+        }
+        .shield-fill { 
+            height: 100%; width: 0%; background: var(--shield); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            box-shadow: 0 0 5px var(--shield);
+        }
+
+        /* Animación cuando el escudo está lleno */
+        .shield-ready {
+            animation: pulse-glow 1.5s infinite alternate;
+            background: linear-gradient(90deg, #3b82f6, #60a5fa, #3b82f6);
+            background-size: 200% 100%;
+            animation: pulse-glow 1s infinite alternate, move-light 2s linear infinite;
+        }
+
+        @keyframes pulse-glow {
+            from { filter: brightness(1) drop-shadow(0 0 2px var(--shield)); }
+            to { filter: brightness(1.5) drop-shadow(0 0 12px var(--shield)); }
+        }
+        @keyframes move-light {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* --- BOTONES BLOQUEADOS --- */
+        .btn-main { 
+            width: 100%; padding: 18px; background: var(--primary); color: white; border: none; 
+            border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;
+            box-shadow: 0 4px 0 #7c54b3; margin-bottom: 12px; position: relative;
+        }
+        .btn-main:disabled { 
+            background: #334155; color: #64748b; box-shadow: 0 4px 0 #1e293b; cursor: not-allowed; opacity: 0.7;
+        }
+        .btn-main:disabled::after { content: " 🔒"; }
+        .btn-main:active:not(:disabled) { transform: translateY(4px); box-shadow: none; }
+
+        .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #334155; padding-bottom: 10px; }
+        .mascot-mini { width: 50px; height: 50px; border-radius: 50%; background: var(--secondary); padding: 5px; }
         .view { display: none; animation: slideUp 0.4s ease-out; }
         .view.active { display: block; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #334155; padding-bottom: 10px; }
-        .mascot-mini { width: 60px; height: 60px; border-radius: 50%; background: var(--secondary); padding: 5px; }
-
-        .btn-main { 
-            width: 100%; padding: 18px; background: var(--primary); color: white; border: none; 
-            border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;
-            box-shadow: 0 4px 0 #7c54b3; margin-bottom: 10px;
-        }
-        .btn-main:active { transform: translateY(4px); box-shadow: none; }
-        
-        .option { 
-            background: #334155; padding: 15px; margin: 10px 0; border-radius: 14px; 
-            cursor: pointer; border: 2px solid transparent; transition: 0.2s;
-        }
-        .option:hover { background: #475569; }
+        .option { background: #334155; padding: 15px; margin: 10px 0; border-radius: 14px; cursor: pointer; border: 2px solid transparent; }
         .correct { background: #065f46 !important; border-color: var(--success) !important; }
         .wrong { background: #7f1d1d !important; border-color: var(--error) !important; }
 
         .progress-bar { height: 10px; background: #334155; border-radius: 5px; margin: 15px 0; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--secondary), var(--primary)); width: 0%; transition: 0.5s; }
-
-        /* --- PRESENTATION SLIDES --- */
-        .slide-content { text-align: center; min-height: 380px; }
-        .mascot-big { width: 180px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+        .mascot-big { width: 160px; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        .mastery-badge { background: #1e293b; padding: 5px 10px; border-radius: 10px; font-size: 0.8rem; color: var(--accent); border: 1px solid var(--accent); }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="header">
-            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-mini" alt="Mascota">
-            <div>
-                <h2 style="margin:0; font-size: 1.2rem;">Álgebra Estelar</h2>
-                <div id="streak-counter">🔥 Racha: 0</div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-mini">
+                <div id="lives-display" style="color:var(--error); font-weight:bold;">❤️❤️❤️❤️❤️</div>
+            </div>
+            <div style="text-align: right;">
+                <div id="shield-text" style="font-size: 0.7rem; font-weight: bold; color: #64748b;">ESCUDO CUÁNTICO</div>
+                <div class="shield-container"><div id="shield-fill" class="shield-fill"></div></div>
             </div>
         </div>
 
         <div id="view-menu" class="view active">
-            <h1 style="text-align: center;">¡Hola, Recluta!</h1>
-            <p style="text-align: center; color: #94a3b8;">Elige tu próxima misión:</p>
-            <button class="btn-main" onclick="startPresentation()">📖 Aprender Código Secreto</button>
-            <button class="btn-main" style="background: var(--secondary); box-shadow: 0 4px 0 #28938c;" onclick="startQuiz('calentamiento')">⚡ Calentamiento (15 Retos)</button>
-            <button class="btn-main" style="background: #475569; box-shadow: 0 4px 0 #2d3a4b;" onclick="startQuiz('examen')">🏆 Examen Maestro (30 Retos)</button>
-            <center><button onclick="resetMastery()" style="background:none; border:none; color:#64748b; font-size:0.7rem; cursor:pointer;">Reiniciar memoria de aprendizaje</button></center>
+            <h1 style="text-align: center; margin-bottom: 5px;">Consola de Misión</h1>
+            <p style="text-align: center; color: #94a3b8; margin-bottom: 25px;">Cadete, completa el entrenamiento para desbloquear el Salto.</p>
+            
+            <button class="btn-main" id="btn-lesson" onclick="startPresentation()">1. Manual de Navegación 📖</button>
+            <button class="btn-main" id="btn-warmup" style="background: var(--secondary); box-shadow: 0 4px 0 #28938c;" onclick="startQuiz('calentamiento')" disabled>2. Entrenamiento de Vuelo ⚡</button>
+            <button class="btn-main" id="btn-final" style="background: #475569; box-shadow: 0 4px 0 #2d3a4b;" onclick="startQuiz('examen')" disabled>3. El Salto Hiperespacial 🏆</button>
+            
+            <center><button onclick="resetAllProgress()" style="background:none; border:none; color:#475569; font-size:0.6rem; cursor:pointer; margin-top:20px;">[REINICIAR MEMORIA DE NAVEGACIÓN]</button></center>
         </div>
 
         <div id="view-learn" class="view">
-            <div class="slide-content" id="slide-area"></div>
+            <div id="slide-area" style="text-align: center; min-height: 400px;"></div>
             <div style="display:flex; gap:10px;">
-                <button class="btn-main" style="background:#475569; box-shadow: 0 4px 0 #2d3a4b;" onclick="changeSlide(-1)">Atrás</button>
+                <button class="btn-main" style="background:#475569; box-shadow: 0 4px 0 #2d3a4b;" onclick="changeSlide(-1)">Anterior</button>
                 <button class="btn-main" id="btn-next-slide" onclick="changeSlide(1)">Siguiente</button>
             </div>
         </div>
 
         <div id="view-quiz" class="view">
             <div style="display:flex; justify-content: space-between; align-items: center;">
-                <span id="quiz-title" class="mastery-badge">MODO ADAPTATIVO</span>
-                <span id="quiz-progress-text">1/15</span>
+                <span id="quiz-title" style="font-size: 0.8rem; color: var(--accent); font-weight: bold;">SISTEMA ACTIVO</span>
+                <span id="quiz-progress-text">0/0</span>
             </div>
             <div class="progress-bar"><div id="quiz-progress-fill" class="progress-fill"></div></div>
-            
-            <div id="question-box">
-                <p id="q-text" style="font-size: 1.3rem; font-weight: bold; margin: 20px 0;"></p>
-                <div id="options-box"></div>
-            </div>
+            <p id="q-text" style="font-size: 1.4rem; font-weight: bold; margin: 20px 0; text-align: center;"></p>
+            <div id="options-box"></div>
 
             <div id="feedback-box" style="display:none; text-align: center; margin-top: 15px;">
-                <img id="mascot-feedback" src="" style="width: 100px;">
-                <p id="feedback-text"></p>
-                <button class="btn-main" onclick="nextQuestion()">Continuar ➔</button>
+                <img id="mascot-feedback" src="" style="width: 120px;">
+                <p id="feedback-text" style="font-size: 1.2rem;"></p>
+                <button class="btn-main" onclick="nextQuestion()">Siguiente Coordenada ➔</button>
             </div>
         </div>
 
         <div id="view-results" class="view" style="text-align: center;">
-            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" style="width: 150px;">
-            <h1 id="res-title">¡Misión Cumplida!</h1>
+            <img id="res-img" src="" style="width: 150px;">
+            <h1 id="res-title"></h1>
             <div style="font-size: 4rem; font-weight: bold; color: var(--accent);" id="res-score">0</div>
             <p id="res-msg"></p>
-            <button class="btn-main" onclick="location.reload()">Regresar al Inicio 🏠</button>
+            <button class="btn-main" onclick="location.reload()">Regresar al Puente 🏠</button>
         </div>
     </div>
 
     <script>
-        // --- BASE DE DATOS DE PREGUNTAS ---
-        const questions = [
-            { id: "c1", q: "Un número cualquiera", a: ["x", "1", "0", "n+1"], c: 0, bank: "calentamiento" },
-            { id: "c2", q: "La suma de un número y diez", a: ["10x", "x-10", "x+10", "10/x"], c: 2, bank: "calentamiento" },
-            { id: "c3", q: "El triple de un número", a: ["x+3", "x³", "3x", "3-x"], c: 2, bank: "calentamiento" },
-            { id: "e1", q: "El cociente de dos números", a: ["x-y", "xy", "x/y", "x+y"], c: 2, bank: "examen" }
+        // --- BANCO DE DATOS ---
+        const bankCalentamiento = [
+            { id: "c1", q: "Coordenada: 'Un número cualquiera'", a: ["x", "10", "n + 1", "x²"], c: 0 },
+            { id: "c2", q: "Ajuste: 'Suma de un número y diez'", a: ["10x", "x + 10", "x - 10", "10/x"], c: 1 },
+            { id: "c3", q: "Potencia: 'El triple de un número'", a: ["x + 3", "3x", "x³", "3/x"], c: 1 },
+            { id: "c4", q: "Reducción: 'Un número disminuido en cinco'", a: ["5 - x", "x - 5", "x/5", "5x"], c: 1 },
+            { id: "c5", q: "Energía: 'El cuadrado de un número'", a: ["2x", "x + 2", "x²", "x/2"], c: 2 },
+            { id: "c6", q: "Frecuencia: 'La mitad de un número'", a: ["x/2", "x - 2", "2x", "x²"], c: 0 },
+            { id: "c7", q: "Fusión: 'Producto de dos números'", a: ["a + b", "a/b", "ab", "a - b"], c: 2 },
+            { id: "c8", q: "Impulso: 'Un número aumentado en su doble'", a: ["x + 2x", "x + 2", "2x", "x²"], c: 0 },
+            { id: "c9", q: "Desvío: 'La diferencia de dos números'", a: ["x + y", "x - y", "xy", "x/y"], c: 1 },
+            { id: "c10", q: "Carga: 'El doble de un número más tres'", a: ["2(x+3)", "2x + 3", "x² + 3", "3x + 2"], c: 1 },
+            { id: "c11", q: "Fracción: 'La tercera parte de un número'", a: ["3x", "x/3", "x - 3", "x³"], c: 1 },
+            { id: "c12", q: "Estabilidad: 'Un número par'", a: ["x + 2", "2x", "x/2", "x²"], c: 1 },
+            { id: "c13", q: "Radar: 'Precio (x) con descuento de 20'", a: ["x + 20", "x - 20", "20x", "20/x"], c: 1 },
+            { id: "c14", q: "Tiempo: 'Edad (L) hace 5 años'", a: ["L + 5", "5L", "L - 5", "5 - L"], c: 2 },
+            { id: "c15", q: "Múltiplo: 'El cuádruple de un número'", a: ["x + 4", "4x", "x/4", "x⁴"], c: 1 }
         ];
 
-        let mastery = JSON.parse(localStorage.getItem('algebraMastery')) || {};
-
-        function saveError(id) {
-            if (!mastery[id]) mastery[id] = { errors: 0 };
-            mastery[id].errors += 1;
-            localStorage.setItem('algebraMastery', JSON.stringify(mastery));
-        }
-
-        function resolveError(id) {
-            if (mastery[id] && mastery[id].errors > 0) {
-                mastery[id].errors -= 1;
-                localStorage.setItem('algebraMastery', JSON.stringify(mastery));
-            }
-        }
-
-        function resetMastery() { localStorage.clear(); location.reload(); }
-
-        // --- LÓGICA DE PRESENTACIÓN ---
-        // URLs Corregidas a RAW
-        const slides = [
-            { t: "¡Bienvenido Recluta!", d: "Soy tu guía en esta misión espacial. El álgebra es el idioma de las estrellas.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose2.png" },
-            { t: "¿Qué es una Variable?", d: "Es una <b>caja misteriosa</b> (como x, n o y) donde guardamos números.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose3.png" },
-            { t: "La Regla de Oro", d: "⚠️ ¡No uses la 'x' para multiplicar! Se confunde. Escribe <b>3x</b> para decir 3 veces x.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png" }
+        const bankExamen = [
+            ...bankCalentamiento,
+            { id: "e16", q: "División: 'El cociente de dos números'", a: ["x+y", "xy", "x/y", "x-y"], c: 2 },
+            { id: "e17", q: "Triple Alianza: 'Suma de tres números distintos'", a: ["x+y+z", "3x", "x+y", "xyz"], c: 0 },
+            { id: "e18", q: "Duplicador: 'El doble de la suma de dos números'", a: ["2x+y", "2(x+y)", "x²+y²", "2x+2"], c: 1 },
+            { id: "e19", q: "Inestabilidad: 'Un número impar'", a: ["2x", "x/2", "2x + 1", "x+1"], c: 2 },
+            { id: "e20", q: "Súper Carga: 'El cuadrado de la suma de dos números'", a: ["x²+y²", "(x+y)²", "2(x+y)", "x+y+2"], c: 1 },
+            { id: "e21", q: "Resta Atómica: 'La diferencia de dos cuadrados'", a: ["(x-y)²", "x²-y²", "2x-2y", "x-y"], c: 1 },
+            { id: "e22", q: "Ajuste Fino: 'El triple de un número menos su mitad'", a: ["3x - x/2", "3(x - 1/2)", "x/3 - 3x", "3x - 2"], c: 0 },
+            { id: "e23", q: "Seguimiento: 'Dos números consecutivos'", a: ["x, y", "x, x+1", "x, 2x", "x, x²"], c: 1 },
+            { id: "e24", q: "Núcleo: 'La raíz cuadrada de un número'", a: ["x²", "2x", "√x", "x/2"], c: 2 },
+            { id: "e25", q: "Vector: 'El quíntuple de un número'", a: ["x+5", "5x", "x/5", "x⁵"], c: 1 },
+            { id: "e26", q: "Superficie: 'Área de un cuadrado de lado 'a''", a: ["4a", "a+a", "a²", "2a"], c: 2 },
+            { id: "e27", q: "Cadena: 'Tres números consecutivos'", a: ["x, x+1, x+2", "x, y, z", "3x", "x, 2x, 3x"], c: 0 },
+            { id: "e28", q: "Volumen: 'El cubo de un número'", a: ["3x", "x+3", "x³", "x/3"], c: 2 },
+            { id: "e29", q: "Evolución: 'La suma de un número y su cuadrado'", a: ["x + 2x", "x + x²", "x² + x²", "2x²"], c: 1 },
+            { id: "e30", q: "Corte: 'La cuarta parte de un número'", a: ["4x", "x-4", "x/4", "x⁴"], c: 2 }
         ];
-        let currentSlide = 0;
 
-        function startPresentation() { showView('view-learn'); renderSlide(); }
-        function renderSlide() {
-            const s = slides[currentSlide];
-            document.getElementById('slide-area').innerHTML = `
-                <img src="${s.i}" class="mascot-big">
-                <h2>${s.t}</h2>
-                <p>${s.d}</p>
-            `;
-            document.getElementById('btn-next-slide').innerText = currentSlide === slides.length - 1 ? "¡Listo!" : "Siguiente";
-        }
-        function changeSlide(dir) {
-            currentSlide += dir;
-            if (currentSlide < 0) showView('view-menu');
-            else if (currentSlide >= slides.length) showView('view-menu');
-            else renderSlide();
-        }
-
-        // --- LÓGICA DEL QUIZ ---
+        // --- LÓGICA DE PROGRESIÓN ---
+        let lives = 5;
+        let streak = 0;
+        let hasShield = false;
         let activeQuiz = [];
         let qIndex = 0;
-        let score = 0;
-        let streak = 0;
+        let correctCount = 0;
 
-        function showView(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        // Cargar progreso guardado
+        let progression = JSON.parse(localStorage.getItem('algebraProgression')) || { lesson: false, warmup: false };
+
+        function updateMenuButtons() {
+            if (progression.lesson) document.getElementById('btn-warmup').disabled = false;
+            if (progression.warmup) document.getElementById('btn-final').disabled = false;
+        }
+        updateMenuButtons();
+
+        // --- LECCIÓN ---
+        const slides = [
+            { t: "Comandante Axolote", d: "¡Cadete! Para saltar al hiperespacio necesitamos el Álgebra. Es el lenguaje para encontrar números ocultos en las galaxias.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose2.png" },
+            { t: "Las Incógnitas", d: "A veces no sabemos cuánta energía nos queda. Usamos letras como <b>x</b> o <b>n</b> para representar esos valores desconocidos.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose3.png" },
+            { t: "Interferencia de Señal", d: "⚠️ REGLA DE VUELO: No uses la 'x' para multiplicar. En el espacio usamos puntos o simplemente pegamos el número a la letra: <b>3x</b> significa 3 veces x.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png" },
+            { t: "Preparado para el Despegue", d: "Completa el entrenamiento sin perder tus vidas. Si aciertas 3 seguidas, el <b>Escudo Cuántico</b> te protegerá de un error.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" }
+        ];
+        let curSlide = 0;
+
+        function startPresentation() { showView('view-learn'); curSlide = 0; renderSlide(); }
+        function renderSlide() {
+            const s = slides[curSlide];
+            document.getElementById('slide-area').innerHTML = `<img src="${s.i}" class="mascot-big"><h2>${s.t}</h2><p style="line-height:1.6">${s.d}</p>`;
+            document.getElementById('btn-next-slide').innerText = curSlide === slides.length - 1 ? "Completar Manual" : "Siguiente";
+        }
+        function changeSlide(dir) {
+            curSlide += dir;
+            if (curSlide < 0) showView('view-menu');
+            else if (curSlide >= slides.length) {
+                progression.lesson = true;
+                saveProgression();
+                showView('view-menu');
+            } else renderSlide();
         }
 
-        function startQuiz(bankType) {
-            let pool = questions.filter(q => q.bank === bankType || bankType === 'examen');
-            pool.sort((a, b) => {
-                let errA = mastery[a.id]?.errors || 0;
-                let errB = mastery[b.id]?.errors || 0;
-                return errB - errA;
-            });
-            activeQuiz = pool.slice(0, 15);
-            qIndex = 0; score = 0;
+        // --- JUEGO ---
+        function startQuiz(type) {
+            lives = 5; streak = 0; hasShield = false; qIndex = 0; correctCount = 0;
+            activeQuiz = type === 'calentamiento' ? [...bankCalentamiento] : [...bankExamen];
+            activeQuiz.sort(() => Math.random() - 0.5);
+            updateUI();
             showView('view-quiz');
             renderQuestion();
+        }
+
+        function updateUI() {
+            document.getElementById('lives-display').innerText = "❤️".repeat(lives);
+            const fill = document.getElementById('shield-fill');
+            if (hasShield) {
+                fill.style.width = "100%";
+                fill.classList.add('shield-ready');
+            } else {
+                fill.classList.remove('shield-ready');
+                fill.style.width = (streak % 3) * 33.3 + "%";
+            }
         }
 
         function renderQuestion() {
             const q = activeQuiz[qIndex];
             document.getElementById('q-text').innerText = q.q;
             document.getElementById('quiz-progress-text').innerText = `${qIndex + 1}/${activeQuiz.length}`;
-            document.getElementById('quiz-progress-fill').style.width = `${((qIndex)/activeQuiz.length)*100}%`;
+            document.getElementById('quiz-progress-fill').style.width = `${(qIndex / activeQuiz.length) * 100}%`;
             
-            const box = document.getElementById('options-box');
-            box.innerHTML = '';
+            const box = document.getElementById('options-box'); box.innerHTML = '';
             q.a.forEach((opt, i) => {
-                const btn = document.createElement('div');
-                btn.className = 'option';
-                btn.innerText = opt;
-                btn.onclick = () => checkAnswer(i, btn);
+                const btn = document.createElement('div'); btn.className = 'option';
+                btn.innerText = opt; btn.onclick = () => checkAnswer(i, btn);
                 box.appendChild(btn);
             });
-            document.getElementById('question-box').style.display = 'block';
             document.getElementById('feedback-box').style.display = 'none';
+            document.getElementById('options-box').style.display = 'block';
         }
 
         function checkAnswer(idx, el) {
             const q = activeQuiz[qIndex];
-            const opts = document.querySelectorAll('.option');
-            opts.forEach(o => o.style.pointerEvents = 'none');
+            document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
 
             if (idx === q.c) {
                 el.classList.add('correct');
-                score++; streak++;
-                confetti({ particleCount: 40, spread: 60, colors: ['#9F73DA', '#35BBB2'] });
+                streak++; correctCount++;
+                if (streak >= 3 && !hasShield) { hasShield = true; streak = 0; }
+                confetti({ particleCount: 30, spread: 50, colors: ['#9F73DA', '#35BBB2'] });
                 showFeedback(true);
-                resolveError(q.id);
             } else {
                 el.classList.add('wrong');
-                opts[q.c].classList.add('correct');
+                document.querySelectorAll('.option')[q.c].classList.add('correct');
+                if (hasShield) hasShield = false; else lives--;
                 streak = 0;
+                activeQuiz.push(activeQuiz[qIndex]); // Se repite al final
                 showFeedback(false);
-                saveError(q.id);
+                if (lives <= 0) { setTimeout(gameOver, 1500); return; }
             }
-            document.getElementById('streak-counter').innerText = `🔥 Racha: ${streak}`;
+            updateUI();
         }
 
         function showFeedback(isCorrect) {
-            document.getElementById('question-box').style.display = 'none';
-            document.getElementById('feedback-box').style.display = 'block';
-            const img = document.getElementById('mascot-feedback');
-            const txt = document.getElementById('feedback-text');
-            
-            // Sustitución de placeholders por URLs reales
-            if (isCorrect) {
-                img.src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png";
-                txt.innerHTML = "<b style='color:var(--success)'>¡Excelente!</b> El código es correcto.";
-            } else {
-                img.src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png";
-                txt.innerHTML = "<b style='color:var(--error)'>¡Casi!</b> El Axolote guardará esta para repasarla.";
-            }
+            document.getElementById('options-box').style.display = 'none';
+            const f = document.getElementById('feedback-box'); f.style.display = 'block';
+            document.getElementById('mascot-feedback').src = isCorrect ? "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" : "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png";
+            document.getElementById('feedback-text').innerHTML = isCorrect ? "<b>¡COORDENADA EXACTA!</b>" : "<b>ERROR DE CÁLCULO</b><br><small>Reintentaremos esta luego.</small>";
         }
 
         function nextQuestion() {
             qIndex++;
             if (qIndex < activeQuiz.length) renderQuestion();
-            else showResults();
+            else finishMission();
         }
 
-        function showResults() {
+        function finishMission() {
             showView('view-results');
-            document.getElementById('res-score').innerText = `${score}/${activeQuiz.length}`;
-            document.getElementById('res-msg').innerText = score > 10 ? "¡Eres un genio del lenguaje estelar!" : "Buen intento. ¡La práctica hace al maestro!";
+            const isFinal = activeQuiz.length > 15;
+            if (!isFinal) progression.warmup = true;
+            saveProgression();
+            
+            document.getElementById('res-img').src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png";
+            document.getElementById('res-title').innerText = "¡Misión Exitosa!";
+            document.getElementById('res-score').innerText = correctCount;
+            document.getElementById('res-msg').innerText = "Has navegado con éxito. El puente de mando está orgulloso.";
+        }
+
+        function gameOver() {
+            showView('view-results');
+            document.getElementById('res-img').src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png";
+            document.getElementById('res-title').innerText = "Nave Averiada";
+            document.getElementById('res-score').innerText = correctCount;
+            document.getElementById('res-msg').innerText = "Te quedaste sin energía. Regresa al manual para reparar tus conocimientos.";
+        }
+
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function saveProgression() {
+            localStorage.setItem('algebraProgression', JSON.stringify(progression));
+            updateMenuButtons();
+        }
+
+        function resetAllProgress() {
+            localStorage.clear();
+            location.reload();
         }
     </script>
 </body>
 </html>
-
-
