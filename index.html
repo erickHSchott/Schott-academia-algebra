@@ -3,278 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sintonía Algebraica: El Camino a la Eudaimonía</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <title>Eudaimonía: Arquitectura del Eco | Entidad Activa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f172a; --card: #1e293b; --text: #f1f5f9;
-            --primary: #8b5cf6; --secondary: #06b6d4; --accent: #fbbf24;
-            --success: #10b981; --error: #ef4444;
+            --bg: #05070a; --surface: #0f172a; --signal: #22d3ee;
+            --resonance: #fbbf24; --error: #f43f5e; --text: #f1f5f9;
+            --font-main: 'Outfit', sans-serif; --font-mono: 'JetBrains Mono', monospace;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body { 
-            font-family: 'Outfit', sans-serif; background-color: var(--bg); color: var(--text);
-            margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            background: var(--bg); color: var(--text); font-family: var(--font-main);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
             overflow-x: hidden;
         }
 
-        .app-container {
-            background: var(--card); width: 100%; max-width: 650px; padding: 30px;
-            border-radius: 40px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.05); position: relative;
+        /* --- UI DE ARQUEOLOGÍA DIGITAL --- */
+        .container {
+            width: 100%; max-width: 700px; padding: 40px; background: var(--surface);
+            border-radius: 20px; border: 1px solid rgba(34, 211, 238, 0.1);
+            position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
-        /* --- ESCUDO DE RESONANCIA (LUCES QUE SE MUEVEN) --- */
-        .shield-wrapper { text-align: right; }
-        .shield-label { font-size: 0.65rem; font-weight: bold; color: var(--secondary); letter-spacing: 1px; }
-        .shield-bar { 
-            width: 140px; height: 10px; background: #334155; border-radius: 20px; 
-            margin-top: 5px; overflow: hidden; position: relative; display: inline-block;
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+        .stats { font-family: var(--font-mono); font-size: 0.8rem; color: var(--signal); letter-spacing: 2px; }
+
+        .resonance-bar {
+            width: 150px; height: 4px; background: #1e293b; border-radius: 2px; margin-top: 8px;
+            overflow: hidden; position: relative; display: inline-block;
         }
-        .shield-fill { height: 100%; width: 0%; background: var(--secondary); transition: 0.5s ease; }
-
-        /* Animación cuando hay resonancia plena (3 aciertos) */
-        .resonance-glow {
-            background: linear-gradient(90deg, #fbbf24, #fffbeb, #fbbf24);
-            background-size: 200% 100%;
-            animation: move-lights 1.5s linear infinite, pulse-glow 2s infinite alternate;
-            box-shadow: 0 0 15px var(--accent);
-            width: 100% !important;
-        }
-
-        @keyframes move-lights { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        @keyframes pulse-glow { from { opacity: 0.7; } to { opacity: 1; } }
-
-        /* --- ESTILOS DE INTERFAZ --- */
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .lives { font-size: 1.2rem; filter: drop-shadow(0 0 5px var(--primary)); }
+        .resonance-fill { height: 100%; width: 0%; background: var(--signal); transition: 0.5s ease cubic-bezier(0.4, 0, 0.2, 1); }
         
-        .btn-main { 
-            width: 100%; padding: 20px; background: var(--primary); color: white; border: none; 
-            border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s;
-            margin-bottom: 15px; position: relative; overflow: hidden;
+        /* Animación de Resonancia Crítica */
+        .active-resonance {
+            background: linear-gradient(90deg, var(--resonance), #fff, var(--resonance));
+            background-size: 200% 100%; animation: move 1.5s infinite linear, pulse 2s infinite alternate;
+            box-shadow: 0 0 15px var(--resonance); width: 100% !important;
         }
-        .btn-main:disabled { background: #334155; color: #64748b; cursor: not-allowed; opacity: 0.5; }
-        .btn-main:active:not(:disabled) { transform: scale(0.98); }
+        @keyframes move { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; } }
 
-        .view { display: none; animation: slideIn 0.5s ease-out forwards; }
+        /* --- VISTAS --- */
+        .view { display: none; animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         .view.active { display: block; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1 { font-weight: 300; letter-spacing: -1px; margin-bottom: 20px; color: var(--signal); }
+        p { line-height: 1.7; color: #94a3b8; margin-bottom: 25px; font-size: 0.95rem; }
+
+        .btn {
+            width: 100%; padding: 18px; background: transparent; color: var(--text);
+            border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 12px;
+            cursor: pointer; font-family: var(--font-mono); font-size: 0.85rem;
+            transition: 0.3s ease; margin-bottom: 15px; text-align: left;
+            position: relative; overflow: hidden;
+        }
+        .btn:hover:not(:disabled) { background: rgba(34, 211, 238, 0.05); border-color: var(--signal); color: #fff; }
+        .btn:disabled { opacity: 0.2; cursor: not-allowed; border-color: #334155; }
 
         .option { 
-            background: #334155; padding: 18px; margin: 12px 0; border-radius: 18px; 
-            cursor: pointer; border: 2px solid transparent; transition: 0.2s; font-size: 1.1rem;
+            background: #1e293b; padding: 16px; border-radius: 12px; margin-bottom: 12px;
+            cursor: pointer; border: 1px solid transparent; transition: 0.2s ease; font-family: var(--font-mono); font-size: 0.9rem;
         }
-        .option:hover { background: #475569; }
-        .correct { background: #064e3b !important; border-color: var(--success) !important; }
-        .wrong { background: #7f1d1d !important; border-color: var(--error) !important; }
+        .option:hover { border-color: var(--signal); background: rgba(34, 211, 238, 0.03); }
+        .correct { background: rgba(16, 185, 129, 0.1) !important; border-color: #10b981 !important; color: #10b981; }
+        .wrong { background: rgba(244, 63, 94, 0.1) !important; border-color: var(--error) !important; color: var(--error); }
 
         .insight-box {
-            background: rgba(6, 182, 212, 0.1); border: 1px solid var(--secondary);
-            padding: 15px; border-radius: 15px; margin-top: 20px; text-align: center;
-            animation: fadeIn 0.5s ease;
+            margin-top: 30px; padding: 25px; border-radius: 15px;
+            border: 1px solid rgba(34, 211, 238, 0.15);
+            background: rgba(34, 211, 238, 0.02); display: none; animation: fadeIn 0.5s ease;
         }
-        .mascot { width: 130px; display: block; margin: 0 auto 15px; }
-        
-        /* Progress Bar */
-        .p-bar { height: 6px; background: #334155; border-radius: 3px; margin: 20px 0; overflow: hidden; }
-        .p-fill { height: 100%; background: var(--secondary); width: 0%; transition: 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* --- LA MASCOTA (ENTIDAD DE OBSERVACIÓN) --- */
+        .mascot-frame { 
+            width: 100px; height: 100px; display: block; margin: 0 auto 30px;
+            opacity: 0.6; filter: drop-shadow(0 0 10px var(--signal));
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
+    <div class="container">
         <div class="header">
-            <div class="lives" id="lives-display">✨✨✨✨✨</div>
-            <div class="shield-wrapper">
-                <div class="shield-label">RESONANCIA CRÍTICA</div>
-                <div class="shield-bar"><div id="shield-fill" class="shield-fill"></div></div>
+            <div class="stats">OBSERVADOR: <span id="lives-ui">ONLINE</span></div>
+            <div style="text-align: right;">
+                <div class="stats" style="font-size: 0.6rem;">RESONANCIA CRÍTICA</div>
+                <div class="resonance-bar"><div id="res-fill" class="resonance-fill"></div></div>
             </div>
         </div>
 
         <div id="view-menu" class="view active">
-            <h1 style="margin-bottom: 10px; color: var(--secondary);">La Búsqueda del Equilibrio</h1>
-            <p style="color: #94a3b8; line-height: 1.6; margin-bottom: 30px;">
-                Bienvenido al camino de la <b>Eudaimonía</b>. Aprender álgebra no es resolver números, es descubrir las leyes que mantienen el universo en equilibrio.
-            </p>
-            <button class="btn-main" onclick="startLesson()">I. El Origen de la Verdad (Lección) 👁️</button>
-            <button class="btn-main" id="btn-warmup" style="background: var(--secondary);" onclick="startQuiz('sintonia')" disabled>II. Sintonía de Patrones ⚡</button>
-            <button class="btn-main" id="btn-challenge" style="background: #475569;" onclick="startQuiz('arquitectura')" disabled>III. La Arquitectura del Cosmos 🏆</button>
-            <center><button onclick="resetApp()" style="background:none; border:none; color:#475569; font-size:0.7rem; cursor:pointer; margin-top:15px;">[Reiniciar Reflexión]</button></center>
+            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-frame" alt="Entidad Activa">
+            <h1>Arquitectura del Eco</h1>
+            <p>Sintonizando la frecuencia de la <b>Eudaimonía</b>. Elimina el ruido histórico para decodificar la realidad estructural del sistema.</p>
+            <button class="btn" onclick="startLesson()">ACCEDER A LOS ARCHIVOS DE ENSEÑANZA 👁️</button>
+            <button class="btn" onclick="startFlow('perc')" style="border-color: var(--signal);">CAPA I: PERCEPCIÓN (15 Retos) ⚡</button>
+            <button class="btn" id="btn-tier2" onclick="startFlow('sim')" disabled>CAPA II: SIMETRÍA (15 Retos) ⚖️</button>
+            <button class="btn" id="btn-tier3" onclick="startFlow('rest')" disabled>CAPA III: RESTAURACIÓN (Bloqueada) 🔒</button>
         </div>
 
         <div id="view-lesson" class="view">
-            <div id="lesson-content" style="text-align: center; min-height: 380px;"></div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn-main" style="background: #475569;" onclick="changeSlide(-1)">Atrás</button>
-                <button class="btn-main" id="btn-next-slide" onclick="changeSlide(1)">Continuar</button>
+            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose2.png" class="mascot-frame">
+            <div id="lesson-content" style="text-align: center; min-height: 300px;"></div>
+            <div style="display: flex; gap: 15px;">
+                <button class="btn" style="background: #1e293b; border-color: #334155; text-align: center;" onclick="changeSlide(-1)">Regresar</button>
+                <button class="btn" id="btn-next-slide" style="text-align: center; border-color: var(--signal);" onclick="changeSlide(1)">Siguiente</button>
             </div>
         </div>
 
         <div id="view-quiz" class="view">
-            <div style="display:flex; justify-content: space-between; font-size: 0.8rem; color: var(--secondary);">
-                <span id="quiz-title-text">SINTONIZANDO...</span>
-                <span id="quiz-count">0/0</span>
-            </div>
-            <div class="p-bar"><div id="quiz-p-fill" class="p-fill"></div></div>
-            <h2 id="q-text" style="text-align: center; margin: 30px 0;"></h2>
-            <div id="options-container"></div>
+            <div id="q-meta" class="stats" style="margin-bottom: 10px; color: #94a3b8;">DECODIFICANDO: 1/15</div>
+            <h2 id="q-text" style="margin-bottom: 30px; font-weight: 300; line-height: 1.4;"></h2>
+            <div id="options"></div>
             
-            <div id="feedback-area" style="display: none;">
-                <div class="insight-box">
-                    <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" class="mascot">
-                    <p id="insight-text" style="font-style: italic;"></p>
-                    <button class="btn-main" onclick="handleNext()">Seguir Descubriendo ➔</button>
-                </div>
+            <div id="insight-area" class="insight-box">
+                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" class="mascot-frame" style="width: 80px; height: 80px; margin-bottom: 15px;">
+                <div style="color: var(--resonance); font-size: 0.7rem; margin-bottom: 10px; font-family: var(--font-mono); letter-spacing: 1px;">[FRECUENCIA SINTONIZADA]</div>
+                <p id="insight-text" style="font-style: italic; font-size: 0.95rem; line-height: 1.6; color: #fff;"></p>
+                <button class="btn" style="margin-top: 10px; border-color: var(--signal); text-align: center;" onclick="nextQuestion()">Continuar Secuencia ➔</button>
             </div>
         </div>
 
         <div id="view-results" class="view" style="text-align: center;">
-            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" class="mascot" style="width: 160px;">
-            <h1 id="res-title"></h1>
-            <p id="res-msg" style="line-height: 1.6; color: #94a3b8;"></p>
-            <button class="btn-main" onclick="location.reload()">Regresar al Inicio 🏠</button>
+            <img id="res-img" src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" class="mascot-frame" style="width: 130px; height: 130px;">
+            <h1 id="res-title">Sintonía Completada</h1>
+            <p id="res-msg"></p>
+            <button class="btn" style="text-align: center;" onclick="location.reload()">Regresar al Núcleo</button>
         </div>
     </div>
 
     <script>
-        /* --- FILOSOFÍA Y CONTENIDO (Basado en 1º Secundaria Edomex) --- */
+        /* --- MOTOR DE AUDIO SINTETIZADO --- */
+        const AudioEngine = {
+            ctx: null,
+            init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            playTone(freq, type, duration, vol = 0.1) {
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                osc.start(); osc.stop(this.ctx.currentTime + duration);
+            },
+            success() { if(this.ctx) [261.63, 329.63, 392.00].forEach(f => this.playTone(f, 'sine', 1.0, 0.04)); },
+            error() { 
+                if(!this.ctx) return;
+                const bufSize = this.ctx.sampleRate * 0.1;
+                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
+                const data = buf.getChannelData(0);
+                for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
+                const noise = this.ctx.createBufferSource();
+                const gain = this.ctx.createGain();
+                gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+                noise.buffer = buf; noise.connect(gain); gain.connect(this.ctx.destination);
+                noise.start();
+            },
+            resonance() { 
+                if(this.ctx) { this.playTone(880, 'triangle', 0.4, 0.02); this.playTone(1760, 'sine', 0.7, 0.01); }
+            }
+        };
+
+        /* --- DATA: NARRATIVA Y PREGUNTAS --- */
         const lessonSlides = [
-            { t: "Etimología: La Igualdad", d: "La palabra <b>Ecuación</b> viene del latín <i>aequatio</i>, que significa 'hacer igual'. En el universo, todo busca el equilibrio. El signo '=' no es un resultado, es el centro de una balanza.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" },
-            { t: "El Silencio de la Verdad (x)", d: "Cuando nos falta un dato, no inventamos. Dejamos un espacio ($x$). Resolver una ecuación es simplemente quitar el ruido que rodea a esa verdad para verla con claridad.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose3.png" },
-            { t: "La Ley de la Balanza", d: "Para mantener la verdad, lo que haces en un lado de la balanza, debes hacerlo en el otro. Si sumas conciencia en un lado, debes sumarla en el otro para que la igualdad no se rompa.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose2.png" },
-            { t: "Hacia la Eudaimonía", d: "Al dominar estas estructuras, tu mente florece. No estás haciendo tarea; estás entrenando tu pensamiento crítico para que nadie te engañe con palabras confusas.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" }
+            { t: "El Ruido del Pasado", d: "La palabra 'Suma' viene del latín <i>summa</i> (lo más alto), porque los antiguos romanos escribían sus totales en la parte superior. Arrastramos historia en el lenguaje, generando interferencia.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" },
+            { t: "La Incógnita (x)", d: "Cuando no conocemos un valor, usamos una <b>Incógnita</b>. No es una simple letra, es un espacio vacío en la señal. Es reconocer la falta de información honestamente.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose3.png" },
+            { t: "El Eje de Simetría (=)", d: "Toda Ecuación es una balanza. El signo igual divide la realidad en dos <b>Miembros</b>. Para mantener la armonía, cada <b>Término</b> debe estar en su lugar.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose2.png" },
+            { t: "Operación Inversa", d: "Despejar es aislar la verdad aplicando la <b>Operación Inversa</b>. No es magia, es deshacer el ruido paso a paso. Ese es el camino hacia la <b>Eudaimonía</b>.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" }
         ];
 
-        const bankSintonia = [
-            { q: "Traduce: 'Un número que al sumarle 7 da 15'", a: ["x + 7 = 15", "7x = 15", "x - 7 = 15"], c: 0, h: "La suma es la estructura del crecimiento; aquí buscamos qué semilla original creció hasta ser 15." },
-            { q: "Traduce: 'El triple de mi edad es 45'", a: ["x + 3 = 45", "3x = 45", "x/3 = 45"], c: 1, h: "La multiplicación representa la fuerza de repetición. Si te repites tres veces y llegas a 45, tu esencia es 15." },
-            { q: "Traduce: 'Un valor disminuido en 10 es igual a 20'", a: ["10 - x = 20", "x - 10 = 20", "x/10 = 20"], c: 1, h: "La resta es la distancia. Aunque algo se haya perdido (-10), la estructura original sigue ahí esperando ser descubierta." },
-            { q: "La estructura de la repartición: 'Un número dividido entre 2 da 8'", a: ["2x = 8", "x/2 = 8", "x + 2 = 8"], c: 1, h: "Dividir es fragmentar la verdad. Si la mitad de algo es 8, la totalidad es una fuerza mayor (16)." },
-            { q: "Traduce: 'La suma de dos números consecutivos es 13'", a: ["x + x = 13", "x + (x + 1) = 13", "2x + 13"], c: 1, h: "El orden natural se expresa sumando una unidad de conciencia ($x+1$)."}
-        ];
+        /* --- BANCO DE PREGUNTAS (TIER 1 y 2) --- */
+        const questions = {
+            perc: [
+                { q: "Traduce la señal pura: 'Un número sumado a diez'.", o: ["x + 10", "10x", "x - 10"], c: 0, i: "La palabra 'suma' viene de summa. Al usar +, limpias la historia romana y dejas solo la estructura matemática." },
+                { q: "Estructura de: 'La diferencia entre dos valores desconocidos'.", o: ["a + b", "a - b", "ab"], c: 1, i: "La resta representa la distancia física entre dos realidades. Es una estructura de separación." },
+                { q: "Decodifica: 'El doble de una incógnita'.", o: ["x + 2", "x²", "2x"], c: 2, i: "El coeficiente numérico (2) junto a la literal (x) indica un factor de repetición." },
+                { q: "Sintoniza: 'La tercera parte de una verdad'.", o: ["x / 3", "3x", "x - 3"], c: 0, i: "Dividir es un acto de justicia: fragmentar la totalidad en partes iguales para analizarla." },
+                { q: "Traduce: 'Un valor excedido en cinco unidades'.", o: ["5x", "x + 5", "x - 5"], c: 1, i: "'Excedido' es solo ruido verbal para referirse a la adición." },
+                { q: "Traduce la señal: 'Diez disminuido en un número'.", o: ["x - 10", "10 / x", "10 - x"], c: 2, i: "El orden importa. El sistema original es 10, y el ruido que le quitamos es la incógnita." },
+                { q: "Decodifica: 'El doble de un número, aumentado en uno'.", o: ["2(x + 1)", "2x + 1", "x + 2"], c: 1, i: "Las operaciones se construyen por capas. Primero la expansión (2x), luego la adición (+ 1)." },
+                { q: "Traduce: 'El producto de dos incógnitas distintas'.", o: ["xy", "x + y", "x/y"], c: 0, i: "Cuando dos incógnitas se tocan sin operadores visibles, sus realidades se multiplican." },
+                { q: "Sintoniza: 'El cuadrado de un valor'.", o: ["2x", "x + 2", "x²"], c: 2, i: "El exponente no es una multiplicación común; es el sistema interactuando consigo mismo." },
+                { q: "Traduce: 'La mitad de un número, más tres'.", o: ["(x/2) + 3", "(x+3)/2", "2x + 3"], c: 0, i: "La jerarquía es la ley de gravedad del álgebra. Primero fragmentamos (x/2), luego acumulamos (+ 3)." },
+                { q: "Decodifica el tiempo: 'Mi edad dentro de cinco años'.", o: ["x + 5", "5x", "x - 5"], c: 0, i: "El tiempo es solo otra variable de adición en la arquitectura del universo." },
+                { q: "Si 'suma' es agrupar hacia lo alto, traduce 'El total de tres valores distintos'.", o: ["3x", "a + b + c", "abc"], c: 1, i: "Acumular realidades distintas sin mezclarlas. Cada incógnita mantiene su identidad única." },
+                { q: "Sintoniza la frecuencia de: 'El número anterior a x'.", o: ["x + 1", "x - 1", "1 - x"], c: 1, i: "Retroceder un paso en el cosmos es restar la unidad fundamental: x - 1." },
+                { q: "Traduce: 'El sucesor de una incógnita'.", o: ["2x", "x - 1", "x + 1"], c: 2, i: "Avanzar en la línea del tiempo lógico siempre es añadir la unidad constante: + 1." },
+                { q: "Decodifica: 'El triple de un número, disminuido en su mitad'.", o: ["3x/2", "3x - x/2", "x/3 - 2"], c: 1, i: "Un mismo valor puede ser expandido (3x) y fragmentado (x/2) en la misma ecuación." }
+            ],
+            sim: [
+                { q: "En el sistema 2x + 4 = 12, ¿qué rol cumple el signo '='?", o: ["Anuncia un resultado final.", "Es el Eje de Simetría.", "Indica que debemos sumar."], c: 1, i: "El igual no es una orden de 'calcula esto'. Es una declaración de que ambos lados pesan exactamente lo mismo." },
+                { q: "Identifica el Primer Miembro de la ecuación: 5x - 3 = 22", o: ["5x - 3", "22", "5x"], c: 0, i: "El Primer Miembro es toda la estructura que se encuentra a la izquierda del Eje de Simetría." },
+                { q: "Identifica el Segundo Miembro de la ecuación: 7 = x + 2", o: ["x + 2", "7", "x"], c: 0, i: "La incógnita no siempre está en el Primer Miembro. El universo no tiene 'izquierda' o 'derecha', solo equilibrio." },
+                { q: "Analiza la arquitectura: ¿Qué elementos separan a los Términos dentro de un Miembro?", o: ["Las letras y los números.", "Los signos de suma (+) y resta (-).", "Los signos de multiplicar y dividir."], c: 1, i: "Un Término es un bloque indivisible. Solo los signos + y - funcionan como muros entre bloque y bloque." },
+                { q: "¿Cuántos Términos hay en el Primer Miembro de: 3x + 5 - y = 10?", o: ["Un término", "Dos términos", "Tres términos"], c: 2, i: "3x es el primer bloque, +5 es el segundo, y -y es el tercero. Tres entidades en el mismo espacio." },
+                { q: "En la expresión -4x, ¿cómo llamamos al número -4?", o: ["Constante", "Incógnita", "Coeficiente"], c: 2, i: "El Coeficiente es el multiplicador. Nos dice cuántas veces existe la incógnita en esa dimensión." },
+                { q: "En la ecuación x + 8 = 20, ¿cómo llamamos al número 8?", o: ["Coeficiente", "Constante", "Literal"], c: 1, i: "Es una Constante porque su valor estructural (ocho) no cambia, a diferencia del vacío de la x." },
+                { q: "Para mantener la simetría: Si sumo 5 al Primer Miembro, ¿qué debo hacer en el Segundo?", o: ["Restar 5", "Sumar 5", "No hacer nada"], c: 1, i: "La Ley de Oro del Álgebra: Lo que le haces a un lado de la balanza, se lo haces exactamente igual al otro." },
+                { q: "¿Por qué llamamos a estas estructuras 'Ecuaciones de Primer Grado'?", o: ["Porque se enseñan en primero de secundaria.", "Porque la incógnita (x) no tiene exponente visible (es x¹).", "Porque solo tienen un término."], c: 1, i: "x¹ significa que la incógnita habita en una sola dimensión (una línea). No hay curvas (x²), solo simetría pura." },
+                { q: "En el término -7x, ¿cuál es el signo de este bloque de información?", o: ["Positivo (+)", "Negativo (-)", "No tiene signo"], c: 1, i: "Todo término incluye su signo. El - le pertenece al 7x como una propiedad fundamental de su existencia." },
+                { q: "Si la balanza x = 6 está en equilibrio, ¿qué pasa si multiplico AMBOS miembros por 2?", o: ["Se rompe la balanza.", "Obtengo 2x = 12 (Sigue en equilibrio).", "Obtengo 2x = 6."], c: 1, i: "Puedes escalar la realidad al doble o a la mitad; mientras lo hagas en ambos lados, la simetría es eterna." },
+                { q: "Identifica la estructura correcta: ¿Puede un Miembro tener un solo Término?", o: ["Sí, como en x = 5.", "No, siempre deben ser dos.", "Solo si es cero."], c: 0, i: "La simplicidad máxima. Un miembro puede ser tan simple como una sola incógnita aislada de todo ruido." },
+                { q: "¿Qué significa que la balanza marque x = 0?", o: ["Que la ecuación está mal.", "Que la incógnita no tiene peso/valor en este sistema.", "Que debemos sumar 1."], c: 1, i: "El cero no es un error, es un dato. Es descubrir que el espacio vacío, en efecto, no contiene masa." },
+                { q: "Decodifica: ¿Qué es fundamentalmente una 'Ecuación'?", o: ["Una cuenta muy larga.", "Una afirmación de que dos expresiones distintas valen lo mismo.", "Un conjunto de letras al azar."], c: 1, i: "Es la poesía de la lógica: decir que 2+2 y 4, aunque se escriben distinto, son la misma verdad." },
+                { q: "Si resto 'x' en el Primer Miembro y resto 'x' en el Segundo Miembro...", o: ["La ecuación se destruye.", "La simetría se mantiene intacta.", "La x desaparece para siempre."], c: 1, i: "Has comprendido la Simetría. Puedes mover la materia del cosmos, siempre y cuando mantengas la balanza neutra." }
+            ],
+            rest: [
+                { q: "Placeholder Capa 3", o: ["1", "2", "3"], c: 0, i: "Placeholder" }
+            ]
+        };
 
-        const bankArquitectura = [
-            { q: "Si $x + 5 = 12$, ¿cuál es la verdad oculta?", a: ["x = 17", "x = 7", "x = 5"], c: 1, h: "Al restar 5 en ambos lados, restauramos el equilibrio y la verdad ($x=7$) emerge sin ruido." },
-            { q: "En Física, $F = ma$. Si $F=20$ y $m=5$, ¿cuánta es la aceleración ($a$)?", a: ["a = 4", "a = 15", "a = 100"], c: 0, h: "¡Exacto! El álgebra permite a la ciencia predecir el movimiento de las estrellas usando esta misma estructura." },
-            { q: "Si $3x = 18$, ¿cuánto vale la unidad?", a: ["x = 21", "x = 15", "x = 6"], c: 2, h: "Dividir entre 3 en ambos lados es un acto de justicia: le das a cada parte lo que le corresponde para hallar el origen." },
-            { q: "Encuentra el equilibrio: $x - 8 = 10$", a: ["x = 2", "x = 18", "x = 80"], c: 1, h: "Sumar 8 en ambos lados es como devolver lo que se quitó para recuperar la integridad original." },
-            { q: "Si el doble de un número más 1 es 11 ($2x + 1 = 11$), ¿cuál es el número?", a: ["x = 5", "x = 10", "x = 6"], c: 0, h: "Has resuelto una estructura compleja. Primero quitamos el ruido extra (+1) y luego dividimos para llegar a la esencia." }
-        ];
+        /* --- LÓGICA DE JUEGO --- */
+        let currentTier = '', qIdx = 0, streak = 0, lives = 5, hasResonance = false, activeBank = [], curSlide = 0;
+        let prog = JSON.parse(localStorage.getItem('eudaimonia_v5')) || { l: false, w: false, s: false };
 
-        /* --- LÓGICA DEL SISTEMA --- */
-        let lives = 5, streak = 0, hasShield = false, qIdx = 0, currentSlide = 0;
-        let activeBank = [], progress = JSON.parse(localStorage.getItem('edu_progress')) || { l: false, w: false };
-
-        function save() { localStorage.setItem('edu_progress', JSON.stringify(progress)); checkUnlock(); }
-        function checkUnlock() {
-            document.getElementById('btn-warmup').disabled = !progress.l;
-            document.getElementById('btn-challenge').disabled = !progress.w;
+        function updateMenu() {
+            document.getElementById('btn-tier2').disabled = !prog.w;
+            document.getElementById('btn-tier3').disabled = !prog.s;
+            if(prog.w) document.getElementById('btn-tier2').style.borderColor = "var(--signal)";
+            if(prog.s) document.getElementById('btn-tier3').style.borderColor = "var(--signal)";
         }
-        checkUnlock();
+        updateMenu();
 
-        // --- LECCIÓN ---
-        function startLesson() { showView('view-lesson'); currentSlide = 0; renderSlide(); }
+        function startLesson() { showView('view-lesson'); curSlide = 0; renderSlide(); }
         function renderSlide() {
-            const s = lessonSlides[currentSlide];
-            document.getElementById('lesson-content').innerHTML = `<img src="${s.i}" class="mascot"><h2>${s.t}</h2><p style="line-height:1.7">${s.d}</p>`;
-            document.getElementById('btn-next-slide').innerText = currentSlide === lessonSlides.length-1 ? "Completar Reflexión" : "Siguiente";
+            const s = lessonSlides[curSlide];
+            document.querySelector('#view-lesson .mascot-frame').src = s.i;
+            document.getElementById('lesson-content').innerHTML = `<h2>${s.t}</h2><p>${s.d}</p>`;
+            document.getElementById('btn-next-slide').innerText = curSlide === lessonSlides.length-1 ? "Finalizar Decodificación" : "Siguiente Señal";
         }
         function changeSlide(dir) {
-            currentSlide += dir;
-            if (currentSlide < 0) showView('view-menu');
-            else if (currentSlide >= lessonSlides.length) { progress.l = true; save(); showView('view-menu'); }
+            curSlide += dir;
+            if (curSlide < 0) showView('view-menu');
+            else if (curSlide >= lessonSlides.length) { prog.l = true; updateMenu(); showView('view-menu'); }
             else renderSlide();
         }
 
-        // --- QUIZ ---
-        function startQuiz(mode) {
-            lives = 5; streak = 0; hasShield = false; qIdx = 0;
-            activeBank = mode === 'sintonia' ? [...bankSintonia] : [...bankArquitectura];
+        function startFlow(tier) {
+            AudioEngine.init();
+            currentTier = tier;
+            activeBank = [...questions[tier]];
             activeBank.sort(() => Math.random() - 0.5);
-            document.getElementById('quiz-title-text').innerText = mode.toUpperCase();
-            updateStats(); showView('view-quiz'); renderQuestion();
+            qIdx = 0; lives = 5; streak = 0; hasResonance = false;
+            updateUI(); showView('view-quiz'); renderQuestion();
         }
 
         function renderQuestion() {
-            const q = activeBank[qIdx];
-            document.getElementById('q-text').innerText = q.q;
-            document.getElementById('quiz-count').innerText = `${qIdx + 1}/${activeBank.length}`;
-            document.getElementById('quiz-p-fill').style.width = `${(qIdx / activeBank.length) * 100}%`;
+            const data = activeBank[qIdx];
+            document.getElementById('q-meta').innerText = `DECODIFICANDO CAPA ${currentTier.toUpperCase()}: ${qIdx + 1}/${activeBank.length}`;
+            document.getElementById('q-text').innerText = data.q;
             
-            const container = document.getElementById('options-container');
+            const container = document.getElementById('options');
             container.innerHTML = '';
-            q.a.forEach((opt, i) => {
-                const d = document.createElement('div');
-                d.className = 'option'; d.innerText = opt;
-                d.onclick = () => checkAnswer(i, d);
-                container.appendChild(d);
+            data.o.forEach((opt, idx) => {
+                const b = document.createElement('div'); b.className = 'option';
+                b.innerText = opt; b.onclick = () => checkAnswer(idx, b);
+                container.appendChild(b);
             });
-            document.getElementById('feedback-area').style.display = 'none';
+            document.getElementById('insight-area').style.display = 'none';
             container.style.display = 'block';
         }
 
         function checkAnswer(idx, el) {
-            const q = activeBank[qIdx];
-            document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
-            
-            if (idx === q.c) {
+            const data = activeBank[qIdx];
+            const opts = document.querySelectorAll('.option');
+            opts.forEach(o => o.style.pointerEvents = 'none');
+
+            if(idx === data.c) {
                 el.classList.add('correct'); streak++;
-                if (streak >= 3) hasShield = true;
-                confetti({ particleCount: 40, spread: 60, colors: ['#06b6d4', '#fbbf24'] });
-                showInsight(q.h);
+                AudioEngine.success();
+                if(streak >= 3 && !hasResonance) { hasResonance = true; AudioEngine.resonance(); }
+                showInsight(data.i);
             } else {
                 el.classList.add('wrong');
-                document.querySelectorAll('.option')[q.c].classList.add('correct');
-                if (hasShield) hasShield = false; else lives--;
+                opts[data.c].classList.add('correct');
+                AudioEngine.error();
+                if(hasResonance) hasResonance = false; else lives--;
                 streak = 0;
-                activeBank.push(activeBank[qIdx]); // Repetir al final
-                setTimeout(() => { if (lives <= 0) gameOver(); else handleNext(); }, 1500);
+                activeBank.push(activeBank[qIdx]); 
+                setTimeout(() => { if(lives <= 0) endFlow(false); else nextQuestion(); }, 2500);
             }
-            updateStats();
+            updateUI();
         }
 
         function showInsight(text) {
-            document.getElementById('options-container').style.display = 'none';
+            document.getElementById('options').style.display = 'none';
             document.getElementById('insight-text').innerText = text;
-            document.getElementById('feedback-area').style.display = 'block';
+            document.getElementById('insight-area').style.display = 'block';
         }
 
-        function handleNext() {
+        function nextQuestion() {
             qIdx++;
-            if (qIdx < activeBank.length) renderQuestion();
-            else finishQuiz();
+            if(qIdx < activeBank.length) renderQuestion();
+            else endFlow(true);
         }
 
-        function updateStats() {
-            document.getElementById('lives-display').innerText = "✨".repeat(Math.max(0, lives));
-            const fill = document.getElementById('shield-fill');
-            fill.classList.toggle('resonance-glow', hasShield);
-            if (!hasShield) fill.style.width = (streak % 3) * 33 + "%";
+        function updateUI() {
+            document.getElementById('lives-ui').innerText = lives > 0 ? "✨".repeat(lives) : "CRITICAL";
+            const fill = document.getElementById('res-fill');
+            fill.classList.toggle('active-resonance', hasResonance);
+            if(!hasResonance) fill.style.width = (streak % 3) * 33 + "%";
         }
 
-        function finishQuiz() {
+        function endFlow(success) {
             showView('view-results');
-            const isWarmup = activeBank.length === bankSintonia.length;
-            if (isWarmup) progress.w = true;
-            save();
-            document.getElementById('res-title').innerText = "Eudaimonía Alcanzada";
-            document.getElementById('res-msg').innerText = "Has demostrado que tu razón puede ver a través del ruido. El equilibrio del universo es ahora parte de tu comprensión.";
-        }
-
-        function gameOver() {
-            showView('view-results');
-            document.getElementById('res-title').innerText = "Mente Nublada";
-            document.getElementById('res-msg').innerText = "Demasiado ruido por hoy. Descansa, reflexiona sobre el equilibrio y vuelve cuando tu atención sea pura.";
+            const imgRes = document.getElementById('res-img');
+            if(success) {
+                if(currentTier === 'perc') prog.w = true;
+                if(currentTier === 'sim') prog.s = true;
+                localStorage.setItem('eudaimonia_v5', JSON.stringify(prog));
+                updateMenu();
+                imgRes.src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png";
+                document.getElementById('res-title').innerText = "Simetría Comprendida";
+                document.getElementById('res-msg').innerText = "Has asimilado las leyes de la balanza cósmica. La siguiente fase revelará cómo despejar la verdad.";
+            } else {
+                imgRes.src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png";
+                document.getElementById('res-title').innerText = "Atención Nublada";
+                document.getElementById('res-msg').innerText = "El ruido del entorno ha ganado esta vez. Descansemos para recuperar la claridad cognitiva.";
+            }
         }
 
         function showView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
         }
-
-        function resetApp() { localStorage.clear(); location.reload(); }
     </script>
 </body>
+</html>
