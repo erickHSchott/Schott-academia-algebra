@@ -1,325 +1,331 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arquitectura del Eco | Xylo v12.0</title>
-	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-	<style>
-    	:root {
-        	--bg: #010204; --surface: #090e1a; --signal: #22d3ee;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitectura del Eco | Xylo v12.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #010204; --surface: #090e1a; --signal: #22d3ee;
             --resonance: #fbbf24; --error: #f43f5e; --text: #f1f5f9;
-        	--secret: #d946ef; --font-mono: 'JetBrains Mono', monospace;
-    	}
- 
-    	body, html {
-        	margin: 0; padding: 0; background: var(--bg); color: var(--text);
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; background: var(--bg); color: var(--text); 
             font-family: 'Outfit', sans-serif; overflow-x: hidden; min-height: 100vh;
-    	}
- 
-    	/* --- ANILLO DE ALIENTO Y EFECTOS VISUALES --- */
+        }
+
+        /* --- ANIMACIONES MÍSTICAS --- */
         .mascot-container {
-        	width: 200px; height: 200px; margin: 0 auto 20px;
-        	position: relative; display: flex; align-items: center; justify-content: center;
-    	}
- 
-    	.mascot-img {
-        	width: 80%; z-index: 2; transition: transform 0.2s ease-out;
-        	filter: drop-shadow(0 0 10px var(--signal));
-    	}
- 
+            width: 180px; height: 180px; margin: 0 auto 20px;
+            position: relative; display: flex; align-items: center; justify-content: center;
+        }
+
+        .mascot-img {
+            width: 75%; z-index: 2; transition: transform 0.2s ease-out;
+            filter: drop-shadow(0 0 10px var(--signal));
+        }
+
         .breathing-ring {
-        	position: absolute; width: 100%; height: 100%;
-        	border: 2px solid var(--signal); border-radius: 50%;
-        	opacity: 0.3; z-index: 1; transition: 0.3s;
-    	}
- 
-    	/* Animación cuando Xylo habla */
-    	.xylo-speaking .mascot-img {
-        	animation: breath 0.6s infinite alternate ease-in-out;
-        	filter: drop-shadow(0 0 30px var(--signal));
-    	}
-    	.xylo-speaking .breathing-ring {
-        	animation: pulse-ring 0.6s infinite alternate ease-in-out;
-        	opacity: 0.8; border-width: 4px;
-    	}
- 
-    	@keyframes breath {
-        	from { transform: scale(1); }
-        	to { transform: scale(1.2); }
-    	}
-    	@keyframes pulse-ring {
-        	from { transform: scale(0.8); opacity: 0.2; }
-        	to { transform: scale(1.4); opacity: 0.6; box-shadow: 0 0 40px var(--signal); }
-    	}
- 
-    	/* --- INTERFAZ --- */
-    	.container {
-        	width: 90%; max-width: 850px; margin: 4vh auto; padding: 40px;
-            background: rgba(9, 14, 26, 0.9); border: 1px solid rgba(34, 211, 238, 0.2);
-            border-radius: 30px; backdrop-filter: blur(25px);
-    	}
- 
-    	.view { display: none; transition: 0.5s; }
-    	.view.active { display: block; animation: fadeIn 0.8s ease; }
-    	@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
- 
-    	.option {
-            background: rgba(255, 255, 255, 0.03); padding: 22px; border-radius: 15px; margin-bottom: 15px;
-        	cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.4s;
-            font-family: var(--font-mono); font-size: 1.1rem; width: 100%; text-align: left; color: #fff;
-    	}
- 
-    	.btn-active {
-        	border: 2px solid var(--signal) !important;
-            background: linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(34, 211, 238, 0.3)) !important;
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
-            font-weight: 600;
-    	}
- 
-    	.locked { opacity: 0.15; cursor: not-allowed; filter: blur(1px); }
- 
-    	.insight-box {
-            margin-top: 25px; padding: 25px; border-radius: 20px; background: rgba(0,0,0,0.7);
-            border-left: 6px solid var(--signal); display: none; line-height: 1.6;
-    	}
- 
-    	#portal {
-        	position: fixed; inset: 0; z-index: 100; background: radial-gradient(circle, #090e1a 0%, #000 100%);
-        	display: flex; flex-direction: column; justify-content: center; align-items: center;
-    	}
- 
-    	.input-name {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--signal); color: #fff;
-        	padding: 15px 25px; font-size: 1.3rem; border-radius: 12px; margin-bottom: 25px; text-align: center;
-    	}
-	</style>
+            position: absolute; width: 100%; height: 100%;
+            border: 2px solid var(--signal); border-radius: 50%;
+            opacity: 0.2; z-index: 1;
+        }
+
+        .xylo-speaking .mascot-img { animation: breath 0.7s infinite alternate ease-in-out; }
+        .xylo-speaking .breathing-ring { animation: pulse-ring 0.7s infinite alternate ease-in-out; }
+
+        @keyframes breath { from { transform: scale(1); } to { transform: scale(1.15); } }
+        @keyframes pulse-ring { 
+            from { transform: scale(0.9); opacity: 0.1; } 
+            to { transform: scale(1.3); opacity: 0.5; box-shadow: 0 0 30px var(--signal); } 
+        }
+
+        /* --- UI COMPONENTS --- */
+        .container {
+            width: 90%; max-width: 850px; margin: 4vh auto; padding: 40px;
+            background: rgba(9, 14, 26, 0.95); border: 1px solid rgba(34, 211, 238, 0.1);
+            border-radius: 25px; backdrop-filter: blur(20px);
+        }
+
+        .view { display: none; }
+        .view.active { display: block; animation: fadeIn 0.6s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .option {
+            background: rgba(255, 255, 255, 0.02); padding: 20px; border-radius: 12px; margin-bottom: 15px;
+            cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.08); transition: 0.3s;
+            font-family: var(--font-mono); width: 100%; text-align: left; color: #fff;
+        }
+
+        .btn-active {
+            border: 2px solid var(--signal) !important;
+            background: rgba(34, 211, 238, 0.1) !important;
+            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
+        }
+
+        .locked { opacity: 0.2; cursor: not-allowed; }
+
+        .diagram-frame {
+            width: 100%; max-height: 250px; overflow: hidden; border-radius: 15px;
+            margin-bottom: 20px; border: 1px solid rgba(34, 211, 238, 0.3); display: none;
+        }
+        .diagram-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+
+        .narration-text {
+            font-size: 1.4rem; line-height: 1.6; font-weight: 300;
+            color: #cbd5e1; border-left: 4px solid var(--signal); padding-left: 20px; margin-bottom: 30px;
+        }
+
+        #portal {
+            position: fixed; inset: 0; z-index: 100; background: #000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+    </style>
 </head>
 <body>
- 
-	<div id="portal">
-    	<h1 style="color: var(--signal); letter-spacing: 12px; font-weight: 300;">ARQUITECTURA DEL ECO</h1>
-    	<p style="color: #64748b; font-family: var(--font-mono); margin-bottom: 30px;">Iniciando Protocolo Místico...</p>
-    	<input type="text" id="username" class="input-name" placeholder="IDENTIFÍCATE">
-    	<button class="option btn-active" style="width: 280px; text-align: center;" onclick="initSystem()">ENTRAR AL NÚCLEO</button>
-	</div>
- 
-	<div class="container" id="game-shell">
-    	<div id="view-menu" class="view">
-        	<h2 id="welcome-title" style="color: var(--signal); font-weight: 300; margin-bottom: 30px;"></h2>
-        	<div id="layer-buttons">
-                <button class="option locked" id="btn-perc" onclick="startFlow('perc')">CAPA I: EL PODER DE LA INCÓGNITA</button>
-                <button class="option locked" id="btn-sim" onclick="startFlow('sim')">CAPA II: EL EQUILIBRIO DE XYLO</button>
-                <button class="option locked" id="btn-rest" onclick="startFlow('rest')">CAPA III: RESTAURACIÓN TOTAL</button>
+
+    <div id="portal">
+        <h1 style="color: var(--signal); letter-spacing: 8px; font-weight: 300;">ARQUITECTURA DEL ECO</h1>
+        <input type="text" id="username" style="background:#111; border:1px solid var(--signal); color:#fff; padding:15px; border-radius:8px; margin-bottom:20px; text-align:center;" placeholder="OPERADOR">
+        <button class="option btn-active" style="width: 220px; text-align: center;" onclick="initSystem()">CONECTAR</button>
+    </div>
+
+    <div class="container" id="game-shell">
+        <div id="view-menu" class="view">
+            <h2 id="welcome-title" style="color: var(--signal); font-weight: 300;"></h2>
+            <p style="color:#64748b; margin-bottom:30px;">Selecciona una frecuencia para restaurar:</p>
+            <div id="layer-buttons">
+                <button class="option locked" id="btn-perc" onclick="startNarrative('perc')">
+                    <b>CAPA I: LA FUNDACIÓN</b><br>
+                    <small style="color:#64748b">Lenguaje algebraico y patrones básicos.</small>
+                </button>
+                <button class="option locked" id="btn-sim" onclick="startNarrative('sim')">
+                    <b>CAPA II: EL EQUILIBRIO</b><br>
+                    <small style="color:#64748b">Ecuaciones lineales y balanza cuántica.</small>
+                </button>
+                <button class="option locked" id="btn-rest" onclick="startNarrative('rest')">
+                    <b>CAPA III: RESTAURACIÓN</b><br>
+                    <small style="color:#64748b">Sistemas complejos y despejes avanzados.</small>
+                </button>
             </div>
-    	</div>
- 
-    	<div id="view-quiz" class="view">
-        	<div style="display:flex; justify-content: space-between; color: #64748b; font-family: var(--font-mono); margin-bottom: 20px;">
-                <span id="q-meta">PASO 1</span>
-                <span>ERRORES: <span id="ui-errors" style="color: var(--error);">0</span></span>
-            </div>
- 
-        	<div class="mascot-container" id="xylo-box">
+        </div>
+
+        <div id="view-narrative" class="view">
+            <div class="mascot-container" id="xylo-narrative-box">
                 <div class="breathing-ring"></div>
                 <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
             </div>
- 
-        	<div id="q-text" style="font-size: 1.7rem; margin-bottom: 30px; font-weight: 300;"></div>
-        	<div id="options-grid"></div>
- 
-        	<div id="insight-area" class="insight-box">
-            	<p id="insight-text" style="font-size: 1.2rem;"></p>
-                <button class="option btn-active" style="margin-top: 15px;" onclick="processNext()">SIGUIENTE FRECUENCIA ➔</button>
+            <div id="diagram-container" class="diagram-frame">
+                <img id="layer-diagram" src="" alt="Diagrama de Capa">
             </div>
-    	</div>
- 
-    	<div id="view-results" class="view">
-        	<h1 style="color: var(--resonance); text-align: center; font-weight: 300;">CAPA RECONSTRUIDA</h1>
-        	<p id="res-msg" style="text-align: center; font-size: 1.3rem; margin-bottom: 30px;"></p>
-        	<button class="option btn-active" onclick="showMenu()">VOLVER AL NÚCLEO</button>
-    	</div>
-	</div>
- 
-	<script>
-    	const PROFESSOR_EMAIL = "erickhschott@gmail.com";
-    	let currentUser = "";
-    	let currentTier = "";
-    	let currentQuestions = [];
-    	let errorQueue = [];
-    	let qIndex = 0;
-    	let errorsCount = 0;
-    	let isReviewingErrors = false;
- 
-    	const DB = {
-        	perc: [
-            	{ q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "Análisis Estructural: El doble es una multiplicación (2x). Al decir aumentado, sumamos la constante 5. El eco es 2x mas 5." },
-            	{ q: "El triple de un número disminuido en ocho", o: ["3x - 8", "8 - 3x", "3(x-8)"], c: 0, i: "El triple invoca al factor 3. Disminuido resta la energía de la unidad 8. El resultado es 3x menos 8." }
-        	],
-        	sim: [
-            	{ q: "Si x=4, despeja el valor de 2x + 10", o: ["18", "14", "20"], c: 0, i: "Sustitución cuántica. 2 por 4 es 8. Sumamos 10. La armonía final es 18." }
-        	],
-        	rest: [
-            	{ q: "¿Cómo neutralizas una suma de 15?", o: ["Restando 15", "Dividiendo entre 15", "Multiplicando"], c: 0, i: "Para restaurar el equilibrio, aplicamos la fuerza opuesta. La resta anula la suma." }
-        	]
-    	};
- 
-    	const AudioEngine = {
-        	ctx: null, mainOsc: null, lfo: null, mainGain: null,
-        	init() {
-                if(!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-            	}
-        	},
-            playHarmonicHeartbeat(tier) {
+            <div id="narrative-text" class="narration-text"></div>
+            <button class="option btn-active" style="text-align:center" onclick="beginQuiz()">ACEPTAR TRANSMISIÓN Y COMENZAR</button>
+        </div>
+
+        <div id="view-quiz" class="view">
+            <div style="display:flex; justify-content: space-between; color: #64748b; font-family: var(--font-mono); margin-bottom: 20px;">
+                <span id="q-meta">PASO 1</span>
+                <span>FALLOS: <span id="ui-errors" style="color: var(--error);">0</span></span>
+            </div>
+            <div class="mascot-container" id="xylo-quiz-box">
+                <div class="breathing-ring"></div>
+                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
+            </div>
+            <div id="q-text" style="font-size: 1.6rem; margin-bottom: 25px; font-weight: 300;"></div>
+            <div id="options-grid"></div>
+            <div id="insight-area" style="display:none; margin-top:20px; padding:20px; background:rgba(0,0,0,0.5); border-left:4px solid var(--signal); border-radius:10px;">
+                <p id="insight-text" style="font-size:1.1rem; line-height:1.5;"></p>
+                <button class="option btn-active" onclick="processNext()">SIGUIENTE DATO ➔</button>
+            </div>
+        </div>
+
+        <div id="view-results" class="view">
+            <h1 style="color: var(--signal); text-align: center; font-weight: 300;">FRECUENCIA PURIFICADA</h1>
+            <p id="res-msg" style="text-align: center; font-size: 1.2rem; margin-bottom: 30px;"></p>
+            <button class="option btn-active" onclick="showMenu()">VOLVER AL NÚCLEO</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = "";
+        let currentTier = "";
+        let currentQuestions = [];
+        let errorQueue = [];
+        let qIndex = 0;
+        let errorsCount = 0;
+        let isReviewingErrors = false;
+
+        const DB = {
+            perc: {
+                intro: "Escucha el eco del pasado. Antes de las máquinas, los humanos usaban patrones para construir pirámides. El Álgebra, al-jabr, es el arte de reunir lo roto. Un número desconocido no es un vacío, es una semilla esperando ser nombrada. Si digo 'el doble', estoy invocando una duplicidad. Si digo 'aumentado', estoy expandiendo su realidad. Aprende a leer el código antes de escribirlo.",
+                diagram: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Eratosthenes_measure_of_Earth.png",
+                questions: [
+                    { q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "Correcto. El doble es multiplicación (2x), aumentado es suma (+5). Has unido las partes correctamente." },
+                    { q: "La tercera parte de un número", o: ["x/3", "3x", "x - 3"], c: 0, i: "Exacto. Dividir la unidad entre tres crea la frecuencia x sobre 3." }
+                ]
+            },
+            sim: {
+                intro: "El equilibrio es la ley suprema. Una ecuación es una balanza mística. Lo que restas a la izquierda, debes restarlo a la derecha para que el universo no colapse. El signo igual es el espejo donde se encuentran dos verdades. Mantén la calma, observa el centro y despeja las sombras hasta que la verdad quede sola.",
+                diagram: "https://upload.wikimedia.org/wikipedia/commons/5/5e/E%3Dmc2_and_the_Atom.jpg",
+                questions: [
+                    { q: "Si x + 10 = 25, ¿cuál es el valor de x?", o: ["15", "35", "10"], c: 0, i: "Restaste 10 en ambos lados de la balanza. La armonía se mantiene en 15." }
+                ]
+            },
+            rest: {
+                intro: "Has llegado a la frontera de la IA. Aquí las ecuaciones ya no son simples líneas, son redes que sostienen el conocimiento. Restaurar un sistema complejo requiere precisión quirúrgica. Si una variable está atrapada en un denominador, debes multiplicar la realidad entera para liberarla. ¡Demuestra que eres un maestro del eco!",
+                diagram: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Neural_network_example.svg",
+                questions: [
+                    { q: "Para despejar x en x/4 = 8, debes...", o: ["Multiplicar 8 por 4", "Dividir 8 entre 4", "Restar 4"], c: 0, i: "Liberaste la variable. Multiplicar por 4 neutraliza la división original." }
+                ]
+            }
+        };
+
+        const AudioEngine = {
+            ctx: null, mainOsc: null, lfo: null, mainGain: null,
+            init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            playHeartbeat(tier) {
                 this.stop();
                 this.mainOsc = this.ctx.createOscillator();
                 this.mainGain = this.ctx.createGain();
-                this.lfo = this.ctx.createOscillator(); // El "latido"
-            	const lfoGain = this.ctx.createGain();
- 
-            	let baseFreq = (tier === 'perc') ? 110 : (tier === 'sim') ? 146.83 : 196.00;
-                this.mainOsc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
-            	
-            	// Configurar el latido (ventanas de silencio)
-                this.lfo.frequency.value = 0.5; // Un pulso cada 2 segundos
-                lfoGain.gain.value = 0.4; // Profundidad del silencio
-            	
+                this.lfo = this.ctx.createOscillator();
+                const lfoGain = this.ctx.createGain();
+                
+                let freq = (tier === 'perc') ? 110 : (tier === 'sim') ? 146 : 196;
+                this.mainOsc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                this.lfo.frequency.value = 0.5;
+                lfoGain.gain.value = 0.3;
+                
                 this.lfo.connect(lfoGain.gain);
                 this.mainOsc.connect(this.mainGain);
                 this.mainGain.connect(this.ctx.destination);
-            	
-                this.mainGain.gain.value = (tier === 'rest') ? 0.7 : 0.4;
-            	
-                this.mainOsc.start();
-                this.lfo.start();
- 
-            	// Cambio de nota sutil cada 5 segundos (4 compases imaginarios)
-                this.noteInterval = setInterval(() => {
-                    let nextNote = baseFreq * (Math.random() > 0.5 ? 1.25 : 1.12); // Terceras y segundas
-                    this.mainOsc.frequency.exponentialRampToValueAtTime(nextNote, this.ctx.currentTime + 2);
-                    setTimeout(() => {
-                        this.mainOsc.frequency.exponentialRampToValueAtTime(baseFreq, this.ctx.currentTime + 2);
-                	}, 2500);
-            	}, 5000);
-        	},
-        	stop() {
-                if(this.mainOsc) { this.mainOsc.stop(); clearInterval(this.noteInterval); }
-                if(this.lfo) this.lfo.stop();
-        	},
-            speak(text) {
+                this.mainGain.gain.value = 0.4;
+                this.mainOsc.start(); this.lfo.start();
+            },
+            stop() { if(this.mainOsc) { this.mainOsc.stop(); this.lfo.stop(); } },
+            speak(text, boxId) {
                 window.speechSynthesis.cancel();
-            	const u = new SpeechSynthesisUtterance(text);
-            	u.lang = 'es-MX';
-                u.pitch = 1.8;  // VOZ AGUDA MÍSTICA
-            	u.rate = 0.85;  // PAUSADA
-            	
-            	const box = document.getElementById('xylo-box');
+                const u = new SpeechSynthesisUtterance(text);
+                u.lang = 'es-MX'; u.pitch = 1.8; u.rate = 0.85;
+                const box = document.getElementById(boxId);
                 u.onstart = () => box.classList.add('xylo-speaking');
                 u.onend = () => box.classList.remove('xylo-speaking');
                 window.speechSynthesis.speak(u);
-        	}
-    	};
- 
-    	function initSystem() {
+            }
+        };
+
+        function initSystem() {
             currentUser = document.getElementById('username').value.trim();
             if(!currentUser) return;
             document.getElementById('portal').style.display = 'none';
             AudioEngine.init();
             showMenu();
-            AudioEngine.speak(`Saludos, ${currentUser}. Soy Xylo. El eco de la matemática nos guiará hoy.`);
-    	}
- 
-    	function showMenu() {
-        	const unlocked = JSON.parse(localStorage.getItem('xylo_layers')) || ['perc'];
-        	const tiers = ['perc', 'sim', 'rest'];
-        	
-            tiers.forEach(t => {
-            	const btn = document.getElementById(`btn-${t}`);
+            AudioEngine.speak(`Saludos, ${currentUser}. Soy Xylo. Iniciando conexión con el núcleo.`, 'xylo-quiz-box');
+        }
+
+        function showMenu() {
+            const unlocked = JSON.parse(localStorage.getItem('xylo_layers')) || ['perc'];
+            ['perc', 'sim', 'rest'].forEach(t => {
+                const btn = document.getElementById(`btn-${t}`);
                 btn.className = 'option locked';
                 if(unlocked.includes(t)) {
                     btn.classList.remove('locked');
                     if(t === unlocked[unlocked.length - 1]) btn.classList.add('btn-active');
-            	}
-        	});
- 
+                }
+            });
             document.getElementById('welcome-title').innerText = `OPERADOR: [${currentUser.toUpperCase()}]`;
             switchView('view-menu');
-    	}
- 
-    	function startFlow(tier) {
+        }
+
+        function startNarrative(tier) {
+            if(document.getElementById(`btn-${tier}`).classList.contains('locked')) return;
             currentTier = tier;
-            currentQuestions = [...DB[tier]];
-        	errorQueue = []; qIndex = 0; errorsCount = 0; isReviewingErrors = false;
-            AudioEngine.playHarmonicHeartbeat(tier);
+            const data = DB[tier];
+            document.getElementById('narrative-text').innerText = data.intro;
+            
+            const diag = document.getElementById('layer-diagram');
+            const frame = document.getElementById('diagram-container');
+            if(data.diagram) { diag.src = data.diagram; frame.style.display = 'block'; }
+            else { frame.style.display = 'none'; }
+
+            AudioEngine.playHeartbeat(tier);
+            switchView('view-narrative');
+            AudioEngine.speak(data.intro, 'xylo-narrative-box');
+        }
+
+        function beginQuiz() {
+            currentQuestions = [...DB[currentTier].questions];
+            errorQueue = []; qIndex = 0; errorsCount = 0; isReviewingErrors = false;
             switchView('view-quiz');
             loadQuestion();
-    	}
- 
-    	function loadQuestion() {
-        	const q = isReviewingErrors ? errorQueue[qIndex] : currentQuestions[qIndex];
-            document.getElementById('q-meta').innerText = isReviewingErrors ? `RESTAURANDO ERROR ${qIndex+1}` : `SECUENCIA ${qIndex+1}`;
+        }
+
+        function loadQuestion() {
+            const q = isReviewingErrors ? errorQueue[qIndex] : currentQuestions[qIndex];
+            document.getElementById('q-meta').innerText = isReviewingErrors ? `REPARANDO ERROR ${qIndex+1}` : `SECUENCIA ${qIndex+1}`;
             document.getElementById('q-text').innerText = q.q;
             document.getElementById('ui-errors').innerText = errorsCount;
-        	
-        	const grid = document.getElementById('options-grid');
+            
+            const grid = document.getElementById('options-grid');
             grid.innerHTML = '';
             q.o.forEach((opt, i) => {
-            	const b = document.createElement('button');
+                const b = document.createElement('button');
                 b.className = 'option';
                 b.innerText = opt;
                 b.onclick = () => checkAnswer(i, q.c, q.i, q);
                 grid.appendChild(b);
-        	});
+            });
             document.getElementById('insight-area').style.display = 'none';
-    	}
- 
-    	function checkAnswer(idx, correct, info, qObj) {
+        }
+
+        function checkAnswer(idx, correct, info, qObj) {
             Array.from(document.getElementById('options-grid').children).forEach(b => b.style.pointerEvents = 'none');
-        	const area = document.getElementById('insight-area');
-        	const txt = document.getElementById('insight-text');
+            const area = document.getElementById('insight-area');
             area.style.display = 'block';
- 
-        	if(idx === correct) {
-                txt.innerHTML = `<span style="color:var(--signal)">✓ FRECUENCIA CORRECTA:</span> ${info}`;
-                AudioEngine.speak(info);
-        	} else {
+            const txt = document.getElementById('insight-text');
+
+            if(idx === correct) {
+                txt.innerHTML = `<span style="color:var(--signal)">✓ SINCRO COMPLETA:</span> ${info}`;
+                AudioEngine.speak(info, 'xylo-quiz-box');
+            } else {
                 errorsCount++;
                 txt.innerHTML = `<span style="color:var(--error)">✗ DISONANCIA:</span> ${info}`;
                 if(!errorQueue.includes(qObj)) errorQueue.push(qObj);
-                AudioEngine.speak("Disonancia detectada. " + info);
-        	}
-    	}
- 
-    	function processNext() {
-        	qIndex++;
-        	const target = isReviewingErrors ? errorQueue : currentQuestions;
-        	if(qIndex < target.length) {
+                AudioEngine.speak("Disonancia. " + info, 'xylo-quiz-box');
+            }
+        }
+
+        function processNext() {
+            qIndex++;
+            const target = isReviewingErrors ? errorQueue : currentQuestions;
+            if(qIndex < target.length) {
                 loadQuestion();
-        	} else if(errorQueue.length > 0) {
+            } else if(errorQueue.length > 0) {
                 isReviewingErrors = true; qIndex = 0;
-            	const temp = [...errorQueue]; errorQueue = []; currentQuestions = temp;
-                AudioEngine.speak("Iniciando bucle de restauración. Corregiremos las disonancias.");
+                const temp = [...errorQueue]; errorQueue = []; currentQuestions = temp;
+                AudioEngine.speak("Iniciando bucle de restauración.", 'xylo-quiz-box');
                 loadQuestion();
-        	} else {
+            } else {
                 finishTier();
-        	}
-    	}
- 
-    	function finishTier() {
-        	const unlocked = JSON.parse(localStorage.getItem('xylo_layers')) || ['perc'];
+            }
+        }
+
+        function finishTier() {
+            const unlocked = JSON.parse(localStorage.getItem('xylo_layers')) || ['perc'];
             if(currentTier === 'perc' && !unlocked.includes('sim')) unlocked.push('sim');
             if(currentTier === 'sim' && !unlocked.includes('rest')) unlocked.push('rest');
             localStorage.setItem('xylo_layers', JSON.stringify(unlocked));
-            document.getElementById('res-msg').innerText = `Capa purificada. Has superado las pruebas, ${currentUser}.`;
+            document.getElementById('res-msg').innerText = `Capa purificada con éxito.`;
             AudioEngine.stop();
             switchView('view-results');
-    	}
- 
-    	function switchView(id) {
+        }
+
+        function switchView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-    	}
-	</script>
+        }
+    </script>
 </body>
 </html>
