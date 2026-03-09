@@ -3,335 +3,409 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eudaimonía: Arquitectura del Eco | Entidad Activa</title>
+    <title>Eudaimonía: Arquitectura del Eco | Evaluación v9.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #05070a; --surface: #0f172a; --signal: #22d3ee;
+            --bg: #010204; --surface: #090e1a; --signal: #22d3ee;
             --resonance: #fbbf24; --error: #f43f5e; --text: #f1f5f9;
-            --font-main: 'Outfit', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+            --secret: #d946ef; --font-mono: 'JetBrains Mono', monospace;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            background: var(--bg); color: var(--text); font-family: var(--font-main);
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            overflow-x: hidden;
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; min-height: 100vh; }
+
+        /* PORTAL DE INICIO */
+        #portal {
+            position: fixed; inset: 0; z-index: 100; background: radial-gradient(circle, #0f172a 0%, #010204 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
         }
 
-        /* --- UI DE ARQUEOLOGÍA DIGITAL --- */
+        .input-name {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--signal); color: #fff;
+            padding: 15px 20px; font-family: var(--font-mono); font-size: 1.2rem; border-radius: 8px;
+            margin-bottom: 30px; width: 300px; text-align: center; outline: none;
+        }
+        .input-name:focus { box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); }
+
+        .start-btn {
+            padding: 20px 40px; background: transparent; color: var(--signal); border: 2px solid var(--signal);
+            font-family: var(--font-mono); font-size: 1rem; cursor: pointer; border-radius: 6px;
+            transition: 0.4s; letter-spacing: 3px; text-transform: uppercase;
+        }
+        .start-btn:hover { background: var(--signal); color: var(--bg); box-shadow: 0 0 40px var(--signal); }
+
         .container {
-            width: 100%; max-width: 700px; padding: 40px; background: var(--surface);
-            border-radius: 20px; border: 1px solid rgba(34, 211, 238, 0.1);
-            position: relative; box-shadow: 0 0 50px rgba(0,0,0,0.8);
+            width: 90%; max-width: 850px; margin: 4vh auto; padding: 40px;
+            background: rgba(9, 14, 26, 0.95); border: 1px solid rgba(34, 211, 238, 0.15);
+            border-radius: 20px; position: relative; z-index: 10; backdrop-filter: blur(20px);
         }
 
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .stats { font-family: var(--font-mono); font-size: 0.8rem; color: var(--signal); letter-spacing: 2px; }
-
-        .resonance-bar {
-            width: 150px; height: 4px; background: #1e293b; border-radius: 2px; margin-top: 8px;
-            overflow: hidden; position: relative; display: inline-block;
-        }
-        .resonance-fill { height: 100%; width: 0%; background: var(--signal); transition: 0.5s ease cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        /* Animación de Resonancia Crítica */
-        .active-resonance {
-            background: linear-gradient(90deg, var(--resonance), #fff, var(--resonance));
-            background-size: 200% 100%; animation: move 1.5s infinite linear, pulse 2s infinite alternate;
-            box-shadow: 0 0 15px var(--resonance); width: 100% !important;
-        }
-        @keyframes move { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        @keyframes pulse { from { opacity: 0.8; } to { opacity: 1; } }
-
-        /* --- VISTAS --- */
-        .view { display: none; animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .view.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { font-weight: 300; letter-spacing: -1px; margin-bottom: 20px; color: var(--signal); }
-        p { line-height: 1.7; color: #94a3b8; margin-bottom: 25px; font-size: 0.95rem; }
-
-        .btn {
-            width: 100%; padding: 18px; background: transparent; color: var(--text);
-            border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 12px;
-            cursor: pointer; font-family: var(--font-mono); font-size: 0.85rem;
-            transition: 0.3s ease; margin-bottom: 15px; text-align: left;
-            position: relative; overflow: hidden;
-        }
-        .btn:hover:not(:disabled) { background: rgba(34, 211, 238, 0.05); border-color: var(--signal); color: #fff; }
-        .btn:disabled { opacity: 0.2; cursor: not-allowed; border-color: #334155; }
+        .view { display: none; }
+        .view.active { display: block; animation: slideIn 0.8s ease forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .option { 
-            background: #1e293b; padding: 16px; border-radius: 12px; margin-bottom: 12px;
-            cursor: pointer; border: 1px solid transparent; transition: 0.2s ease; font-family: var(--font-mono); font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px; margin-bottom: 12px;
+            cursor: pointer; border: 1px solid rgba(34, 211, 238, 0.1); transition: 0.3s;
+            font-family: var(--font-mono); font-size: 1.05rem;
         }
-        .option:hover { border-color: var(--signal); background: rgba(34, 211, 238, 0.03); }
-        .correct { background: rgba(16, 185, 129, 0.1) !important; border-color: #10b981 !important; color: #10b981; }
-        .wrong { background: rgba(244, 63, 94, 0.1) !important; border-color: var(--error) !important; color: var(--error); }
+        .option:hover:not(.locked) { border-color: var(--signal); background: rgba(34, 211, 238, 0.15); transform: translateX(10px); }
+        .locked { opacity: 0.3; cursor: not-allowed; border-color: #334155; }
 
-        .insight-box {
-            margin-top: 30px; padding: 25px; border-radius: 15px;
-            border: 1px solid rgba(34, 211, 238, 0.15);
-            background: rgba(34, 211, 238, 0.02); display: none; animation: fadeIn 0.5s ease;
+        .mascot-container { width: 130px; height: 130px; margin: 0 auto 30px; position: relative; }
+        .mascot-img { width: 100%; animation: float 5s infinite ease-in-out; filter: drop-shadow(0 0 15px var(--signal)); }
+        
+        .shield-ring {
+            position: absolute; inset: -20px; border: 3px solid var(--resonance);
+            border-radius: 50%; opacity: 0; transition: 0.5s; transform: scale(0.8);
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .shield-on { opacity: 1; transform: scale(1); animation: spin 8s linear infinite; box-shadow: 0 0 40px rgba(251, 191, 36, 0.5); }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        /* --- LA MASCOTA (ENTIDAD DE OBSERVACIÓN) --- */
-        .mascot-frame { 
-            width: 100px; height: 100px; display: block; margin: 0 auto 30px;
-            opacity: 0.6; filter: drop-shadow(0 0 10px var(--signal));
-            animation: float 4s ease-in-out infinite;
+        .insight-box { 
+            margin-top: 30px; padding: 30px; border-radius: 15px; background: rgba(34, 211, 238, 0.05);
+            border-left: 5px solid var(--signal); display: none; line-height: 1.8;
         }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+        .correct { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.15) !important; color: #10b981; }
+        .wrong { border-color: var(--error) !important; background: rgba(244, 63, 94, 0.15) !important; color: var(--error); }
+
+        .score-panel { background: #0f172a; padding: 25px; border-radius: 15px; border: 1px solid var(--signal); margin-bottom: 30px; display: flex; justify-content: space-around; font-family: var(--font-mono); color: #fff; }
+        .score-item { text-align: center; }
+        .score-val { font-size: 2rem; color: var(--resonance); display: block; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
-            <div class="stats">OBSERVADOR: <span id="lives-ui">ONLINE</span></div>
-            <div style="text-align: right;">
-                <div class="stats" style="font-size: 0.6rem;">RESONANCIA CRÍTICA</div>
-                <div class="resonance-bar"><div id="res-fill" class="resonance-fill"></div></div>
-            </div>
-        </div>
+    <div id="portal">
+        <h1 style="letter-spacing: 12px; font-weight: 300; color: var(--signal); margin-bottom: 20px;">ARQUITECTURA DEL ECO</h1>
+        <p style="color: #64748b; margin-bottom: 40px; font-family: var(--font-mono);">Identificación de Operador Requerida</p>
+        <input type="text" id="username" class="input-name" placeholder="Tu Nombre o Matrícula" autocomplete="off">
+        <button class="start-btn" onclick="initSystem()">INICIAR EVALUACIÓN</button>
+    </div>
 
-        <div id="view-menu" class="view active">
-            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-frame" alt="Entidad Activa">
-            <h1>Arquitectura del Eco</h1>
-            <p>Sintonizando la frecuencia de la <b>Eudaimonía</b>. Elimina el ruido histórico para decodificar la realidad estructural del sistema.</p>
-            <button class="btn" onclick="startLesson()">ACCEDER A LOS ARCHIVOS DE ENSEÑANZA 👁️</button>
-            <button class="btn" onclick="startFlow('perc')" style="border-color: var(--signal);">CAPA I: PERCEPCIÓN (15 Retos) ⚡</button>
-            <button class="btn" id="btn-tier2" onclick="startFlow('sim')" disabled>CAPA II: SIMETRÍA (15 Retos) ⚖️</button>
-            <button class="btn" id="btn-tier3" onclick="startFlow('rest')" disabled>CAPA III: RESTAURACIÓN (Bloqueada) 🔒</button>
-        </div>
-
-        <div id="view-lesson" class="view">
-            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose2.png" class="mascot-frame">
-            <div id="lesson-content" style="text-align: center; min-height: 300px;"></div>
-            <div style="display: flex; gap: 15px;">
-                <button class="btn" style="background: #1e293b; border-color: #334155; text-align: center;" onclick="changeSlide(-1)">Regresar</button>
-                <button class="btn" id="btn-next-slide" style="text-align: center; border-color: var(--signal);" onclick="changeSlide(1)">Siguiente</button>
-            </div>
+    <div class="container" id="game-shell">
+        <div id="view-menu" class="view">
+            <h2 style="font-weight: 300; margin-bottom: 30px; color: var(--signal);">Secuencias de Acceso</h2>
+            <div id="menu-user" style="color: #94a3b8; font-family: var(--font-mono); margin-bottom: 30px;">OPERADOR: [NO_IDENTIFICADO]</div>
+            <button class="option" id="btn-tier1" style="width: 100%; text-align: left;" onclick="startQuiz('perc')">CAPA I: EL PODER DE LA INCÓGNITA</button>
+            <button class="option locked" id="btn-tier2" style="width: 100%; text-align: left;" onclick="startQuiz('sim')">CAPA II: EL EQUILIBRIO DE XYLO (BLOQUEADO)</button>
+            <button class="option locked" id="btn-tier3" style="width: 100%; text-align: left;" onclick="startQuiz('rest')">CAPA III: RESTAURACIÓN TOTAL (BLOQUEADO)</button>
         </div>
 
         <div id="view-quiz" class="view">
-            <div id="q-meta" class="stats" style="margin-bottom: 10px; color: #94a3b8;">DECODIFICANDO: 1/15</div>
-            <h2 id="q-text" style="margin-bottom: 30px; font-weight: 300; line-height: 1.4;"></h2>
-            <div id="options"></div>
+            <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); color: #64748b; margin-bottom: 20px;">
+                <span id="q-meta">CAPA I | PASO: 1/15</span>
+                <span>ERRORES: <span id="ui-errors" style="color: var(--error);">0</span></span>
+            </div>
+            
+            <div class="mascot-container" style="width: 80px; height: 80px;">
+                <div id="shield-ring" class="shield-ring"></div>
+                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
+            </div>
+
+            <div id="q-text" style="font-size: 1.5rem; margin-bottom: 30px; font-weight: 300; line-height: 1.5;"></div>
+            <div id="options-grid"></div>
             
             <div id="insight-area" class="insight-box">
-                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" class="mascot-frame" style="width: 80px; height: 80px; margin-bottom: 15px;">
-                <div style="color: var(--resonance); font-size: 0.7rem; margin-bottom: 10px; font-family: var(--font-mono); letter-spacing: 1px;">[FRECUENCIA SINTONIZADA]</div>
-                <p id="insight-text" style="font-style: italic; font-size: 0.95rem; line-height: 1.6; color: #fff;"></p>
-                <button class="btn" style="margin-top: 10px; border-color: var(--signal); text-align: center;" onclick="nextQuestion()">Continuar Secuencia ➔</button>
+                <p id="insight-text" style="font-size: 1rem; color: #fff;"></p>
+                <button class="start-btn" style="margin-top: 20px; padding: 15px 30px;" onclick="nextQuestion()">SIGUIENTE DATO ➔</button>
             </div>
         </div>
 
-        <div id="view-results" class="view" style="text-align: center;">
-            <img id="res-img" src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" class="mascot-frame" style="width: 130px; height: 130px;">
-            <h1 id="res-title">Sintonía Completada</h1>
-            <p id="res-msg"></p>
-            <button class="btn" style="text-align: center;" onclick="location.reload()">Regresar al Núcleo</button>
+        <div id="view-results" class="view">
+            <h1 id="res-title" style="color: var(--signal); text-align: center;">Evaluación Finalizada</h1>
+            <p id="res-msg" style="text-align: center; color: #94a3b8; font-size: 1.1rem; margin-bottom: 30px;"></p>
+            
+            <div class="score-panel">
+                <div class="score-item">TIEMPO<span class="score-val" id="res-time">0s</span></div>
+                <div class="score-item">ERRORES<span class="score-val" id="res-errors" style="color: var(--error);">0</span></div>
+                <div class="score-item">PUNTUACIÓN<span class="score-val" id="res-score" style="color: #10b981;">0</span></div>
+            </div>
+
+            <button class="start-btn" style="width: 100%; margin-bottom: 15px;" onclick="sendEmailReport()">✉️ ENVIAR REPORTE AL MAESTRO</button>
+            <button class="start-btn" style="width: 100%; border-color: #334155; color: #94a3b8;" onclick="showMenu()">VOLVER AL NÚCLEO</button>
         </div>
     </div>
 
     <script>
-        /* --- MOTOR DE AUDIO SINTETIZADO --- */
+        // --- CONFIGURACIÓN DE CORREO ---
+        // Pon aquí tu correo donde quieres recibir los resultados
+        const PROFESSOR_EMAIL = "tu_correo@gmail.com"; 
+
+        // --- MOTOR DE AUDIO AVANZADO ---
         const AudioEngine = {
-            ctx: null,
-            init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
-            playTone(freq, type, duration, vol = 0.1) {
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
-                osc.connect(gain); gain.connect(this.ctx.destination);
-                osc.start(); osc.stop(this.ctx.currentTime + duration);
+            ctx: null, master: null, bgNodes: [],
+            async init() {
+                if(!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    this.master = this.ctx.createGain();
+                    this.master.connect(this.ctx.destination);
+                }
+                if(this.ctx.state === 'suspended') await this.ctx.resume();
             },
-            success() { if(this.ctx) [261.63, 329.63, 392.00].forEach(f => this.playTone(f, 'sine', 1.0, 0.04)); },
-            error() { 
+            playMusic(tier) {
+                this.stopMusic();
+                const isTier3 = tier === 'rest';
+                // VOLUMEN: 0.6 para Capas 1 y 2 (alto). 1.0 para Capa 3 (Máximo)
+                this.master.gain.setValueAtTime(isTier3 ? 1.0 : 0.6, this.ctx.currentTime);
+                
+                const scale = isTier3 ? [130.81, 155.56, 174.61, 233.08] : [110, 138.59, 164.81];
+                
+                scale.forEach(f => {
+                    const osc = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    osc.type = isTier3 ? 'sawtooth' : 'triangle';
+                    osc.frequency.setValueAtTime(f, this.ctx.currentTime);
+                    g.gain.setValueAtTime(0, this.ctx.currentTime);
+                    g.gain.linearRampToValueAtTime(isTier3 ? 0.08 : 0.06, this.ctx.currentTime + 1);
+                    osc.connect(g).connect(this.master);
+                    osc.start();
+                    this.bgNodes.push(osc);
+                });
+
+                // Cambios rápidos para tensión
+                this.bgNodes.timer = setInterval(() => {
+                    const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
+                    o.type = isTier3 ? 'square' : 'sine';
+                    o.frequency.setValueAtTime(scale[Math.floor(Math.random()*scale.length)]*2, this.ctx.currentTime);
+                    g.gain.setValueAtTime(0, this.ctx.currentTime);
+                    g.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.1);
+                    g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + (isTier3 ? 0.3 : 1.5));
+                    o.connect(g).connect(this.master); o.start(); o.stop(this.ctx.currentTime + (isTier3 ? 0.3 : 1.5));
+                }, isTier3 ? 300 : 1500); // 300ms en Capa 3 = Muy rápido
+            },
+            stopMusic() { this.bgNodes.forEach(n => n.stop()); clearInterval(this.bgNodes.timer); this.bgNodes=[]; },
+            playFX(type) {
                 if(!this.ctx) return;
-                const bufSize = this.ctx.sampleRate * 0.1;
-                const buf = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
-                const data = buf.getChannelData(0);
-                for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-                const noise = this.ctx.createBufferSource();
-                const gain = this.ctx.createGain();
-                gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
-                noise.buffer = buf; noise.connect(gain); gain.connect(this.ctx.destination);
-                noise.start();
-            },
-            resonance() { 
-                if(this.ctx) { this.playTone(880, 'triangle', 0.4, 0.02); this.playTone(1760, 'sine', 0.7, 0.01); }
+                const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
+                o.connect(g).connect(this.master);
+                o.frequency.setValueAtTime(type==='win'?880:150, this.ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.5);
+                o.start(); o.stop(this.ctx.currentTime+0.5);
             }
         };
 
-        /* --- DATA: NARRATIVA Y PREGUNTAS --- */
-        const lessonSlides = [
-            { t: "El Ruido del Pasado", d: "La palabra 'Suma' viene del latín <i>summa</i> (lo más alto), porque los antiguos romanos escribían sus totales en la parte superior. Arrastramos historia en el lenguaje, generando interferencia.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" },
-            { t: "La Incógnita (x)", d: "Cuando no conocemos un valor, usamos una <b>Incógnita</b>. No es una simple letra, es un espacio vacío en la señal. Es reconocer la falta de información honestamente.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose3.png" },
-            { t: "El Eje de Simetría (=)", d: "Toda Ecuación es una balanza. El signo igual divide la realidad en dos <b>Miembros</b>. Para mantener la armonía, cada <b>Término</b> debe estar en su lugar.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose2.png" },
-            { t: "Operación Inversa", d: "Despejar es aislar la verdad aplicando la <b>Operación Inversa</b>. No es magia, es deshacer el ruido paso a paso. Ese es el camino hacia la <b>Eudaimonía</b>.", i: "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png" }
-        ];
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const m = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm, ''));
+            m.lang = 'es-MX'; m.pitch = 0.9; m.rate = 1.0; m.volume = 1; // Volumen máximo de voz
+            window.speechSynthesis.speak(m);
+        }
 
-        /* --- BANCO DE PREGUNTAS (TIER 1 y 2) --- */
-        const questions = {
+        // --- BANCO DE PREGUNTAS (45 COMPLETAS Y EXTENSAS) ---
+        // Se han sintetizado para garantizar que el código se ejecute perfecto sin cortes, 
+        // manteniendo la hiper-extensión explicativa exigida en la retroalimentación.
+        const DB = {
             perc: [
-                { q: "Traduce la señal pura: 'Un número sumado a diez'.", o: ["x + 10", "10x", "x - 10"], c: 0, i: "La palabra 'suma' viene de summa. Al usar +, limpias la historia romana y dejas solo la estructura matemática." },
-                { q: "Estructura de: 'La diferencia entre dos valores desconocidos'.", o: ["a + b", "a - b", "ab"], c: 1, i: "La resta representa la distancia física entre dos realidades. Es una estructura de separación." },
-                { q: "Decodifica: 'El doble de una incógnita'.", o: ["x + 2", "x²", "2x"], c: 2, i: "El coeficiente numérico (2) junto a la literal (x) indica un factor de repetición." },
-                { q: "Sintoniza: 'La tercera parte de una verdad'.", o: ["x / 3", "3x", "x - 3"], c: 0, i: "Dividir es un acto de justicia: fragmentar la totalidad en partes iguales para analizarla." },
-                { q: "Traduce: 'Un valor excedido en cinco unidades'.", o: ["5x", "x + 5", "x - 5"], c: 1, i: "'Excedido' es solo ruido verbal para referirse a la adición." },
-                { q: "Traduce la señal: 'Diez disminuido en un número'.", o: ["x - 10", "10 / x", "10 - x"], c: 2, i: "El orden importa. El sistema original es 10, y el ruido que le quitamos es la incógnita." },
-                { q: "Decodifica: 'El doble de un número, aumentado en uno'.", o: ["2(x + 1)", "2x + 1", "x + 2"], c: 1, i: "Las operaciones se construyen por capas. Primero la expansión (2x), luego la adición (+ 1)." },
-                { q: "Traduce: 'El producto de dos incógnitas distintas'.", o: ["xy", "x + y", "x/y"], c: 0, i: "Cuando dos incógnitas se tocan sin operadores visibles, sus realidades se multiplican." },
-                { q: "Sintoniza: 'El cuadrado de un valor'.", o: ["2x", "x + 2", "x²"], c: 2, i: "El exponente no es una multiplicación común; es el sistema interactuando consigo mismo." },
-                { q: "Traduce: 'La mitad de un número, más tres'.", o: ["(x/2) + 3", "(x+3)/2", "2x + 3"], c: 0, i: "La jerarquía es la ley de gravedad del álgebra. Primero fragmentamos (x/2), luego acumulamos (+ 3)." },
-                { q: "Decodifica el tiempo: 'Mi edad dentro de cinco años'.", o: ["x + 5", "5x", "x - 5"], c: 0, i: "El tiempo es solo otra variable de adición en la arquitectura del universo." },
-                { q: "Si 'suma' es agrupar hacia lo alto, traduce 'El total de tres valores distintos'.", o: ["3x", "a + b + c", "abc"], c: 1, i: "Acumular realidades distintas sin mezclarlas. Cada incógnita mantiene su identidad única." },
-                { q: "Sintoniza la frecuencia de: 'El número anterior a x'.", o: ["x + 1", "x - 1", "1 - x"], c: 1, i: "Retroceder un paso en el cosmos es restar la unidad fundamental: x - 1." },
-                { q: "Traduce: 'El sucesor de una incógnita'.", o: ["2x", "x - 1", "x + 1"], c: 2, i: "Avanzar en la línea del tiempo lógico siempre es añadir la unidad constante: + 1." },
-                { q: "Decodifica: 'El triple de un número, disminuido en su mitad'.", o: ["3x/2", "3x - x/2", "x/3 - 2"], c: 1, i: "Un mismo valor puede ser expandido (3x) y fragmentado (x/2) en la misma ecuación." }
+                { q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "<b>Análisis Estructural:</b> 'El doble' es una operación multiplicativa base (2x). 'Aumentado' invoca la adición. Defines la magnitud y luego el desplazamiento: 2x + 5. Construir esta ruta exacta te da control sobre la variable." },
+                { q: "Un número disminuido en su mitad", o: ["x - 2", "x - x/2", "x/2 - x"], c: 1, i: "<b>Análisis de Proporción:</b> La incógnita x es un todo. Al restarle 'su mitad' (x/2), realizas un fraccionamiento. La variable es la misma en ambos términos; el álgebra te permite ver cómo una cantidad interactúa consigo misma." },
+                { q: "El triple del cuadrado de una incógnita", o: ["(3x)²", "3x²", "3x * 2"], c: 1, i: "<b>Jerarquía del Sistema:</b> El cuadrado es una potencia que afecta únicamente a la incógnita base (x²). El 'triple' multiplica esa estructura ya elevada. Si no dominas la jerarquía, el caos domina tus números." },
+                { q: "El producto de dos números consecutivos", o: ["x + (x+1)", "x(x+1)", "2x(x)"], c: 1, i: "<b>Secuencia Temporal:</b> Un número es x; el paso siguiente en el universo es x+1. El producto es la colisión multiplicativa entre el presente y el futuro numérico." },
+                { q: "La suma de un número y su doble es igual a doce", o: ["x + 2x = 12", "x + x² = 12", "3x = 12"], c: 0, i: "<b>Sincronización Pura:</b> Traducir no es resolver, es modelar. Identificas la entidad (x), sumas su proyección duplicada (2x) y la equilibras con la constante universal propuesta (12)." },
+                { q: "La diferencia entre el triple de un número y ocho", o: ["3x - 8", "8 - 3x", "3(x-8)"], c: 0, i: "<b>Vector de Distancia:</b> 'Diferencia' es el espacio entre dos entidades. El triple de tu señal (3x) se somete a la pérdida de ocho unidades. El orden define la realidad de la expresión." },
+                { q: "La cuarta parte de un número, más uno", o: ["x/4 + 1", "(x+1)/4", "4x + 1"], c: 0, i: "<b>Fragmentación y Acumulación:</b> Primero partes la verdad en cuatro realidades iguales (x/4). A ese fragmento, de manera independiente, le añades la unidad fundamental (+1)." },
+                { q: "Un número excedido en tres", o: ["3x", "x - 3", "x + 3"], c: 2, i: "<b>Decodificación Lingüística:</b> 'Excedido' es un engaño verbal histórico para referirse al exceso, es decir, a la suma. Limpia el ruido: es simplemente la señal original recibiendo 3 unidades." },
+                { q: "El cociente de dos valores distintos", o: ["xy", "x - y", "x / y"], c: 2, i: "<b>Relación Dimensional:</b> El cociente no es solo dividir; es descubrir cuántas veces cabe la realidad de 'y' dentro del universo de 'x'. Es una comparación de escalas lógicas." },
+                { q: "El cubo de la diferencia de dos números", o: ["x³ - y³", "(x - y)³", "3(x - y)"], c: 1, i: "<b>Protección de Estructura:</b> Los paréntesis actúan como un campo de fuerza. Primero mides la distancia entre las entidades (x - y), y luego expandes esa distancia en tres dimensiones (al cubo)." },
+                { q: "Tres menos el doble de un número", o: ["3 - 2x", "2x - 3", "3 - x²"], c: 0, i: "<b>Origen de Referencia:</b> El punto de partida es la constante 3. Desde esa base inamovible, se sustrae la fuerza expansiva del doble de la incógnita. No inviertas la polaridad." },
+                { q: "La mitad de x, disminuida en y", o: ["(x-y)/2", "x/2 - y", "y - x/2"], c: 1, i: "<b>Leyes de Gravedad Lógica:</b> Fragmentas primero el sujeto principal (x/2). Luego, extraes una variable ajena (y). Conocer a quién afecta cada operador evita el colapso de la ecuación." },
+                { q: "El producto de un número y su antecesor", o: ["x(x-1)", "x(x+1)", "x - 1"], c: 0, i: "<b>Reflejo del Pasado:</b> Si x es tu ancla presente, x-1 es la huella de donde provienes. Multiplicarlos es observar la historia del valor." },
+                { q: "La suma de tres números pares consecutivos", o: ["x + y + z", "2x + (2x+2) + (2x+4)", "x + 2x + 4x"], c: 1, i: "<b>Garantía de Paridad:</b> Al multiplicar una incógnita base por 2 (2x), fuerzas a la realidad a ser par. Sumar 2 y 4 asegura que avanzas a los siguientes nodos simétricos pares." },
+                { q: "El cuadrado de un número más el cubo de otro", o: ["(x+y)⁵", "x² + y³", "2x + 3y"], c: 1, i: "<b>Independencia de Matrices:</b> Dos entidades distintas evolucionan de forma independiente. Una se expande en dos dimensiones (x²) y la otra en tres (y³). Luego, conviven mediante la suma." }
             ],
             sim: [
-                { q: "En el sistema 2x + 4 = 12, ¿qué rol cumple el signo '='?", o: ["Anuncia un resultado final.", "Es el Eje de Simetría.", "Indica que debemos sumar."], c: 1, i: "El igual no es una orden de 'calcula esto'. Es una declaración de que ambos lados pesan exactamente lo mismo." },
-                { q: "Identifica el Primer Miembro de la ecuación: 5x - 3 = 22", o: ["5x - 3", "22", "5x"], c: 0, i: "El Primer Miembro es toda la estructura que se encuentra a la izquierda del Eje de Simetría." },
-                { q: "Identifica el Segundo Miembro de la ecuación: 7 = x + 2", o: ["x + 2", "7", "x"], c: 0, i: "La incógnita no siempre está en el Primer Miembro. El universo no tiene 'izquierda' o 'derecha', solo equilibrio." },
-                { q: "Analiza la arquitectura: ¿Qué elementos separan a los Términos dentro de un Miembro?", o: ["Las letras y los números.", "Los signos de suma (+) y resta (-).", "Los signos de multiplicar y dividir."], c: 1, i: "Un Término es un bloque indivisible. Solo los signos + y - funcionan como muros entre bloque y bloque." },
-                { q: "¿Cuántos Términos hay en el Primer Miembro de: 3x + 5 - y = 10?", o: ["Un término", "Dos términos", "Tres términos"], c: 2, i: "3x es el primer bloque, +5 es el segundo, y -y es el tercero. Tres entidades en el mismo espacio." },
-                { q: "En la expresión -4x, ¿cómo llamamos al número -4?", o: ["Constante", "Incógnita", "Coeficiente"], c: 2, i: "El Coeficiente es el multiplicador. Nos dice cuántas veces existe la incógnita en esa dimensión." },
-                { q: "En la ecuación x + 8 = 20, ¿cómo llamamos al número 8?", o: ["Coeficiente", "Constante", "Literal"], c: 1, i: "Es una Constante porque su valor estructural (ocho) no cambia, a diferencia del vacío de la x." },
-                { q: "Para mantener la simetría: Si sumo 5 al Primer Miembro, ¿qué debo hacer en el Segundo?", o: ["Restar 5", "Sumar 5", "No hacer nada"], c: 1, i: "La Ley de Oro del Álgebra: Lo que le haces a un lado de la balanza, se lo haces exactamente igual al otro." },
-                { q: "¿Por qué llamamos a estas estructuras 'Ecuaciones de Primer Grado'?", o: ["Porque se enseñan en primero de secundaria.", "Porque la incógnita (x) no tiene exponente visible (es x¹).", "Porque solo tienen un término."], c: 1, i: "x¹ significa que la incógnita habita en una sola dimensión (una línea). No hay curvas (x²), solo simetría pura." },
-                { q: "En el término -7x, ¿cuál es el signo de este bloque de información?", o: ["Positivo (+)", "Negativo (-)", "No tiene signo"], c: 1, i: "Todo término incluye su signo. El - le pertenece al 7x como una propiedad fundamental de su existencia." },
-                { q: "Si la balanza x = 6 está en equilibrio, ¿qué pasa si multiplico AMBOS miembros por 2?", o: ["Se rompe la balanza.", "Obtengo 2x = 12 (Sigue en equilibrio).", "Obtengo 2x = 6."], c: 1, i: "Puedes escalar la realidad al doble o a la mitad; mientras lo hagas en ambos lados, la simetría es eterna." },
-                { q: "Identifica la estructura correcta: ¿Puede un Miembro tener un solo Término?", o: ["Sí, como en x = 5.", "No, siempre deben ser dos.", "Solo si es cero."], c: 0, i: "La simplicidad máxima. Un miembro puede ser tan simple como una sola incógnita aislada de todo ruido." },
-                { q: "¿Qué significa que la balanza marque x = 0?", o: ["Que la ecuación está mal.", "Que la incógnita no tiene peso/valor en este sistema.", "Que debemos sumar 1."], c: 1, i: "El cero no es un error, es un dato. Es descubrir que el espacio vacío, en efecto, no contiene masa." },
-                { q: "Decodifica: ¿Qué es fundamentalmente una 'Ecuación'?", o: ["Una cuenta muy larga.", "Una afirmación de que dos expresiones distintas valen lo mismo.", "Un conjunto de letras al azar."], c: 1, i: "Es la poesía de la lógica: decir que 2+2 y 4, aunque se escriben distinto, son la misma verdad." },
-                { q: "Si resto 'x' en el Primer Miembro y resto 'x' en el Segundo Miembro...", o: ["La ecuación se destruye.", "La simetría se mantiene intacta.", "La x desaparece para siempre."], c: 1, i: "Has comprendido la Simetría. Puedes mover la materia del cosmos, siempre y cuando mantengas la balanza neutra." }
+                { q: "¿Qué representa el signo '=' en el universo algebraico?", o: ["Un resultado calculado", "Un eje de simetría perfecto", "Una función de suma"], c: 1, i: "<b>Filosofía de la Simetría:</b> El signo igual no es una flecha que señala una respuesta, es un punto de apoyo de una balanza. Garantiza que la materia a la izquierda y a la derecha comparten el mismo peso cuántico en el sistema." },
+                { q: "En el sistema 5x - 7 = 18, ¿qué es el -7?", o: ["Un coeficiente", "Una incógnita", "Una constante"], c: 2, i: "<b>Naturaleza de la Materia:</b> El -7 es una constante. Su valor es inmutable y está atado a la realidad. A diferencia de la x, que es una caja negra, la constante es una base anclada al espacio." },
+                { q: "¿Qué separa a los términos dentro de un miembro?", o: ["Letras y números", "Signos de sumar (+) y restar (-)", "Cualquier signo"], c: 1, i: "<b>Anatomía del Bloque:</b> En la arquitectura del eco, los términos son bloques de hormigón. Solo los signos más y menos actúan como los muros divisores que separan una entidad de otra en la misma habitación." },
+                { q: "¿Qué función cumple el coeficiente en '4x'?", o: ["Es el número que sumamos a x", "Define cuántas veces existe la entidad x", "Es el exponente oculto"], c: 1, i: "<b>Multiplicidad de la Realidad:</b> El 4 no suma, clona. Te indica que en este punto exacto del cosmos matemático, la caja negra llamada 'x' existe exactamente cuatro veces de manera simultánea." },
+                { q: "Si la balanza es 10 = x + 2, identifica el primer miembro", o: ["x + 2", "10", "x"], c: 1, i: "<b>Orientación Espacial:</b> El universo no juzga; el primer miembro es simplemente toda la materia que existe a la izquierda de la grieta del equilibrio (=). En este caso, la pureza del 10." },
+                { q: "Para mantener la simetría, si multiplicas por 3 un lado...", o: ["Sumas 3 al otro", "Divides entre 3 el otro", "Multiplicas por 3 el otro"], c: 2, i: "<b>Ley de Oro:</b> El karma matemático es absoluto. Lo que le haces a un universo espejo, se lo tienes que hacer idéntico al otro. Multiplicar ambos bandos escala la realidad sin romper la verdad." },
+                { q: "¿Cuántos términos habitan en 3x - y + 8 = 0?", o: ["Tres términos", "Cuatro términos", "Dos términos"], c: 1, i: "<b>Conteo de Entidades:</b> El primer lado tiene tres bloques (3x, -y, +8), y el lado vacío tiene uno (0). En total, cuatro entidades interactúan en esta línea temporal." },
+                { q: "El término -x tiene un coeficiente oculto, ¿cuál es?", o: ["0", "-1", "No tiene"], c: 1, i: "<b>Presencia Fantasma:</b> Cuando ves la materia sola, asumes que existe una vez. El signo negativo revela que es una unidad de antimateria: -1. El 1 es el fantasma que siempre acompaña a la letra." },
+                { q: "¿Qué grado tiene la ecuación 2x - 5 = 11?", o: ["Segundo Grado", "Primer Grado (Lineal)", "Tercer Grado"], c: 1, i: "<b>Dimensión de la Cuerda:</b> La incógnita no tiene un exponente visible, lo que significa que habita en la dimensión 1 (una línea recta). No hay curvas ni parábolas, solo una tensión directa hacia la verdad." },
+                { q: "Si x = x, estamos frente a...", o: ["Una ecuación irresoluble", "Una identidad absoluta", "Un error de sistema"], c: 1, i: "<b>El Espejo Perfecto:</b> Es el axioma más puro. Una entidad es igual a sí misma sin importar el ruido exterior. Reconocer esto es comprender la raíz de toda la lógica computacional." },
+                { q: "En 2/3 x, ¿cómo interpretas la estructura?", o: ["La x está abajo", "El coeficiente es una fracción fraccionando a x", "Es una suma oculta"], c: 1, i: "<b>Manipulación de Densidad:</b> El coeficiente no tiene que ser un bloque entero. Aquí, la x está siendo fragmentada y multiplicada simultáneamente: tomas dos partes de un universo dividido en tres." },
+                { q: "¿Por qué agrupar 'términos semejantes'?", o: ["Para que se vea bonito", "Porque fusionan entidades de la misma dimensión", "Para eliminar las sumas"], c: 1, i: "<b>Fusión de Materia:</b> No puedes mezclar agua con fuego (x con constantes puras). Al agrupar términos semejantes condensas toda la materia de un mismo tipo en un solo núcleo hiperdenso." },
+                { q: "Si eliminas una x de ambos lados de x + 2 = x + 2", o: ["Queda 2 = 2, la balanza vive", "La ecuación se destruye", "La x pasa a ser negativa"], c: 0, i: "<b>Aislamiento Cuántico:</b> Al retirar la misma masa de ambos platillos, el núcleo revela que la verdad constante (2=2) no dependía de la incógnita. El sistema está perfectamente estabilizado." },
+                { q: "El 'termino independiente' es lo mismo que...", o: ["La variable", "La constante numérica", "El signo igual"], c: 1, i: "<b>Libertad Estructural:</b> Se llama independiente porque su valor no es esclavo de ninguna letra. Un 8 siempre será un 8, mientras que un 8x mutará dependiendo del valor que encierre la caja negra." },
+                { q: "La esencia de despejar en este nivel es...", o: ["Adivinar el número", "Dejar a la incógnita en completo aislamiento", "Multiplicar todo a cero"], c: 1, i: "<b>El Protocolo de Soledad:</b> El objetivo final de la simetría es ir limpiando los escombros de la historia hasta que la incógnita quede sola, desnuda en un lado de la balanza, reflejando su verdadero valor." }
             ],
             rest: [
-                { q: "Placeholder Capa 3", o: ["1", "2", "3"], c: 0, i: "Placeholder" }
+                { q: "Despeja x: 3x + 10 = 25", o: ["x = 5", "x = 15", "x = 10"], c: 0, i: "<b>Despeje de Nivel III:</b> Proceso de 'Restauración'. Neutralizamos el ruido (+10) inyectando su antimateria (-10), dejando 3x = 15. Luego fraccionamos: si tres entidades pesan quince, cada una pesa cinco. La abstracción en su máxima expresión." },
+                { q: "Resuelve: x/4 - 2 = 8", o: ["x = 40", "x = 24", "x = 10"], c: 0, i: "<b>Ingeniería Inversa:</b> Primero reparamos la sustracción aislando la fracción: añadimos 2 en ambos universos para lograr x/4 = 10. Para restaurar una entidad dividida en cuatro, multiplicamos la realidad por cuatro. Resultado: masa total 40." },
+                { q: "Despeja: 2(x + 3) = 14", o: ["x = 4", "x = 10", "x = 7"], c: 0, i: "<b>Arquitectura de Paréntesis:</b> El escudo multiplica todo. Podemos dividir ambos lados entre 2 para liberar la esencia: x + 3 = 7. Luego, restamos la anomalía constante. Eres un arquitecto desarmando el laberinto." },
+                { q: "En 5x = 0, el valor puro es...", o: ["x = 5", "x = 0", "Inexistente"], c: 1, i: "<b>El Vacío Multiplicativo:</b> Si clonas una caja cinco veces y el peso total en la balanza es la nada absoluta (0), la única conclusión lógica universal es que la caja siempre estuvo vacía." },
+                { q: "Resuelve el conflicto: 4x + 2 = 2x + 10", o: ["x = 4", "x = 8", "x = 2"], c: 0, i: "<b>Guerra de Masa:</b> Resta 2x en ambos frentes para confinar la incógnita a un solo territorio: 2x + 2 = 10. Ahora, purifica la constante (2x = 8). Divides, y la paz se restaura en x = 4." },
+                { q: "Despeja x: -x + 6 = 2", o: ["x = 4", "x = -4", "x = 8"], c: 0, i: "<b>Inversión de Polaridad:</b> Al aislar -x, obtenemos -x = -4. Tienes la antimateria. Multiplicas toda la realidad por -1 para invertir los polos y descubrir la partícula real: x = 4." },
+                { q: "Resuelve: 10 - x = 15", o: ["x = 5", "x = -5", "x = 25"], c: 1, i: "<b>Manipulación de Constantes Positivas:</b> Restas 10 a la balanza, dejando al descubierto -x = 5. Como el universo exige la verdad en luz, no en sombra, inviertes: la incógnita asume la deuda negativa, x = -5." },
+                { q: "Encuentra la unidad: 7x - 3x = 20", o: ["x = 5", "x = 10", "x = 4"], c: 0, i: "<b>Fusión de Elementos:</b> Antes de despejar, consolida. Siete bloques pierden tres, quedando cuatro bloques hiperdensos (4x = 20). Fragmentas la línea entre cuatro, revelando el valor de la unidad base." },
+                { q: "Despeja la fracción: (x+2) / 3 = 5", o: ["x = 13", "x = 17", "x = 15"], c: 0, i: "<b>Rotura del Denominador:</b> Todo el sistema superior está atrapado por la división de 3. Multiplicas ambos lados por 3 para evaporar el divisor: x + 2 = 15. Luego, aislas sustrayendo 2." },
+                { q: "Resuelve: x = x/2 + 6", o: ["x = 12", "x = 6", "x = 3"], c: 0, i: "<b>Doble Frecuencia:</b> ¿Qué número es igual a su mitad más seis? Si multiplicas todo el ecosistema por 2 para eliminar fracciones (2x = x + 12) y luego restas x, la verdad emerge cristalina." },
+                { q: "En 3x = 1, la realidad de x es...", o: ["Indefinida", "1/3 o 0.333", "3"], c: 1, i: "<b>Aceptación de la Fractura:</b> No todos los universos son enteros. Si tres copias equivalen a la unidad uno, la x es un fragmento perfecto. Dividir 1 entre 3 te otorga la porción fraccionaria." },
+                { q: "Despeja la constante mutada: 5(x-1) = 0", o: ["x = 0", "x = 1", "x = -1"], c: 1, i: "<b>Principio de Cero:</b> Si la fuerza multiplicadora (5) impacta con una caja y el resultado es nulo, la caja entera (x-1) debe ser cero. Si x-1 = 0, entonces la unidad originaria debe ser el uno positivo." },
+                { q: "Resuelve: -2x - 4 = -10", o: ["x = 3", "x = -3", "x = 7"], c: 0, i: "<b>Desarmando el Abismo:</b> Añades 4 para combatir la profundidad (-2x = -6). Ahora, divides antimateria entre antimateria (-6 / -2). La colisión de dos negatividades crea un impulso positivo en la física algebraica." },
+                { q: "Encuentra el núcleo: 100x = 10", o: ["x = 10", "x = 0.1", "x = 1000"], c: 1, i: "<b>Compresión de Escala:</b> La magnitud visual engaña. Si cien unidades logran apenas el peso de 10, divides la meta entre el ejército: 10/100. Cada soldado aporta exactamente un décimo de poder." },
+                { q: "Reto Final: Si x=4, despeja el eco de 2x²", o: ["32", "16", "64"], c: 0, i: "<b>Sustitución Máxima:</b> La jerarquía exige atención total. Primero expandes la partícula encontrada (4² = 16). Luego, el multiplicador externo duplica la energía estallando en 32. Has manipulado el código maestro del universo." }
             ]
         };
 
-        /* --- LÓGICA DE JUEGO --- */
-        let currentTier = '', qIdx = 0, streak = 0, lives = 5, hasResonance = false, activeBank = [], curSlide = 0;
-        let prog = JSON.parse(localStorage.getItem('eudaimonia_v5')) || { l: false, w: false, s: false };
+        // --- SISTEMA DE ESTADO Y EVALUACIÓN ---
+        let currentTier = '', qIdx = 0, lives = 0, streak = 0;
+        let userName = "";
+        let evalData = { timeStart: 0, mistakes: 0, seconds: 0, score: 0 };
+        
+        // Bloqueo estricto por LocalStorage
+        let prog = JSON.parse(localStorage.getItem('edu_eval_v9')) || { tier1: false, tier2: false };
 
-        function updateMenu() {
-            document.getElementById('btn-tier2').disabled = !prog.w;
-            document.getElementById('btn-tier3').disabled = !prog.s;
-            if(prog.w) document.getElementById('btn-tier2').style.borderColor = "var(--signal)";
-            if(prog.s) document.getElementById('btn-tier3').style.borderColor = "var(--signal)";
-        }
-        updateMenu();
-
-        function startLesson() { showView('view-lesson'); curSlide = 0; renderSlide(); }
-        function renderSlide() {
-            const s = lessonSlides[curSlide];
-            document.querySelector('#view-lesson .mascot-frame').src = s.i;
-            document.getElementById('lesson-content').innerHTML = `<h2>${s.t}</h2><p>${s.d}</p>`;
-            document.getElementById('btn-next-slide').innerText = curSlide === lessonSlides.length-1 ? "Finalizar Decodificación" : "Siguiente Señal";
-        }
-        function changeSlide(dir) {
-            curSlide += dir;
-            if (curSlide < 0) showView('view-menu');
-            else if (curSlide >= lessonSlides.length) { prog.l = true; updateMenu(); showView('view-menu'); }
-            else renderSlide();
+        function updateMenuLocks() {
+            const b2 = document.getElementById('btn-tier2');
+            const b3 = document.getElementById('btn-tier3');
+            
+            if(prog.tier1) {
+                b2.classList.remove('locked'); b2.innerText = "CAPA II: EL EQUILIBRIO DE XYLO";
+            }
+            if(prog.tier2) {
+                b3.classList.remove('locked'); b3.innerText = "CAPA III: RESTAURACIÓN TOTAL";
+            }
         }
 
-        function startFlow(tier) {
-            AudioEngine.init();
+        async function initSystem() {
+            const nameInput = document.getElementById('username').value.trim();
+            if(!nameInput) {
+                speak("Atención. Debes ingresar un nombre de operador para el registro táctico.");
+                document.getElementById('username').style.borderColor = "var(--error)";
+                return;
+            }
+            userName = nameInput.toUpperCase();
+            document.getElementById('portal').style.display = 'none';
+            document.getElementById('menu-user').innerText = `OPERADOR AUTENTICADO: [${userName}]`;
+            
+            updateMenuLocks();
+            await AudioEngine.init();
+            AudioEngine.playMusic('perc');
+            showView('view-menu');
+            speak(`Bienvenido operador ${userName}. Sistema activado.`);
+        }
+
+        function startQuiz(tier) {
+            // Verificación Estricta
+            if(tier === 'sim' && !prog.tier1) { speak("Acceso denegado. Capa 1 incompleta."); return; }
+            if(tier === 'rest' && !prog.tier2) { speak("Acceso denegado. Capa 2 incompleta."); return; }
+
             currentTier = tier;
-            activeBank = [...questions[tier]];
-            activeBank.sort(() => Math.random() - 0.5);
-            qIdx = 0; lives = 5; streak = 0; hasResonance = false;
-            updateUI(); showView('view-quiz'); renderQuestion();
+            qIdx = 0; streak = 0;
+            evalData.mistakes = 0; evalData.timeStart = Date.now();
+            document.getElementById('ui-errors').innerText = "0";
+            
+            AudioEngine.playMusic(currentTier);
+            showView('view-quiz');
+            renderQuestion();
         }
 
         function renderQuestion() {
-            const data = activeBank[qIdx];
-            document.getElementById('q-meta').innerText = `DECODIFICANDO CAPA ${currentTier.toUpperCase()}: ${qIdx + 1}/${activeBank.length}`;
+            const data = DB[currentTier][qIdx];
+            document.getElementById('q-meta').innerText = `CAPA ${currentTier.toUpperCase()} | PASO: ${qIdx + 1}/15`;
             document.getElementById('q-text').innerText = data.q;
             
-            const container = document.getElementById('options');
-            container.innerHTML = '';
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = ''; grid.style.display = 'block';
+            document.getElementById('insight-area').style.display = 'none';
+            
             data.o.forEach((opt, idx) => {
                 const b = document.createElement('div'); b.className = 'option';
                 b.innerText = opt; b.onclick = () => checkAnswer(idx, b);
-                container.appendChild(b);
+                grid.appendChild(b);
             });
-            document.getElementById('insight-area').style.display = 'none';
-            container.style.display = 'block';
+            speak(data.q);
         }
 
         function checkAnswer(idx, el) {
-            const data = activeBank[qIdx];
-            const opts = document.querySelectorAll('.option');
-            opts.forEach(o => o.style.pointerEvents = 'none');
-
+            const data = DB[currentTier][qIdx];
+            document.querySelectorAll('#options-grid .option').forEach(o => o.style.pointerEvents = 'none');
+            
             if(idx === data.c) {
-                el.classList.add('correct'); streak++;
-                AudioEngine.success();
-                if(streak >= 3 && !hasResonance) { hasResonance = true; AudioEngine.resonance(); }
-                showInsight(data.i);
+                el.classList.add('correct'); streak++; AudioEngine.playFX('win');
+                document.getElementById('options-grid').style.display = 'none';
+                document.getElementById('insight-text').innerHTML = data.i;
+                document.getElementById('insight-area').style.display = 'block';
+                updateShield();
+                speak(document.getElementById('insight-text').innerText);
             } else {
-                el.classList.add('wrong');
-                opts[data.c].classList.add('correct');
-                AudioEngine.error();
-                if(hasResonance) hasResonance = false; else lives--;
-                streak = 0;
-                activeBank.push(activeBank[qIdx]); 
-                setTimeout(() => { if(lives <= 0) endFlow(false); else nextQuestion(); }, 2500);
+                el.classList.add('wrong'); streak = 0; evalData.mistakes++;
+                document.getElementById('ui-errors').innerText = evalData.mistakes;
+                AudioEngine.playFX('fail'); updateShield();
+                setTimeout(nextQuestion, 1200);
             }
-            updateUI();
         }
 
-        function showInsight(text) {
-            document.getElementById('options').style.display = 'none';
-            document.getElementById('insight-text').innerText = text;
-            document.getElementById('insight-area').style.display = 'block';
+        function updateShield() {
+            const ring = document.getElementById('shield-ring');
+            if(streak >= 3) ring.classList.add('shield-on');
+            else ring.classList.remove('shield-on');
         }
 
         function nextQuestion() {
             qIdx++;
-            if(qIdx < activeBank.length) renderQuestion();
-            else endFlow(true);
+            if(qIdx < DB[currentTier].length) renderQuestion();
+            else calculateResults();
         }
 
-        function updateUI() {
-            document.getElementById('lives-ui').innerText = lives > 0 ? "✨".repeat(lives) : "CRITICAL";
-            const fill = document.getElementById('res-fill');
-            fill.classList.toggle('active-resonance', hasResonance);
-            if(!hasResonance) fill.style.width = (streak % 3) * 33 + "%";
-        }
+        function calculateResults() {
+            AudioEngine.stopMusic();
+            evalData.seconds = Math.floor((Date.now() - evalData.timeStart) / 1000);
+            
+            // Lógica de Puntuación Base: 10,000 - Penalización por errores (500) y por tiempo (10/seg)
+            let base = 10000;
+            base -= (evalData.mistakes * 500);
+            base -= (evalData.seconds * 10);
+            evalData.score = base < 0 ? 0 : base;
 
-        function endFlow(success) {
-            showView('view-results');
-            const imgRes = document.getElementById('res-img');
-            if(success) {
-                if(currentTier === 'perc') prog.w = true;
-                if(currentTier === 'sim') prog.s = true;
-                localStorage.setItem('eudaimonia_v5', JSON.stringify(prog));
-                updateMenu();
-                imgRes.src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose5.png";
-                document.getElementById('res-title').innerText = "Simetría Comprendida";
-                document.getElementById('res-msg').innerText = "Has asimilado las leyes de la balanza cósmica. La siguiente fase revelará cómo despejar la verdad.";
+            document.getElementById('res-time').innerText = evalData.seconds + "s";
+            document.getElementById('res-errors').innerText = evalData.mistakes;
+            document.getElementById('res-score').innerText = evalData.score;
+
+            let title="", msg="";
+            if(currentTier === 'perc') {
+                prog.tier1 = true;
+                title = "CAPA I SUPERADA ⚡"; msg = "El Poder de la Incógnita es tuyo. Tu capacidad de abstracción acaba de subir de nivel.";
+            } else if(currentTier === 'sim') {
+                prog.tier2 = true;
+                title = "EQUILIBRIO LOGRADO 🦎✨"; msg = "La balanza de Xylo está en paz. Eres un maestro de la simetría algebraica.";
             } else {
-                imgRes.src = "https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose4.png";
-                document.getElementById('res-title').innerText = "Atención Nublada";
-                document.getElementById('res-msg').innerText = "El ruido del entorno ha ganado esta vez. Descansemos para recuperar la claridad cognitiva.";
+                title = "EUDAIMONÍA ALCANZADA 🌟"; msg = "¡Nivel Máximo! Has ordenado el caos usando la razón pura de Aristóteles.";
             }
+
+            localStorage.setItem('edu_eval_v9', JSON.stringify(prog));
+            document.getElementById('res-title').innerText = title;
+            document.getElementById('res-msg').innerText = msg;
+            
+            showView('view-results');
+            speak(title + ". " + msg);
         }
 
-        function showView(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        function showMenu() { updateMenuLocks(); showView('view-menu'); AudioEngine.playMusic('perc'); }
+        function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+        // --- ENVIAR REPORTE AL MAESTRO (TOTALMENTE GRATUITO CON MAILTO) ---
+        function sendEmailReport() {
+            const subject = encodeURIComponent(`Evaluación Álgebra: ${userName} - Nivel ${currentTier.toUpperCase()}`);
+            const body = encodeURIComponent(
+                `REPORTE DE SISTEMA EUDAIMONÍA\n` +
+                `----------------------------------------\n` +
+                `Nombre del Estudiante: ${userName}\n` +
+                `Capa Completada: ${currentTier.toUpperCase()}\n` +
+                `Tiempo de Resolución: ${evalData.seconds} segundos\n` +
+                `Errores Cometidos: ${evalData.mistakes}\n` +
+                `PUNTUACIÓN FINAL: ${evalData.score} / 10000\n` +
+                `----------------------------------------\n` +
+                `Enviado desde el Protocolo Automático.`
+            );
+            // Esto abrirá el Gmail, Outlook o App de correo del dispositivo del estudiante listo para enviar.
+            window.open(`mailto:${PROFESSOR_EMAIL}?subject=${subject}&body=${body}`, '_blank');
         }
     </script>
 </body>
 </html>
+</html>
+
