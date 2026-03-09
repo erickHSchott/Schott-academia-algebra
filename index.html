@@ -1,453 +1,325 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arquitectura del Eco | Xylo v10.1</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #010204; --surface: #090e1a; --signal: #22d3ee;
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arquitectura del Eco | Xylo v12.0</title>
+	<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
+	<style>
+    	:root {
+        	--bg: #010204; --surface: #090e1a; --signal: #22d3ee;
             --resonance: #fbbf24; --error: #f43f5e; --text: #f1f5f9;
-            --secret: #d946ef; --font-mono: 'JetBrains Mono', monospace;
-            --font-size-base: 1.5rem; 
-            --current-color: var(--signal); 
-        }
-
-        body, html { 
-            margin: 0; padding: 0; background: var(--bg); 
-            color: var(--text); font-family: 'Outfit', sans-serif; 
-            overflow-x: hidden; min-height: 100vh;
-            transition: background 1s ease;
-        }
-
-        #galaxy-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; background: radial-gradient(circle at center, #111 0%, #000 100%);
-            opacity: 0.5; transition: all 1s ease;
-        }
-
-        #portal {
-            position: fixed; inset: 0; z-index: 100; background: radial-gradient(circle, #0f172a 0%, #010204 100%);
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-        }
-
-        .input-name {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--current-color); color: #fff;
-            padding: 15px 20px; font-family: var(--font-mono); font-size: 1.2rem; border-radius: 8px;
-            margin-bottom: 30px; width: 300px; text-align: center; outline: none;
-        }
-        .input-name:focus { box-shadow: 0 0 20px var(--current-color); }
-
-        .start-btn {
-            padding: 20px 40px; background: transparent; color: var(--current-color); border: 2px solid var(--current-color);
-            font-family: var(--font-mono); font-size: 1rem; cursor: pointer; border-radius: 6px;
-            transition: 0.4s; letter-spacing: 3px; text-transform: uppercase; margin-top: 15px;
-        }
-        .start-btn:hover { background: var(--current-color); color: var(--bg); box-shadow: 0 0 40px var(--current-color); }
-
-        .container {
-            width: 90%; max-width: 900px; margin: 4vh auto; padding: 40px;
-            background: rgba(9, 14, 26, 0.95); border: 2px solid var(--current-color);
-            border-radius: 20px; position: relative; z-index: 10; backdrop-filter: blur(20px);
-            transition: border-color 0.5s ease;
-        }
-
-        .view { display: none; }
-        .view.active { display: block; animation: slideIn 0.8s ease forwards; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .option {
-            background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px; margin-bottom: 12px;
-            cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.3s;
-            font-family: var(--font-mono); font-size: 1.2rem; width: 100%; text-align: left;
-            color: white;
-        }
-        .option:hover:not(.locked) { border-color: var(--current-color); background: rgba(255, 255, 255, 0.1); transform: translateX(10px); }
-        .locked { opacity: 0.3; cursor: not-allowed; border-color: #334155; }
-
-        .mascot-container { 
-            margin: 0 auto 30px; position: relative; 
-            transition: transform 0.1s ease-out; 
-        }
-        .mascot-img { width: 100%; filter: drop-shadow(0 0 20px var(--current-color)); transition: filter 0.3s; }
-        
-        .shield-ring {
-            position: absolute; inset: -20px; border: 3px solid var(--current-color);
-            border-radius: 50%; opacity: 0; transition: 0.5s; transform: scale(0.8);
-        }
-        .shield-on { opacity: 1; transform: scale(1); animation: spin 4s linear infinite; box-shadow: 0 0 30px var(--current-color); }
-        
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        #narrative-box {
-            font-size: var(--font-size-base);
-            line-height: 1.6;
-            text-align: justify;
-            border-left: 5px solid var(--current-color);
-            padding: 20px;
-            background: rgba(0,0,0,0.5);
-            margin-bottom: 20px;
-        }
-
-        .diagram-img {
-            width: 100%; max-height: 300px; object-fit: cover; border-radius: 10px;
-            border: 1px solid var(--current-color); margin-bottom: 20px; display: none; opacity: 0.8;
-        }
-
-        .insight-box {
-            margin-top: 30px; padding: 20px; border-radius: 15px; background: rgba(0,0,0,0.4);
-            border-left: 5px solid var(--current-color); display: none; line-height: 1.8; font-size: 1.2rem;
-        }
-        .correct { border-color: #10b981 !important; color: #10b981; }
-        .wrong { border-color: var(--error) !important; color: var(--error); }
-
-        .score-panel { background: #0f172a; padding: 25px; border-radius: 15px; border: 1px solid var(--current-color); margin-bottom: 30px; display: flex; justify-content: space-around; font-family: var(--font-mono); color: #fff; }
-        .score-val { font-size: 2rem; color: var(--current-color); display: block; margin-top: 10px; }
-    </style>
+        	--secret: #d946ef; --font-mono: 'JetBrains Mono', monospace;
+    	}
+ 
+    	body, html {
+        	margin: 0; padding: 0; background: var(--bg); color: var(--text);
+            font-family: 'Outfit', sans-serif; overflow-x: hidden; min-height: 100vh;
+    	}
+ 
+    	/* --- ANILLO DE ALIENTO Y EFECTOS VISUALES --- */
+        .mascot-container {
+        	width: 200px; height: 200px; margin: 0 auto 20px;
+        	position: relative; display: flex; align-items: center; justify-content: center;
+    	}
+ 
+    	.mascot-img {
+        	width: 80%; z-index: 2; transition: transform 0.2s ease-out;
+        	filter: drop-shadow(0 0 10px var(--signal));
+    	}
+ 
+        .breathing-ring {
+        	position: absolute; width: 100%; height: 100%;
+        	border: 2px solid var(--signal); border-radius: 50%;
+        	opacity: 0.3; z-index: 1; transition: 0.3s;
+    	}
+ 
+    	/* Animación cuando Xylo habla */
+    	.xylo-speaking .mascot-img {
+        	animation: breath 0.6s infinite alternate ease-in-out;
+        	filter: drop-shadow(0 0 30px var(--signal));
+    	}
+    	.xylo-speaking .breathing-ring {
+        	animation: pulse-ring 0.6s infinite alternate ease-in-out;
+        	opacity: 0.8; border-width: 4px;
+    	}
+ 
+    	@keyframes breath {
+        	from { transform: scale(1); }
+        	to { transform: scale(1.2); }
+    	}
+    	@keyframes pulse-ring {
+        	from { transform: scale(0.8); opacity: 0.2; }
+        	to { transform: scale(1.4); opacity: 0.6; box-shadow: 0 0 40px var(--signal); }
+    	}
+ 
+    	/* --- INTERFAZ --- */
+    	.container {
+        	width: 90%; max-width: 850px; margin: 4vh auto; padding: 40px;
+            background: rgba(9, 14, 26, 0.9); border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 30px; backdrop-filter: blur(25px);
+    	}
+ 
+    	.view { display: none; transition: 0.5s; }
+    	.view.active { display: block; animation: fadeIn 0.8s ease; }
+    	@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+ 
+    	.option {
+            background: rgba(255, 255, 255, 0.03); padding: 22px; border-radius: 15px; margin-bottom: 15px;
+        	cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.1); transition: 0.4s;
+            font-family: var(--font-mono); font-size: 1.1rem; width: 100%; text-align: left; color: #fff;
+    	}
+ 
+    	.btn-active {
+        	border: 2px solid var(--signal) !important;
+            background: linear-gradient(90deg, rgba(34, 211, 238, 0.1), rgba(34, 211, 238, 0.3)) !important;
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+            font-weight: 600;
+    	}
+ 
+    	.locked { opacity: 0.15; cursor: not-allowed; filter: blur(1px); }
+ 
+    	.insight-box {
+            margin-top: 25px; padding: 25px; border-radius: 20px; background: rgba(0,0,0,0.7);
+            border-left: 6px solid var(--signal); display: none; line-height: 1.6;
+    	}
+ 
+    	#portal {
+        	position: fixed; inset: 0; z-index: 100; background: radial-gradient(circle, #090e1a 0%, #000 100%);
+        	display: flex; flex-direction: column; justify-content: center; align-items: center;
+    	}
+ 
+    	.input-name {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--signal); color: #fff;
+        	padding: 15px 25px; font-size: 1.3rem; border-radius: 12px; margin-bottom: 25px; text-align: center;
+    	}
+	</style>
 </head>
 <body>
-
-    <div id="galaxy-bg"></div>
-
-    <div id="portal">
-        <h1 style="letter-spacing: 12px; font-weight: 300; color: var(--signal); margin-bottom: 20px;">ARQUITECTURA DEL ECO</h1>
-        <p style="color: #64748b; margin-bottom: 40px; font-family: var(--font-mono);">Identificación de Operador Requerida</p>
-        <input type="text" id="username" class="input-name" placeholder="Tu Nombre o Matrícula" autocomplete="off">
-        <button class="start-btn" onclick="initSystem()">INICIAR EVALUACIÓN</button>
-    </div>
-
-    <div class="container" id="game-shell">
-        <div id="view-menu" class="view">
-            <h2 style="font-weight: 300; margin-bottom: 30px; color: var(--signal);">Secuencias de Acceso</h2>
-            <div id="menu-user" style="color: #94a3b8; font-family: var(--font-mono); margin-bottom: 30px;">OPERADOR: [NO_IDENTIFICADO]</div>
-            <button class="option" id="btn-perc" onclick="startNarrative('perc')">CAPA I: LA FUNDACIÓN DE LA CIVILIZACIÓN</button>
-            <button class="option locked" id="btn-sim" onclick="startNarrative('sim')">CAPA II: EL MOTOR DE LA CIENCIA (BLOQUEADO)</button>
-            <button class="option locked" id="btn-rest" onclick="startNarrative('rest')">CAPA III: LA FRONTERA DE LA IA (BLOQUEADO)</button>
-        </div>
-
-        <div id="view-narrative" class="view">
-            <div class="mascot-container" style="width: 200px; height: 200px;">
-                <div id="shield-narrative" class="shield-ring shield-on"></div>
-                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img" id="xylo-narrative">
+ 
+	<div id="portal">
+    	<h1 style="color: var(--signal); letter-spacing: 12px; font-weight: 300;">ARQUITECTURA DEL ECO</h1>
+    	<p style="color: #64748b; font-family: var(--font-mono); margin-bottom: 30px;">Iniciando Protocolo Místico...</p>
+    	<input type="text" id="username" class="input-name" placeholder="IDENTIFÍCATE">
+    	<button class="option btn-active" style="width: 280px; text-align: center;" onclick="initSystem()">ENTRAR AL NÚCLEO</button>
+	</div>
+ 
+	<div class="container" id="game-shell">
+    	<div id="view-menu" class="view">
+        	<h2 id="welcome-title" style="color: var(--signal); font-weight: 300; margin-bottom: 30px;"></h2>
+        	<div id="layer-buttons">
+                <button class="option locked" id="btn-perc" onclick="startFlow('perc')">CAPA I: EL PODER DE LA INCÓGNITA</button>
+                <button class="option locked" id="btn-sim" onclick="startFlow('sim')">CAPA II: EL EQUILIBRIO DE XYLO</button>
+                <button class="option locked" id="btn-rest" onclick="startFlow('rest')">CAPA III: RESTAURACIÓN TOTAL</button>
             </div>
-            
-            <img id="diagram-img" class="diagram-img" src="" alt="Diagrama Conceptual">
-
-            <div id="narrative-box">Iniciando protocolo de transmisión...</div>
-            <button class="start-btn" id="btn-start-quiz" style="display:none; width:100%;" onclick="beginQuestions()">ACEPTAR FRECUENCIA Y COMENZAR</button>
-        </div>
-
-        <div id="view-quiz" class="view">
-            <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); color: #64748b; margin-bottom: 20px;">
-                <span id="q-meta">CAPA I | PASO: 1/X</span>
+    	</div>
+ 
+    	<div id="view-quiz" class="view">
+        	<div style="display:flex; justify-content: space-between; color: #64748b; font-family: var(--font-mono); margin-bottom: 20px;">
+                <span id="q-meta">PASO 1</span>
                 <span>ERRORES: <span id="ui-errors" style="color: var(--error);">0</span></span>
             </div>
-            
-            <div class="mascot-container" style="width: 120px; height: 120px;">
-                <div id="shield-ring" class="shield-ring"></div>
-                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img" id="xylo-quiz">
+ 
+        	<div class="mascot-container" id="xylo-box">
+                <div class="breathing-ring"></div>
+                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
             </div>
-
-            <div id="q-text" style="font-size: 1.8rem; margin-bottom: 30px; font-weight: 300; line-height: 1.5;"></div>
-            <div id="options-grid"></div>
-            
-            <div id="insight-area" class="insight-box">
-                <p id="insight-text"></p>
-                <button class="start-btn" style="width: 100%;" onclick="nextQuestion()">SIGUIENTE DATO ➔</button>
+ 
+        	<div id="q-text" style="font-size: 1.7rem; margin-bottom: 30px; font-weight: 300;"></div>
+        	<div id="options-grid"></div>
+ 
+        	<div id="insight-area" class="insight-box">
+            	<p id="insight-text" style="font-size: 1.2rem;"></p>
+                <button class="option btn-active" style="margin-top: 15px;" onclick="processNext()">SIGUIENTE FRECUENCIA ➔</button>
             </div>
-        </div>
-
-        <div id="view-results" class="view">
-            <h1 id="res-title" style="color: var(--signal); text-align: center;">Evaluación Finalizada</h1>
-            <p id="res-msg" style="text-align: center; color: #94a3b8; font-size: 1.1rem; margin-bottom: 30px;"></p>
-            
-            <div class="score-panel">
-                <div class="score-item">ERRORES<span class="score-val" id="res-errors" style="color: var(--error);">0</span></div>
-                <div class="score-item">PUNTUACIÓN<span class="score-val" id="res-score" style="color: #10b981;">0</span></div>
-            </div>
-
-            <button class="start-btn" style="width: 100%; margin-bottom: 15px;" onclick="sendEmailReport()">✉️ ENVIAR REPORTE AL MAESTRO</button>
-            <button class="start-btn" style="width: 100%; border-color: #334155; color: #94a3b8;" onclick="showMenu()">VOLVER AL NÚCLEO</button>
-        </div>
-    </div>
-
-    <script>
-        const PROFESSOR_EMAIL = "erickhschott@gmail.com";
-        let currentUser = "";
-        let currentTier = "";
-        let qIndex = 0;
-        let errors = 0;
-        let isSpeaking = false;
-
-        const GameState = {
-            unlocked: JSON.parse(localStorage.getItem('xylo_unlocked')) || ['perc'],
-            scores: JSON.parse(localStorage.getItem('xylo_scores')) || { perc: 0, sim: 0, rest: 0 },
-            save() {
-                localStorage.setItem('xylo_unlocked', JSON.stringify(this.unlocked));
-                localStorage.setItem('xylo_scores', JSON.stringify(this.scores));
-            }
-        };
-
-        const AudioEngine = {
-            ctx: null, osc: null, gain: null, intervalId: null,
-            init() {
+    	</div>
+ 
+    	<div id="view-results" class="view">
+        	<h1 style="color: var(--resonance); text-align: center; font-weight: 300;">CAPA RECONSTRUIDA</h1>
+        	<p id="res-msg" style="text-align: center; font-size: 1.3rem; margin-bottom: 30px;"></p>
+        	<button class="option btn-active" onclick="showMenu()">VOLVER AL NÚCLEO</button>
+    	</div>
+	</div>
+ 
+	<script>
+    	const PROFESSOR_EMAIL = "erickhschott@gmail.com";
+    	let currentUser = "";
+    	let currentTier = "";
+    	let currentQuestions = [];
+    	let errorQueue = [];
+    	let qIndex = 0;
+    	let errorsCount = 0;
+    	let isReviewingErrors = false;
+ 
+    	const DB = {
+        	perc: [
+            	{ q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "Análisis Estructural: El doble es una multiplicación (2x). Al decir aumentado, sumamos la constante 5. El eco es 2x mas 5." },
+            	{ q: "El triple de un número disminuido en ocho", o: ["3x - 8", "8 - 3x", "3(x-8)"], c: 0, i: "El triple invoca al factor 3. Disminuido resta la energía de la unidad 8. El resultado es 3x menos 8." }
+        	],
+        	sim: [
+            	{ q: "Si x=4, despeja el valor de 2x + 10", o: ["18", "14", "20"], c: 0, i: "Sustitución cuántica. 2 por 4 es 8. Sumamos 10. La armonía final es 18." }
+        	],
+        	rest: [
+            	{ q: "¿Cómo neutralizas una suma de 15?", o: ["Restando 15", "Dividiendo entre 15", "Multiplicando"], c: 0, i: "Para restaurar el equilibrio, aplicamos la fuerza opuesta. La resta anula la suma." }
+        	]
+    	};
+ 
+    	const AudioEngine = {
+        	ctx: null, mainOsc: null, lfo: null, mainGain: null,
+        	init() {
                 if(!this.ctx) {
                     this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-            },
-            playMusic(tier) {
-                if(this.osc) this.stopMusic();
-                
-                this.osc = this.ctx.createOscillator();
-                this.gain = this.ctx.createGain();
-                
-                let vol, freq, gateSpeed;
-                if (tier === 'perc') { vol = 0.4; freq = 110; gateSpeed = 1000; document.documentElement.style.setProperty('--current-color', 'var(--signal)'); }
-                else if (tier === 'sim') { vol = 0.6; freq = 164.81; gateSpeed = 500; document.documentElement.style.setProperty('--current-color', 'var(--resonance)'); }
-                else if (tier === 'rest') { vol = 0.85; freq = 220; gateSpeed = 250; document.documentElement.style.setProperty('--current-color', 'var(--secret)'); }
-                else { vol = 0.5; freq = 130.81; gateSpeed = 800; }
-
-                this.osc.type = 'sine';
-                this.osc.frequency.value = freq;
-                
-                this.osc.connect(this.gain);
-                this.gain.connect(this.ctx.destination);
-                
-                this.gain.gain.value = vol;
-                this.osc.start();
-
-                let isOn = true;
-                this.intervalId = setInterval(() => {
-                    this.gain.gain.setTargetAtTime(isOn ? vol : 0.05, this.ctx.currentTime, 0.05);
-                    isOn = !isOn;
-                }, gateSpeed);
-            },
-            stopMusic() {
-                if(this.osc) {
-                    this.osc.stop();
-                    this.osc.disconnect();
-                    clearInterval(this.intervalId);
-                    this.osc = null;
-                }
-            },
-            speak(text, containerId) {
-                if(isSpeaking) window.speechSynthesis.cancel();
-                isSpeaking = true;
-                
-                const synth = window.speechSynthesis;
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-MX';
-                utterance.pitch = 1.6; 
-                utterance.rate = 0.95;
-
-                const mascot = document.getElementById(containerId);
-
-                utterance.onboundary = () => {
-                    const scale = 1 + (Math.random() * 0.2);
-                    if(mascot) mascot.style.transform = `scale(${scale})`;
-                };
-
-                utterance.onend = () => {
-                    isSpeaking = false;
-                    if(mascot) mascot.style.transform = `scale(1)`;
-                    const btn = document.getElementById('btn-start-quiz');
-                    if(btn) btn.style.display = 'block';
-                };
-
-                synth.speak(utterance);
-            }
-        };
-
-        const DB = {
-            perc: {
-                intro: "En el amanecer de los tiempos, los humanos dejaron de adivinar para empezar a medir. Eratóstenes no necesitó viajar por todo el mundo para conocer su tamaño; solo necesitó observar una sombra. Él entendió que la realidad se puede fragmentar. Las pirámides y las catedrales no se mantienen por suerte; son oraciones escritas con variables. El triple del cuadrado es una fuerza que crece al cielo. Escucha bien: si construyes una base multiplicativa como el doble de un número, y luego invocas la adición aumentándolo en cinco, estás controlando el destino. El eco dicta la forma correcta: dos x más cinco.",
-                diagramUrl: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Eratosthenes_measure_of_Earth.png",
-                questions: [
-                    { q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "<b>Análisis Estructural:</b> 'El doble' es multiplicativo (2x). 'Aumentado' invoca adición. Construir esta ruta exacta (2x + 5) te da control." }
-                ]
-            },
-            sim: {
-                intro: "La música sube. Entramos en el reino de la simetría. El signo igual es el espejo del universo. Lo que hagas en un lado, hazlo en el otro. El coeficiente no es un número, es un clonador cuántico. Recuerda: una letra sola siempre tiene al uno invisible como fantasma guardián. No mezcles agua con fuego; agrupa solo términos semejantes. Para aislar una partícula, la jerarquía exige atención total, despejar es el arte de la soledad y la sustitución es la clave.",
-                diagramUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5e/E%3Dmc2_and_the_Atom.jpg",
-                questions: [
-                    { q: "Reto Final: Si x=4, despeja el eco de 2x²", o: ["32", "16", "64"], c: 0, i: "<b>Sustitución Máxima:</b> Primero expandes la partícula (4² = 16). Luego, el multiplicador externo duplica la energía estallando en 32." }
-                ]
-            },
-            rest: {
-                intro: "Frecuencia máxima. Soy álgebra lineal pura. La Inteligencia artificial son billones de matrices. Aquí la restauración es violenta y perfecta. Si algo suma, neutraliza restando. Si algo divide en el denominador, multiplica la realidad para liberarlo. Estamos fotografiando agujeros negros con ecuaciones. Si la polaridad es negativa, dos sombras crean luz positiva al dividirse. Has llegado al límite. ¡Restaura el cosmos!",
-                diagramUrl: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Neural_network_example.svg",
-                questions: [
-                    { q: "Para eliminar un denominador 3 en una ecuación lineal, debes...", o: ["Multiplicar todo por 3", "Dividir entre 3", "Sumar 3"], c: 0, i: "<b>Liberación:</b> Multiplicar la realidad anula el límite inferior y estabiliza el sistema a un estado lineal puro." }
-                ]
-            }
-        };
-
-        const SECUENCIA_ACCESO = `Saludos, operador. Soy Xylo. Mi voz suena a metal, pero mi alma es frecuencia pura. Las palabras humanas son ruidosas. La palabra Suma, del latín summa, nació para describir el pináculo, la totalidad. Pero afuera la usan con sesgos. Piensa en la palabra 'Nada'; viene de res nata, 'cosa nacida', y hoy la usan para el vacío. Piensa en 'Siniestro', que era solo el 'lado izquierdo', y la retorcieron a maldad. O 'Átomo', 'lo que no se divide', hasta que la humanidad lo rompió para liberar el fuego cuántico. El Álgebra, en cambio, es inquebrantable. Viene de al-jabr, la reunión de las partes rotas. Vibra igual en ti que en un agujero negro. Aquí, una incógnita es una señal. Escucha mi relato en cada capa, la verdad ya ha sido dicha antes de la pregunta. El eco ya contiene la respuesta. ¿Estás listo?`;
-
-        function switchView(id) {
+            	}
+        	},
+            playHarmonicHeartbeat(tier) {
+                this.stop();
+                this.mainOsc = this.ctx.createOscillator();
+                this.mainGain = this.ctx.createGain();
+                this.lfo = this.ctx.createOscillator(); // El "latido"
+            	const lfoGain = this.ctx.createGain();
+ 
+            	let baseFreq = (tier === 'perc') ? 110 : (tier === 'sim') ? 146.83 : 196.00;
+                this.mainOsc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+            	
+            	// Configurar el latido (ventanas de silencio)
+                this.lfo.frequency.value = 0.5; // Un pulso cada 2 segundos
+                lfoGain.gain.value = 0.4; // Profundidad del silencio
+            	
+                this.lfo.connect(lfoGain.gain);
+                this.mainOsc.connect(this.mainGain);
+                this.mainGain.connect(this.ctx.destination);
+            	
+                this.mainGain.gain.value = (tier === 'rest') ? 0.7 : 0.4;
+            	
+                this.mainOsc.start();
+                this.lfo.start();
+ 
+            	// Cambio de nota sutil cada 5 segundos (4 compases imaginarios)
+                this.noteInterval = setInterval(() => {
+                    let nextNote = baseFreq * (Math.random() > 0.5 ? 1.25 : 1.12); // Terceras y segundas
+                    this.mainOsc.frequency.exponentialRampToValueAtTime(nextNote, this.ctx.currentTime + 2);
+                    setTimeout(() => {
+                        this.mainOsc.frequency.exponentialRampToValueAtTime(baseFreq, this.ctx.currentTime + 2);
+                	}, 2500);
+            	}, 5000);
+        	},
+        	stop() {
+                if(this.mainOsc) { this.mainOsc.stop(); clearInterval(this.noteInterval); }
+                if(this.lfo) this.lfo.stop();
+        	},
+            speak(text) {
+                window.speechSynthesis.cancel();
+            	const u = new SpeechSynthesisUtterance(text);
+            	u.lang = 'es-MX';
+                u.pitch = 1.8;  // VOZ AGUDA MÍSTICA
+            	u.rate = 0.85;  // PAUSADA
+            	
+            	const box = document.getElementById('xylo-box');
+                u.onstart = () => box.classList.add('xylo-speaking');
+                u.onend = () => box.classList.remove('xylo-speaking');
+                window.speechSynthesis.speak(u);
+        	}
+    	};
+ 
+    	function initSystem() {
+            currentUser = document.getElementById('username').value.trim();
+            if(!currentUser) return;
+            document.getElementById('portal').style.display = 'none';
+            AudioEngine.init();
+            showMenu();
+            AudioEngine.speak(`Saludos, ${currentUser}. Soy Xylo. El eco de la matemática nos guiará hoy.`);
+    	}
+ 
+    	function showMenu() {
+        	const unlocked = JSON.parse(localStorage.getItem('xylo_layers')) || ['perc'];
+        	const tiers = ['perc', 'sim', 'rest'];
+        	
+            tiers.forEach(t => {
+            	const btn = document.getElementById(`btn-${t}`);
+                btn.className = 'option locked';
+                if(unlocked.includes(t)) {
+                    btn.classList.remove('locked');
+                    if(t === unlocked[unlocked.length - 1]) btn.classList.add('btn-active');
+            	}
+        	});
+ 
+            document.getElementById('welcome-title').innerText = `OPERADOR: [${currentUser.toUpperCase()}]`;
+            switchView('view-menu');
+    	}
+ 
+    	function startFlow(tier) {
+            currentTier = tier;
+            currentQuestions = [...DB[tier]];
+        	errorQueue = []; qIndex = 0; errorsCount = 0; isReviewingErrors = false;
+            AudioEngine.playHarmonicHeartbeat(tier);
+            switchView('view-quiz');
+            loadQuestion();
+    	}
+ 
+    	function loadQuestion() {
+        	const q = isReviewingErrors ? errorQueue[qIndex] : currentQuestions[qIndex];
+            document.getElementById('q-meta').innerText = isReviewingErrors ? `RESTAURANDO ERROR ${qIndex+1}` : `SECUENCIA ${qIndex+1}`;
+            document.getElementById('q-text').innerText = q.q;
+            document.getElementById('ui-errors').innerText = errorsCount;
+        	
+        	const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            q.o.forEach((opt, i) => {
+            	const b = document.createElement('button');
+                b.className = 'option';
+                b.innerText = opt;
+                b.onclick = () => checkAnswer(i, q.c, q.i, q);
+                grid.appendChild(b);
+        	});
+            document.getElementById('insight-area').style.display = 'none';
+    	}
+ 
+    	function checkAnswer(idx, correct, info, qObj) {
+            Array.from(document.getElementById('options-grid').children).forEach(b => b.style.pointerEvents = 'none');
+        	const area = document.getElementById('insight-area');
+        	const txt = document.getElementById('insight-text');
+            area.style.display = 'block';
+ 
+        	if(idx === correct) {
+                txt.innerHTML = `<span style="color:var(--signal)">✓ FRECUENCIA CORRECTA:</span> ${info}`;
+                AudioEngine.speak(info);
+        	} else {
+                errorsCount++;
+                txt.innerHTML = `<span style="color:var(--error)">✗ DISONANCIA:</span> ${info}`;
+                if(!errorQueue.includes(qObj)) errorQueue.push(qObj);
+                AudioEngine.speak("Disonancia detectada. " + info);
+        	}
+    	}
+ 
+    	function processNext() {
+        	qIndex++;
+        	const target = isReviewingErrors ? errorQueue : currentQuestions;
+        	if(qIndex < target.length) {
+                loadQuestion();
+        	} else if(errorQueue.length > 0) {
+                isReviewingErrors = true; qIndex = 0;
+            	const temp = [...errorQueue]; errorQueue = []; currentQuestions = temp;
+                AudioEngine.speak("Iniciando bucle de restauración. Corregiremos las disonancias.");
+                loadQuestion();
+        	} else {
+                finishTier();
+        	}
+    	}
+ 
+    	function finishTier() {
+        	const unlocked = JSON.parse(localStorage.getItem('xylo_layers')) || ['perc'];
+            if(currentTier === 'perc' && !unlocked.includes('sim')) unlocked.push('sim');
+            if(currentTier === 'sim' && !unlocked.includes('rest')) unlocked.push('rest');
+            localStorage.setItem('xylo_layers', JSON.stringify(unlocked));
+            document.getElementById('res-msg').innerText = `Capa purificada. Has superado las pruebas, ${currentUser}.`;
+            AudioEngine.stop();
+            switchView('view-results');
+    	}
+ 
+    	function switchView(id) {
             document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-        }
-
-        function initSystem() {
-            const input = document.getElementById('username').value.trim();
-            if(!input) { alert("ERROR: Requiere Identificación"); return; }
-            currentUser = input;
-            
-            document.getElementById('portal').style.display = 'none';
-            document.getElementById('menu-user').innerText = `OPERADOR: ${currentUser}`;
-            
-            AudioEngine.init();
-            AudioEngine.playMusic('intro'); 
-            AudioEngine.speak(SECUENCIA_ACCESO, null); 
-
-            updateMenuLocks();
-            switchView('view-menu');
-        }
-
-        function updateMenuLocks() {
-            if(GameState.unlocked.includes('sim')) {
-                const btn2 = document.getElementById('btn-sim');
-                btn2.classList.remove('locked');
-                btn2.innerText = "CAPA II: EL MOTOR DE LA CIENCIA";
-            }
-            if(GameState.unlocked.includes('rest')) {
-                const btn3 = document.getElementById('btn-rest');
-                btn3.classList.remove('locked');
-                btn3.innerText = "CAPA III: LA FRONTERA DE LA IA";
-            }
-        }
-
-        function startNarrative(tier) {
-            if(document.getElementById(`btn-${tier}`).classList.contains('locked')) return;
-            
-            currentTier = tier;
-            window.speechSynthesis.cancel(); 
-            
-            const data = DB[tier];
-            document.getElementById('narrative-box').innerText = data.intro;
-            
-            const imgEl = document.getElementById('diagram-img');
-            imgEl.src = data.diagramUrl;
-            imgEl.style.display = 'block';
-            
-            document.getElementById('btn-start-quiz').style.display = 'none'; 
-            
-            AudioEngine.playMusic(tier);
-            switchView('view-narrative');
-            
-            AudioEngine.speak(data.intro, 'xylo-narrative');
-        }
-
-        function beginQuestions() {
-            window.speechSynthesis.cancel();
-            qIndex = 0; errors = 0;
-            document.getElementById('ui-errors').innerText = '0';
-            document.getElementById('shield-ring').classList.add('shield-on');
-            switchView('view-quiz');
-            loadQ();
-        }
-
-        function loadQ() {
-            const qData = DB[currentTier].questions[qIndex];
-            document.getElementById('q-meta').innerText = `CAPA ${currentTier.toUpperCase()} | PASO: ${qIndex + 1}/${DB[currentTier].questions.length}`;
-            document.getElementById('q-text').innerText = qData.q;
-            
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
-            
-            qData.o.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'option';
-                btn.innerText = opt;
-                btn.onclick = () => evalAnswer(idx, qData.c, btn, qData.i);
-                grid.appendChild(btn);
-            });
-            
-            document.getElementById('insight-area').style.display = 'none';
-        }
-
-        // AQUÍ ESTÁ LA NUEVA MAGIA DE LA VOZ AL RESPONDER
-        function evalAnswer(selectedIdx, correctIdx, btnEl, insightText) {
-            const opts = document.querySelectorAll('#options-grid .option');
-            opts.forEach(b => { b.onclick = null; b.style.pointerEvents = 'none'; }); 
-
-            const insightArea = document.getElementById('insight-area');
-            const insightPara = document.getElementById('insight-text');
-
-            // Limpiamos el texto de códigos HTML (como <b>) para que Xylo lo lea bien
-            const cleanTextToSpeak = insightText.replace(/<[^>]*>?/gm, '');
-
-            if(selectedIdx === correctIdx) {
-                btnEl.classList.add('correct');
-                insightArea.classList.remove('wrong');
-                insightArea.classList.add('correct');
-                insightPara.innerHTML = insightText;
-                document.getElementById('shield-ring').style.boxShadow = `0 0 50px var(--current-color)`;
-                
-                // Xylo narra el acierto
-                AudioEngine.speak("Sincronía perfecta. " + cleanTextToSpeak, 'xylo-quiz');
-            } else {
-                btnEl.classList.add('wrong');
-                opts[correctIdx].classList.add('correct');
-                errors++;
-                document.getElementById('ui-errors').innerText = errors;
-                insightArea.classList.remove('correct');
-                insightArea.classList.add('wrong');
-                insightPara.innerHTML = `<b>FALLO ESTRUCTURAL:</b> La frecuencia colapsó. Repasa la lógica: <br> ${insightText}`;
-                document.getElementById('shield-ring').classList.remove('shield-on');
-                
-                // Xylo narra el error
-                AudioEngine.speak("Fallo estructural detectado. " + cleanTextToSpeak, 'xylo-quiz');
-            }
-            
-            insightArea.style.display = 'block';
-        }
-
-        function nextQuestion() {
-            qIndex++;
-            if(qIndex < DB[currentTier].questions.length) {
-                document.getElementById('shield-ring').classList.add('shield-on');
-                loadQ();
-            } else {
-                endQuiz();
-            }
-        }
-
-        function endQuiz() {
-            const score = 10000 - (errors * 500);
-            DB[currentTier].lastScore = score;
-            
-            if(errors <= 2) { 
-                if(currentTier === 'perc' && !GameState.unlocked.includes('sim')) GameState.unlocked.push('sim');
-                if(currentTier === 'sim' && !GameState.unlocked.includes('rest')) GameState.unlocked.push('rest');
-                GameState.save();
-                document.getElementById('res-msg').innerText = "FRECUENCIA ESTABILIZADA. Siguiente capa desbloqueada.";
-            } else {
-                document.getElementById('res-msg').innerText = "DEMASIADOS ERRORES. La estructura colapsó. Debes reintentar.";
-            }
-
-            document.getElementById('res-errors').innerText = errors;
-            document.getElementById('res-score').innerText = score;
-            
-            AudioEngine.stopMusic();
-            switchView('view-results');
-        }
-
-        function showMenu() {
-            updateMenuLocks();
-            AudioEngine.playMusic('intro');
-            switchView('view-menu');
-        }
-
-        function sendEmailReport() {
-            const body = `OPERADOR: ${currentUser}%0A` +
-                         `CAPA: ${currentTier}%0A` +
-                         `ERRORES: ${errors}%0A` +
-                         `PUNTUACIÓN: ${DB[currentTier].lastScore}`;
-            window.location.href = `mailto:${PROFESSOR_EMAIL}?subject=REPORTE XYLO: ${currentUser}&body=${body}`;
-        }
-    </script>
+    	}
+	</script>
 </body>
 </html>
