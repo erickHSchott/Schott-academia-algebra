@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xylo v13.0 | Arquitectura del Eco</title>
+    <title>Xylo v13.1 | Profundidad del Eco</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -17,66 +17,45 @@
             font-family: 'Outfit', sans-serif; overflow: hidden; height: 100vh;
         }
 
-        /* --- INTERFAZ DINÁMICA --- */
         .container {
             width: 90%; max-width: 900px; margin: 2vh auto; padding: 30px;
-            background: rgba(10, 15, 29, 0.9); border: 1px solid rgba(34, 211, 238, 0.15);
-            border-radius: 40px; backdrop-filter: blur(30px); position: relative;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5); height: 90vh; overflow-y: auto;
+            background: rgba(10, 15, 29, 0.95); border: 1px solid rgba(34, 211, 238, 0.2);
+            border-radius: 40px; backdrop-filter: blur(30px); height: 90vh; overflow-y: auto;
         }
 
-        /* --- XYLO Y EL ANILLO DE ALIENTO --- */
+        /* --- XYLO Y SINCRONÍA --- */
         .xylo-frame {
-            width: 220px; height: 220px; margin: 0 auto; position: relative;
+            width: 180px; height: 180px; margin: 0 auto; position: relative;
             display: flex; align-items: center; justify-content: center;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .xylo-img { width: 70%; z-index: 5; filter: drop-shadow(0 0 15px var(--signal)); }
-
+        .xylo-img { width: 80%; z-index: 5; filter: drop-shadow(0 0 15px var(--signal)); }
         .breath-ring {
-            position: absolute; border: 2px solid var(--signal);
-            border-radius: 50%; opacity: 0.2; z-index: 1; width: 100%; height: 100%;
-            transition: 0.4s ease;
+            position: absolute; border: 2px solid var(--signal); border-radius: 50%;
+            opacity: 0.1; width: 100%; height: 100%; transition: 0.4s;
         }
 
-        /* Estado Hablando (Sincronía) */
-        .talking .xylo-frame { transform: scale(1.2); }
-        .talking .breath-ring { 
-            border-width: 6px; opacity: 0.6; transform: scale(1.3);
-            box-shadow: 0 0 40px var(--signal);
-        }
+        .talking .xylo-frame { transform: scale(1.25); }
+        .talking .breath-ring { opacity: 0.5; transform: scale(1.4); box-shadow: 0 0 40px var(--signal); }
 
-        /* --- SISTEMA DE ENERGÍA Y ESCUDO --- */
+        /* --- SISTEMA DE ESCUDO Y VIDAS --- */
         .status-hub { display: flex; justify-content: space-around; margin-bottom: 20px; }
-        .stat-box { text-align: center; font-family: var(--font-mono); }
-        
         .life-core { color: var(--error); font-size: 1.5rem; letter-spacing: 5px; }
-        
-        .shield-bars { display: flex; gap: 5px; margin-top: 5px; justify-content: center; }
         .s-bar { width: 30px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; transition: 0.3s; }
         .s-bar.on { background: var(--shield); box-shadow: 0 0 10px var(--shield); }
-        
-        .shield-active { border: 2px solid var(--shield) !important; box-shadow: 0 0 30px var(--shield) !important; }
+        .shield-active { border: 2px solid var(--shield) !important; box-shadow: 0 0 20px var(--shield) !important; }
 
-        /* --- CONTENIDO --- */
+        /* --- CAPAS --- */
+        .layer-card {
+            background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; margin-bottom: 10px;
+            border: 1px solid rgba(255,255,255,0.08); transition: 0.3s; cursor: pointer;
+        }
+        .layer-card.locked { opacity: 0.3; cursor: not-allowed; filter: grayscale(1); }
+        .layer-card:hover:not(.locked) { border-color: var(--signal); background: rgba(34, 211, 238, 0.05); }
+
         .view { display: none; }
-        .view.active { display: block; animation: slideUp 0.5s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        .option {
-            background: rgba(255,255,255,0.03); padding: 18px; border-radius: 15px; margin-bottom: 12px;
-            cursor: pointer; border: 1px solid rgba(255,255,255,0.1); color: #fff;
-            font-family: var(--font-mono); width: 100%; text-align: left; transition: 0.3s;
-        }
-        .option:hover:not(.locked) { border-color: var(--signal); background: rgba(34, 211, 238, 0.1); }
-        .locked { opacity: 0.2; cursor: not-allowed; }
-
-        .diagram-box {
-            width: 100%; height: 200px; background: #000; border: 1px dashed var(--signal);
-            margin: 20px 0; border-radius: 15px; display: flex; align-items: center; justify-content: center;
-        }
-        .diagram-box img { max-width: 100%; max-height: 100%; opacity: 0.7; }
+        .view.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         #portal {
             position: fixed; inset: 0; z-index: 1000; background: #000;
@@ -87,20 +66,20 @@
 <body>
 
     <div id="portal">
-        <h1 style="color:var(--signal); letter-spacing:10px;">XYLO v13.0</h1>
-        <input type="text" id="username" style="background:#111; border:1px solid var(--signal); color:#fff; padding:15px; margin-bottom:20px; text-align:center;" placeholder="NOMBRE DEL OPERADOR">
-        <button class="option" style="width:200px; text-align:center; border-color:var(--signal)" onclick="initApp()">INICIAR ENLACE</button>
+        <h1 style="color:var(--signal); letter-spacing:10px;">XYLO v13.1</h1>
+        <input type="text" id="username" style="background:#111; border:1px solid var(--signal); color:#fff; padding:15px; margin-bottom:20px; text-align:center;" placeholder="OPERADOR">
+        <button class="layer-card" style="width:200px; text-align:center; color:var(--signal)" onclick="initApp()">INICIAR PROTOCOLO</button>
     </div>
 
-    <div class="container" id="main-ui">
+    <div class="container">
         <div class="status-hub">
-            <div class="stat-box">
-                <div>NÚCLEOS VITALES</div>
+            <div style="text-align:center">
+                <div>NÚCLEOS</div>
                 <div id="life-display" class="life-core">❤️❤️❤️</div>
             </div>
-            <div class="stat-box" id="shield-container" style="border: 1px solid transparent; padding: 5px; border-radius: 10px;">
+            <div id="shield-container" style="text-align:center">
                 <div>ESCUDO (RACHA: <span id="streak-val">0</span>)</div>
-                <div class="shield-bars">
+                <div style="display:flex; gap:5px; justify-content:center; margin-top:5px;">
                     <div class="s-bar" id="sb-1"></div>
                     <div class="s-bar" id="sb-2"></div>
                     <div class="s-bar" id="sb-3"></div>
@@ -110,139 +89,132 @@
 
         <div id="xylo-anchor" class="xylo-frame">
             <div class="breath-ring"></div>
-            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="xylo-img" id="xylo-sprite">
+            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="xylo-img">
         </div>
 
         <div id="view-menu" class="view">
-            <h2 id="welcome-msg" style="color:var(--signal); font-weight:300;"></h2>
-            <div id="menu-layers"></div>
+            <p id="menu-intro" style="font-style: italic; color: var(--signal); margin-bottom: 20px;"></p>
+            <div id="layer-list"></div>
         </div>
 
         <div id="view-narrative" class="view">
-            <div class="diagram-box" id="diag-frame">
-                <img id="layer-diag" src="" alt="Diagrama Conceptual">
+            <div style="width:100%; height:180px; background:#000; border:1px solid var(--signal); margin-bottom:20px; border-radius:15px; overflow:hidden;">
+                <img id="layer-diag" src="" style="width:100%; height:100%; object-fit:contain;">
             </div>
-            <p id="narrative-text" style="font-size:1.3rem; line-height:1.6; border-left:3px solid var(--signal); padding-left:15px;"></p>
-            <button class="option" style="text-align:center; border-color:var(--signal)" onclick="startQuiz()">SINCRO Y COMENZAR</button>
+            <p id="narrative-text" style="font-size:1.2rem; line-height:1.5; border-left:3px solid var(--signal); padding-left:15px;"></p>
+            <button class="layer-card" style="width:100%; margin-top:20px; color:var(--signal)" onclick="startQuiz()">SINCRO Y COMENZAR</button>
         </div>
 
         <div id="view-quiz" class="view">
-            <h3 id="q-text" style="font-size:1.6rem; margin:20px 0;"></h3>
+            <h3 id="q-text" style="font-size:1.5rem; margin:20px 0;"></h3>
             <div id="options-grid"></div>
             <div id="feedback" style="display:none; margin-top:20px; padding:15px; background:rgba(0,0,0,0.5); border-radius:10px;">
                 <p id="feedback-text"></p>
-                <button class="option" style="border-color:var(--signal)" onclick="nextStep()">CONTINUAR</button>
+                <button class="layer-card" style="width:100%" onclick="nextStep()">CONTINUAR</button>
             </div>
         </div>
     </div>
 
     <script>
-        const PROFESSOR_EMAIL = "erickhschott@gmail.com";
-        let state = {
-            user: "", lives: 3, streak: 0, hasShield: false,
-            currentTier: "", qIdx: 0, errors: [], 
-            isReviewing: false, layersDone: []
-        };
+        let state = { user: "", lives: 3, streak: 0, hasShield: false, currentTier: "", qIdx: 0, errors: [], layersDone: [] };
 
         const DATA = {
-            perc: {
-                title: "CAPA I: LA FUNDACIÓN",
-                intro: "El Álgebra es el arte de reunir lo que está roto. No busques números, busca patrones. Si digo 'el doble', duplicas la energía. Si digo 'aumentado', expandes la realidad.",
-                img: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Eratosthenes_measure_of_Earth.png",
-                qs: [
-                    {q: "El doble de un número aumentado en 5", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "El doble es (2x), aumentado suma (+5)."},
-                    {q: "La mitad de un número disminuido en 10", o: ["x/2 - 10", "10 - x/2", "x/2 + 10"], c: 0, i: "La mitad divide (x/2), disminuir resta (-10)."}
-                ]
-            }
+            perc: { title: "CAPA I: PATRONES", intro: "El Álgebra es el eco de los números. Si digo 'el doble', invocamos la duplicidad.", img: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Eratosthenes_measure_of_Earth.png", qs: [{q: "Doble de un número + 5", o: ["2x + 5", "x² + 5"], c: 0, i: "Correcto."}] },
+            sim: { title: "CAPA II: BALANZA", intro: "El equilibrio es vital. Lo que haces a un lado, lo haces al otro.", img: "https://upload.wikimedia.org/wikipedia/commons/5/5e/E%3Dmc2_and_the_Atom.jpg", qs: [{q: "Si x+5=10, x es...", o: ["5", "10"], c: 0, i: "Equilibrio total."}] },
+            rest: { title: "CAPA III: NÚCLEO", intro: "Restauración final del sistema. Precisión absoluta.", img: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Neural_network_example.svg", qs: [{q: "x/2 = 4, x es...", o: ["8", "2"], c: 0, i: "Nucleo restaurado."}] }
         };
 
-        // --- MOTOR DE AUDIO (MELODÍA ARMONIOSA) ---
         const AudioSys = {
-            ctx: null, mainGain: null,
-            init() { 
+            ctx: null, gain: null,
+            init() {
                 this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                this.mainGain = this.ctx.createGain();
-                this.mainGain.connect(this.ctx.destination);
-                this.mainGain.gain.value = 0.2;
+                this.gain = this.ctx.createGain();
+                this.gain.connect(this.ctx.destination);
+                this.startDeepAtmos();
             },
-            playNote(freq, dur) {
-                const osc = this.ctx.createOscillator();
-                const g = this.ctx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                g.gain.setValueAtTime(0, this.ctx.currentTime);
-                g.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.1);
-                g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + dur);
-                osc.connect(g); g.connect(this.mainGain);
-                osc.start(); osc.stop(this.ctx.currentTime + dur);
-            },
-            startHarmony() {
-                const scale = [261.63, 293.66, 329.63, 392.00, 440.00]; // Pentatónica C
+            startDeepAtmos() {
+                // Bajo Profundo (Sostenido)
+                const sub = this.ctx.createOscillator();
+                const gSub = this.ctx.createGain();
+                sub.frequency.value = 55; sub.type = 'sine';
+                gSub.gain.value = 0.05;
+                sub.connect(gSub); gSub.connect(this.gain);
+                sub.start();
+
+                // Pulso Rápido (Melodía baja)
                 setInterval(() => {
-                    const note = scale[Math.floor(Math.random() * scale.length)];
-                    this.playNote(note, 3);
-                }, 4000);
+                    const osc = this.ctx.createOscillator();
+                    const g = this.ctx.createGain();
+                    osc.frequency.value = 220 + (Math.random() * 20);
+                    g.gain.setValueAtTime(0.02, this.ctx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + 0.5);
+                    osc.connect(g); g.connect(this.gain);
+                    osc.start(); osc.stop(this.ctx.currentTime + 0.5);
+                }, 400); // 150 BPM aprox
             }
         };
 
-        // --- VOZ Y SINCRONÍA ---
         function xyloSpeak(text) {
             window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(text);
             u.pitch = 1.8; u.rate = 1.1; u.lang = 'es-MX';
-            u.onstart = () => document.body.classList.add('talking');
-            u.onend = () => document.body.classList.remove('talking');
+            u.onstart = () => document.querySelector('.xylo-frame').classList.add('talking');
+            u.onend = () => document.querySelector('.xylo-frame').classList.remove('talking');
             window.speechSynthesis.speak(u);
         }
 
         function initApp() {
             state.user = document.getElementById('username').value.trim();
-            if(!state.user) return alert("Identificación necesaria.");
+            if(!state.user) return;
             document.getElementById('portal').style.display = 'none';
-            AudioSys.init(); AudioSys.startHarmony();
-            xyloSpeak(`Saludos, ${state.user}. Soy Xylo. Iniciando restauración de frecuencia.`);
+            AudioSys.init();
+            const intro = `Bienvenido Operador ${state.user}. Estamos en el nexo del Álgebra. Purifica las capas para restaurar mi memoria cuántica.`;
+            document.getElementById('menu-intro').innerText = intro;
+            xyloSpeak(intro);
             showMenu();
         }
 
         function showMenu() {
-            const menu = document.getElementById('menu-layers');
-            menu.innerHTML = "";
-            const unlocked = [...state.layersDone, "perc"]; // Lógica de bloqueo
-            
-            Object.keys(DATA).forEach(key => {
-                const btn = document.createElement('button');
-                btn.className = `option ${unlocked.includes(key) ? '' : 'locked'}`;
-                btn.innerHTML = `<b>${DATA[key].title}</b>`;
-                btn.onclick = () => startNarrative(key);
-                menu.appendChild(btn);
+            const list = document.getElementById('layer-list');
+            list.innerHTML = "";
+            const tiers = ['perc', 'sim', 'rest'];
+            const unlocked = [tiers[state.layersDone.length]]; // Desbloquea solo la actual
+
+            tiers.forEach(t => {
+                const isLocked = !state.layersDone.includes(t) && unlocked[0] !== t;
+                const card = document.createElement('div');
+                card.className = `layer-card ${isLocked ? 'locked' : ''}`;
+                card.innerHTML = `<b>${DATA[t].title}</b> ${isLocked ? '🔒' : '▶'}`;
+                if(!isLocked) card.onclick = () => startNarrative(t);
+                list.appendChild(card);
             });
-            document.getElementById('welcome-msg').innerText = `OPERADOR: ${state.user.toUpperCase()}`;
             switchView('view-menu');
         }
 
-        function startNarrative(tier) {
-            state.currentTier = tier;
-            document.getElementById('narrative-text').innerText = DATA[tier].intro;
-            document.getElementById('layer-diag').src = DATA[tier].img;
+        function startNarrative(t) {
+            state.currentTier = t;
+            document.getElementById('narrative-text').innerText = DATA[t].intro;
+            document.getElementById('layer-diag').src = DATA[t].img;
             switchView('view-narrative');
-            xyloSpeak(DATA[tier].intro);
+            xyloSpeak(DATA[t].intro);
         }
 
         function startQuiz() {
-            state.qIdx = 0; state.errors = []; state.isReviewing = false;
+            state.qIdx = 0; state.errors = [];
             switchView('view-quiz');
             loadQuestion();
         }
 
         function loadQuestion() {
-            const list = state.isReviewing ? state.errors : DATA[state.currentTier].qs;
+            const list = state.errors.length > 0 && state.qIdx >= DATA[state.currentTier].qs.length ? state.errors : DATA[state.currentTier].qs;
             const q = list[state.qIdx];
             document.getElementById('q-text').innerText = q.q;
             const grid = document.getElementById('options-grid');
             grid.innerHTML = "";
             q.o.forEach((opt, i) => {
                 const btn = document.createElement('button');
-                btn.className = "option";
+                btn.className = "layer-card";
+                btn.style.width = "100%";
                 btn.innerText = opt;
                 btn.onclick = () => checkAns(i, q);
                 grid.appendChild(btn);
@@ -252,100 +224,47 @@
 
         function checkAns(idx, q) {
             const isCorrect = idx === q.c;
-            const feedback = document.getElementById('feedback');
-            const fText = document.getElementById('feedback-text');
-            feedback.style.display = 'block';
-
+            document.getElementById('feedback').style.display = 'block';
             if(isCorrect) {
-                fText.innerHTML = `<span style="color:var(--signal)">✓ ÉXITO:</span> ${q.i}`;
+                document.getElementById('feedback-text').innerHTML = `<span style="color:var(--signal)">✓</span> ${q.i}`;
                 xyloSpeak(q.i);
                 updateShield(true);
             } else {
-                handleError(q);
-                fText.innerHTML = `<span style="color:var(--error)">✗ DISONANCIA:</span> ${q.i}`;
-                xyloSpeak("Error detectado. " + q.i);
-            }
-        }
-
-        function updateShield(correct) {
-            if(correct) {
-                state.streak++;
-                if(state.streak > 3) state.streak = 3;
-            } else {
-                state.streak = 0;
-            }
-            
-            // Actualizar Barras
-            for(let i=1; i<=3; i++) {
-                document.getElementById(`sb-${i}`).className = `s-bar ${state.streak >= i ? 'on' : ''}`;
-            }
-
-            if(state.streak === 3) {
-                state.hasShield = true;
-                document.getElementById('shield-container').classList.add('shield-active');
-            } else {
-                state.hasShield = false;
-                document.getElementById('shield-container').classList.remove('shield-active');
-            }
-            document.getElementById('streak-val').innerText = state.streak;
-        }
-
-        function handleError(q) {
-            if(state.hasShield) {
-                state.streak = 0;
-                updateShield(false); // Pierde escudo
-                xyloSpeak("Escudo colapsado. Núcleo intacto.");
-            } else {
                 state.lives--;
                 updateLives();
-                if(state.lives <= 0) gameOver();
+                document.getElementById('feedback-text').innerHTML = `<span style="color:var(--error)">✗</span> ${q.i}`;
+                xyloSpeak("Error.");
+                if(!state.errors.includes(q)) state.errors.push(q);
+                updateShield(false);
             }
-            if(!state.errors.includes(q)) state.errors.push(q);
         }
 
-        function updateLives() {
-            document.getElementById('life-display').innerText = "❤️".repeat(state.lives);
+        function updateLives() { 
+            document.getElementById('life-display').innerText = "❤️".repeat(state.lives); 
+            if(state.lives <= 0) location.reload();
+        }
+
+        function updateShield(win) {
+            state.streak = win ? Math.min(state.streak + 1, 3) : 0;
+            for(let i=1; i<=3; i++) document.getElementById(`sb-${i}`).className = `s-bar ${state.streak >= i ? 'on' : ''}`;
+            state.hasShield = state.streak === 3;
+            if(state.hasShield) document.getElementById('shield-container').classList.add('shield-active');
+            else document.getElementById('shield-container').classList.remove('shield-active');
         }
 
         function nextStep() {
-            const list = state.isReviewing ? state.errors : DATA[state.currentTier].qs;
             state.qIdx++;
-            if(state.qIdx < list.length) {
+            if(state.qIdx < DATA[state.currentTier].qs.length) {
                 loadQuestion();
             } else if(state.errors.length > 0) {
-                state.isReviewing = true; state.qIdx = 0;
+                xyloSpeak("Reparando disonancias.");
                 const temp = [...state.errors]; state.errors = [];
-                DATA[state.currentTier].qs = temp; // El bucle se vuelve la lista principal
-                xyloSpeak("Iniciando bucle de restauración.");
+                DATA[state.currentTier].qs = temp; state.qIdx = 0;
                 loadQuestion();
             } else {
-                finishLayer();
+                state.layersDone.push(state.currentTier);
+                showMenu();
             }
-        }
-
-        function finishLayer() {
-            state.layersDone.push(state.currentTier);
-            xyloSpeak("Frecuencia purificada. Enviando reporte.");
-            sendReport("COMPLETADO");
-            showMenu();
-        }
-
-        function gameOver() {
-            xyloSpeak("Fallo crítico. Sistema fuera de línea.");
-            sendReport("FALLO CRÍTICO");
-            location.reload();
-        }
-
-        function sendReport(status) {
-            const body = {
-                operador: state.user,
-                estado: status,
-                vidas_restantes: state.lives,
-                capas: state.layersDone.join(', ')
-            };
-            // Simulación de envío directo (EmailJS / Webhook)
-            console.log("REPORTE ENVIADO A erickhschott@gmail.com:", body);
-            // Aquí integrarías: fetch('https://api.emailjs.com/...', {method:'POST', body: JSON.stringify(body)})
         }
 
         function switchView(id) {
@@ -355,3 +274,4 @@
     </script>
 </body>
 </html>
+
