@@ -3,84 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arquitectura del Eco | Xylo v12.1</title>
+    <title>Xylo v13.0 | Arquitectura del Eco</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #010204; --surface: #090e1a; --signal: #22d3ee;
-            --resonance: #fbbf24; --error: #f43f5e; --text: #f1f5f9;
-            --font-mono: 'JetBrains Mono', monospace;
+            --bg: #010204; --surface: #0a0f1d; --signal: #22d3ee;
+            --resonance: #fbbf24; --error: #f43f5e; --shield: #10b981;
+            --text: #f1f5f9; --font-mono: 'JetBrains Mono', monospace;
         }
 
         body, html { 
             margin: 0; padding: 0; background: var(--bg); color: var(--text); 
-            font-family: 'Outfit', sans-serif; overflow-x: hidden; min-height: 100vh;
+            font-family: 'Outfit', sans-serif; overflow: hidden; height: 100vh;
         }
 
-        /* --- ANIMACIONES MÍSTICAS --- */
-        .mascot-container {
-            width: 180px; height: 180px; margin: 0 auto 20px;
-            position: relative; display: flex; align-items: center; justify-content: center;
-        }
-
-        .mascot-img {
-            width: 75%; z-index: 2; transition: transform 0.2s ease-out;
-            filter: drop-shadow(0 0 10px var(--signal));
-        }
-
-        .breathing-ring {
-            position: absolute; width: 100%; height: 100%;
-            border: 2px solid var(--signal); border-radius: 50%;
-            opacity: 0.2; z-index: 1;
-        }
-
-        .xylo-speaking .mascot-img { animation: breath 0.7s infinite alternate ease-in-out; }
-        .xylo-speaking .breathing-ring { animation: pulse-ring 0.7s infinite alternate ease-in-out; }
-
-        @keyframes breath { from { transform: scale(1); } to { transform: scale(1.15); } }
-        @keyframes pulse-ring { 
-            from { transform: scale(0.9); opacity: 0.1; } 
-            to { transform: scale(1.3); opacity: 0.5; box-shadow: 0 0 30px var(--signal); } 
-        }
-
-        /* --- UI COMPONENTS --- */
+        /* --- INTERFAZ DINÁMICA --- */
         .container {
-            width: 90%; max-width: 850px; margin: 4vh auto; padding: 40px;
-            background: rgba(9, 14, 26, 0.95); border: 1px solid rgba(34, 211, 238, 0.1);
-            border-radius: 25px; backdrop-filter: blur(20px);
+            width: 90%; max-width: 900px; margin: 2vh auto; padding: 30px;
+            background: rgba(10, 15, 29, 0.9); border: 1px solid rgba(34, 211, 238, 0.15);
+            border-radius: 40px; backdrop-filter: blur(30px); position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); height: 90vh; overflow-y: auto;
         }
 
+        /* --- XYLO Y EL ANILLO DE ALIENTO --- */
+        .xylo-frame {
+            width: 220px; height: 220px; margin: 0 auto; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .xylo-img { width: 70%; z-index: 5; filter: drop-shadow(0 0 15px var(--signal)); }
+
+        .breath-ring {
+            position: absolute; border: 2px solid var(--signal);
+            border-radius: 50%; opacity: 0.2; z-index: 1; width: 100%; height: 100%;
+            transition: 0.4s ease;
+        }
+
+        /* Estado Hablando (Sincronía) */
+        .talking .xylo-frame { transform: scale(1.2); }
+        .talking .breath-ring { 
+            border-width: 6px; opacity: 0.6; transform: scale(1.3);
+            box-shadow: 0 0 40px var(--signal);
+        }
+
+        /* --- SISTEMA DE ENERGÍA Y ESCUDO --- */
+        .status-hub { display: flex; justify-content: space-around; margin-bottom: 20px; }
+        .stat-box { text-align: center; font-family: var(--font-mono); }
+        
+        .life-core { color: var(--error); font-size: 1.5rem; letter-spacing: 5px; }
+        
+        .shield-bars { display: flex; gap: 5px; margin-top: 5px; justify-content: center; }
+        .s-bar { width: 30px; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; transition: 0.3s; }
+        .s-bar.on { background: var(--shield); box-shadow: 0 0 10px var(--shield); }
+        
+        .shield-active { border: 2px solid var(--shield) !important; box-shadow: 0 0 30px var(--shield) !important; }
+
+        /* --- CONTENIDO --- */
         .view { display: none; }
-        .view.active { display: block; animation: fadeIn 0.6s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .view.active { display: block; animation: slideUp 0.5s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .option {
-            background: rgba(255, 255, 255, 0.02); padding: 20px; border-radius: 12px; margin-bottom: 15px;
-            cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.08); transition: 0.3s;
-            font-family: var(--font-mono); width: 100%; text-align: left; color: #fff;
+            background: rgba(255,255,255,0.03); padding: 18px; border-radius: 15px; margin-bottom: 12px;
+            cursor: pointer; border: 1px solid rgba(255,255,255,0.1); color: #fff;
+            font-family: var(--font-mono); width: 100%; text-align: left; transition: 0.3s;
         }
-
-        .btn-active {
-            border: 2px solid var(--signal) !important;
-            background: rgba(34, 211, 238, 0.1) !important;
-            box-shadow: 0 0 15px rgba(34, 211, 238, 0.2);
-        }
-
+        .option:hover:not(.locked) { border-color: var(--signal); background: rgba(34, 211, 238, 0.1); }
         .locked { opacity: 0.2; cursor: not-allowed; }
 
-        .diagram-frame {
-            width: 100%; max-height: 250px; overflow: hidden; border-radius: 15px;
-            margin-bottom: 20px; border: 1px solid rgba(34, 211, 238, 0.3); display: none;
+        .diagram-box {
+            width: 100%; height: 200px; background: #000; border: 1px dashed var(--signal);
+            margin: 20px 0; border-radius: 15px; display: flex; align-items: center; justify-content: center;
         }
-        .diagram-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-
-        .narration-text {
-            font-size: 1.4rem; line-height: 1.6; font-weight: 300;
-            color: #cbd5e1; border-left: 4px solid var(--signal); padding-left: 20px; margin-bottom: 30px;
-        }
+        .diagram-box img { max-width: 100%; max-height: 100%; opacity: 0.7; }
 
         #portal {
-            position: fixed; inset: 0; z-index: 100; background: #000;
+            position: fixed; inset: 0; z-index: 1000; background: #000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
     </style>
@@ -88,238 +87,265 @@
 <body>
 
     <div id="portal">
-        <h1 style="color: var(--signal); letter-spacing: 8px; font-weight: 300;">ARQUITECTURA DEL ECO</h1>
-        <input type="text" id="username" style="background:#111; border:1px solid var(--signal); color:#fff; padding:15px; border-radius:8px; margin-bottom:20px; text-align:center;" placeholder="OPERADOR">
-        <button class="option btn-active" style="width: 220px; text-align: center;" onclick="initSystem()">CONECTAR</button>
+        <h1 style="color:var(--signal); letter-spacing:10px;">XYLO v13.0</h1>
+        <input type="text" id="username" style="background:#111; border:1px solid var(--signal); color:#fff; padding:15px; margin-bottom:20px; text-align:center;" placeholder="NOMBRE DEL OPERADOR">
+        <button class="option" style="width:200px; text-align:center; border-color:var(--signal)" onclick="initApp()">INICIAR ENLACE</button>
     </div>
 
-    <div class="container" id="game-shell">
-        <div id="view-menu" class="view">
-            <h2 id="welcome-title" style="color: var(--signal); font-weight: 300;"></h2>
-            <p style="color:#64748b; margin-bottom:30px;">Selecciona una frecuencia para restaurar:</p>
-            <div id="layer-buttons">
-                <button class="option locked" id="btn-perc" onclick="startNarrative('perc')">
-                    <b>CAPA I: LA FUNDACIÓN</b><br>
-                    <small style="color:#64748b">Lenguaje algebraico y patrones básicos.</small>
-                </button>
-                <button class="option locked" id="btn-sim" onclick="startNarrative('sim')">
-                    <b>CAPA II: EL EQUILIBRIO</b><br>
-                    <small style="color:#64748b">Ecuaciones lineales y balanza cuántica.</small>
-                </button>
-                <button class="option locked" id="btn-rest" onclick="startNarrative('rest')">
-                    <b>CAPA III: RESTAURACIÓN</b><br>
-                    <small style="color:#64748b">Sistemas complejos y despejes avanzados.</small>
-                </button>
+    <div class="container" id="main-ui">
+        <div class="status-hub">
+            <div class="stat-box">
+                <div>NÚCLEOS VITALES</div>
+                <div id="life-display" class="life-core">❤️❤️❤️</div>
             </div>
+            <div class="stat-box" id="shield-container" style="border: 1px solid transparent; padding: 5px; border-radius: 10px;">
+                <div>ESCUDO (RACHA: <span id="streak-val">0</span>)</div>
+                <div class="shield-bars">
+                    <div class="s-bar" id="sb-1"></div>
+                    <div class="s-bar" id="sb-2"></div>
+                    <div class="s-bar" id="sb-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="xylo-anchor" class="xylo-frame">
+            <div class="breath-ring"></div>
+            <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="xylo-img" id="xylo-sprite">
+        </div>
+
+        <div id="view-menu" class="view">
+            <h2 id="welcome-msg" style="color:var(--signal); font-weight:300;"></h2>
+            <div id="menu-layers"></div>
         </div>
 
         <div id="view-narrative" class="view">
-            <div class="mascot-container" id="xylo-narrative-box">
-                <div class="breathing-ring"></div>
-                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
+            <div class="diagram-box" id="diag-frame">
+                <img id="layer-diag" src="" alt="Diagrama Conceptual">
             </div>
-            <div id="diagram-container" class="diagram-frame">
-                <img id="layer-diagram" src="" alt="Diagrama de Capa">
-            </div>
-            <div id="narrative-text" class="narration-text"></div>
-            <button class="option btn-active" style="text-align:center" onclick="beginQuiz()">ACEPTAR TRANSMISIÓN Y COMENZAR</button>
+            <p id="narrative-text" style="font-size:1.3rem; line-height:1.6; border-left:3px solid var(--signal); padding-left:15px;"></p>
+            <button class="option" style="text-align:center; border-color:var(--signal)" onclick="startQuiz()">SINCRO Y COMENZAR</button>
         </div>
 
         <div id="view-quiz" class="view">
-            <div style="display:flex; justify-content: space-between; color: #64748b; font-family: var(--font-mono); margin-bottom: 20px;">
-                <span id="q-meta">PASO 1</span>
-                <span>FALLOS: <span id="ui-errors" style="color: var(--error);">0</span></span>
-            </div>
-            <div class="mascot-container" id="xylo-quiz-box">
-                <div class="breathing-ring"></div>
-                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
-            </div>
-            <div id="q-text" style="font-size: 1.6rem; margin-bottom: 25px; font-weight: 300;"></div>
+            <h3 id="q-text" style="font-size:1.6rem; margin:20px 0;"></h3>
             <div id="options-grid"></div>
-            <div id="insight-area" style="display:none; margin-top:20px; padding:20px; background:rgba(0,0,0,0.5); border-left:4px solid var(--signal); border-radius:10px;">
-                <p id="insight-text" style="font-size:1.1rem; line-height:1.5;"></p>
-                <button class="option btn-active" onclick="processNext()">SIGUIENTE DATO ➔</button>
+            <div id="feedback" style="display:none; margin-top:20px; padding:15px; background:rgba(0,0,0,0.5); border-radius:10px;">
+                <p id="feedback-text"></p>
+                <button class="option" style="border-color:var(--signal)" onclick="nextStep()">CONTINUAR</button>
             </div>
-        </div>
-
-        <div id="view-results" class="view">
-            <h1 style="color: var(--signal); text-align: center; font-weight: 300;">FRECUENCIA PURIFICADA</h1>
-            <p id="res-msg" style="text-align: center; font-size: 1.2rem; margin-bottom: 30px;"></p>
-            <button class="option btn-active" onclick="showMenu()">VOLVER AL NÚCLEO</button>
         </div>
     </div>
 
     <script>
-        let currentUser = "";
-        let currentTier = "";
-        let currentQuestions = [];
-        let errorQueue = [];
-        let qIndex = 0;
-        let errorsCount = 0;
-        let isReviewingErrors = false;
+        const PROFESSOR_EMAIL = "erickhschott@gmail.com";
+        let state = {
+            user: "", lives: 3, streak: 0, hasShield: false,
+            currentTier: "", qIdx: 0, errors: [], 
+            isReviewing: false, layersDone: []
+        };
 
-        const DB = {
+        const DATA = {
             perc: {
-                intro: "Escucha el eco del pasado. Antes de las máquinas, los humanos usaban patrones para construir pirámides. El Álgebra, al-jabr, es el arte de reunir lo roto. Un número desconocido no es un vacío, es una semilla esperando ser nombrada. Si digo 'el doble', estoy invocando una duplicidad. Si digo 'aumentado', estoy expandiendo su realidad. Aprende a leer el código antes de escribirlo.",
-                diagram: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Eratosthenes_measure_of_Earth.png",
-                questions: [
-                    { q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "Correcto. El doble es multiplicación (2x), aumentado es suma (+5). Has unido las partes correctamente." },
-                    { q: "La tercera parte de un número", o: ["x/3", "3x", "x - 3"], c: 0, i: "Exacto. Dividir la unidad entre tres crea la frecuencia x sobre 3." }
-                ]
-            },
-            sim: {
-                intro: "El equilibrio es la ley suprema. Una ecuación es una balanza mística. Lo que restas a la izquierda, debes restarlo a la derecha para que el universo no colapse. El signo igual es el espejo donde se encuentran dos verdades. Mantén la calma, observa el centro y despeja las sombras hasta que la verdad quede sola.",
-                diagram: "https://upload.wikimedia.org/wikipedia/commons/5/5e/E%3Dmc2_and_the_Atom.jpg",
-                questions: [
-                    { q: "Si x + 10 = 25, ¿cuál es el valor de x?", o: ["15", "35", "10"], c: 0, i: "Restaste 10 en ambos lados de la balanza. La armonía se mantiene en 15." }
-                ]
-            },
-            rest: {
-                intro: "Has llegado a la frontera de la IA. Aquí las ecuaciones ya no son simples líneas, son redes que sostienen el conocimiento. Restaurar un sistema complejo requiere precisión quirúrgica. Si una variable está atrapada en un denominador, debes multiplicar la realidad entera para liberarla. ¡Demuestra que eres un maestro del eco!",
-                diagram: "https://upload.wikimedia.org/wikipedia/commons/b/b5/Neural_network_example.svg",
-                questions: [
-                    { q: "Para despejar x en x/4 = 8, debes...", o: ["Multiplicar 8 por 4", "Dividir 8 entre 4", "Restar 4"], c: 0, i: "Liberaste la variable. Multiplicar por 4 neutraliza la división original." }
+                title: "CAPA I: LA FUNDACIÓN",
+                intro: "El Álgebra es el arte de reunir lo que está roto. No busques números, busca patrones. Si digo 'el doble', duplicas la energía. Si digo 'aumentado', expandes la realidad.",
+                img: "https://upload.wikimedia.org/wikipedia/commons/e/e6/Eratosthenes_measure_of_Earth.png",
+                qs: [
+                    {q: "El doble de un número aumentado en 5", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "El doble es (2x), aumentado suma (+5)."},
+                    {q: "La mitad de un número disminuido en 10", o: ["x/2 - 10", "10 - x/2", "x/2 + 10"], c: 0, i: "La mitad divide (x/2), disminuir resta (-10)."}
                 ]
             }
         };
 
-        const AudioEngine = {
-            ctx: null, mainOsc: null, lfo: null, mainGain: null,
-            init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
-            playHeartbeat(tier) {
-                this.stop();
-                this.mainOsc = this.ctx.createOscillator();
+        // --- MOTOR DE AUDIO (MELODÍA ARMONIOSA) ---
+        const AudioSys = {
+            ctx: null, mainGain: null,
+            init() { 
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
                 this.mainGain = this.ctx.createGain();
-                this.lfo = this.ctx.createOscillator();
-                const lfoGain = this.ctx.createGain();
-                
-                let freq = (tier === 'perc') ? 110 : (tier === 'sim') ? 146 : 196;
-                this.mainOsc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                this.lfo.frequency.value = 0.5;
-                lfoGain.gain.value = 0.3;
-                
-                this.lfo.connect(lfoGain.gain);
-                this.mainOsc.connect(this.mainGain);
                 this.mainGain.connect(this.ctx.destination);
-                this.mainGain.gain.value = 0.4;
-                this.mainOsc.start(); this.lfo.start();
+                this.mainGain.gain.value = 0.2;
             },
-            stop() { if(this.mainOsc) { this.mainOsc.stop(); this.lfo.stop(); } },
-            speak(text, boxId) {
-                window.speechSynthesis.cancel();
-                const u = new SpeechSynthesisUtterance(text);
-                u.lang = 'es-MX'; u.pitch = 1.8; u.rate = 0.85;
-                const box = document.getElementById(boxId);
-                u.onstart = () => box.classList.add('xylo-speaking');
-                u.onend = () => box.classList.remove('xylo-speaking');
-                window.speechSynthesis.speak(u);
+            playNote(freq, dur) {
+                const osc = this.ctx.createOscillator();
+                const g = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                g.gain.setValueAtTime(0, this.ctx.currentTime);
+                g.gain.linearRampToValueAtTime(0.3, this.ctx.currentTime + 0.1);
+                g.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + dur);
+                osc.connect(g); g.connect(this.mainGain);
+                osc.start(); osc.stop(this.ctx.currentTime + dur);
+            },
+            startHarmony() {
+                const scale = [261.63, 293.66, 329.63, 392.00, 440.00]; // Pentatónica C
+                setInterval(() => {
+                    const note = scale[Math.floor(Math.random() * scale.length)];
+                    this.playNote(note, 3);
+                }, 4000);
             }
         };
 
-        function initSystem() {
-            currentUser = document.getElementById('username').value.trim();
-            if(!currentUser) return;
+        // --- VOZ Y SINCRONÍA ---
+        function xyloSpeak(text) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.pitch = 1.8; u.rate = 1.1; u.lang = 'es-MX';
+            u.onstart = () => document.body.classList.add('talking');
+            u.onend = () => document.body.classList.remove('talking');
+            window.speechSynthesis.speak(u);
+        }
+
+        function initApp() {
+            state.user = document.getElementById('username').value.trim();
+            if(!state.user) return alert("Identificación necesaria.");
             document.getElementById('portal').style.display = 'none';
-            AudioEngine.init();
+            AudioSys.init(); AudioSys.startHarmony();
+            xyloSpeak(`Saludos, ${state.user}. Soy Xylo. Iniciando restauración de frecuencia.`);
             showMenu();
-            AudioEngine.speak(`Saludos, ${currentUser}. Soy Xylo. Iniciando conexión con el núcleo.`, 'xylo-quiz-box');
         }
 
         function showMenu() {
-            const unlocked = JSON.parse(localStorage.getItem('xylo_layers')) || ['perc'];
-            ['perc', 'sim', 'rest'].forEach(t => {
-                const btn = document.getElementById(`btn-${t}`);
-                btn.className = 'option locked';
-                if(unlocked.includes(t)) {
-                    btn.classList.remove('locked');
-                    if(t === unlocked[unlocked.length - 1]) btn.classList.add('btn-active');
-                }
+            const menu = document.getElementById('menu-layers');
+            menu.innerHTML = "";
+            const unlocked = [...state.layersDone, "perc"]; // Lógica de bloqueo
+            
+            Object.keys(DATA).forEach(key => {
+                const btn = document.createElement('button');
+                btn.className = `option ${unlocked.includes(key) ? '' : 'locked'}`;
+                btn.innerHTML = `<b>${DATA[key].title}</b>`;
+                btn.onclick = () => startNarrative(key);
+                menu.appendChild(btn);
             });
-            document.getElementById('welcome-title').innerText = `OPERADOR: [${currentUser.toUpperCase()}]`;
+            document.getElementById('welcome-msg').innerText = `OPERADOR: ${state.user.toUpperCase()}`;
             switchView('view-menu');
         }
 
         function startNarrative(tier) {
-            if(document.getElementById(`btn-${tier}`).classList.contains('locked')) return;
-            currentTier = tier;
-            const data = DB[tier];
-            document.getElementById('narrative-text').innerText = data.intro;
-            
-            const diag = document.getElementById('layer-diagram');
-            const frame = document.getElementById('diagram-container');
-            if(data.diagram) { diag.src = data.diagram; frame.style.display = 'block'; }
-            else { frame.style.display = 'none'; }
-
-            AudioEngine.playHeartbeat(tier);
+            state.currentTier = tier;
+            document.getElementById('narrative-text').innerText = DATA[tier].intro;
+            document.getElementById('layer-diag').src = DATA[tier].img;
             switchView('view-narrative');
-            AudioEngine.speak(data.intro, 'xylo-narrative-box');
+            xyloSpeak(DATA[tier].intro);
         }
 
-        function beginQuiz() {
-            currentQuestions = [...DB[currentTier].questions];
-            errorQueue = []; qIndex = 0; errorsCount = 0; isReviewingErrors = false;
+        function startQuiz() {
+            state.qIdx = 0; state.errors = []; state.isReviewing = false;
             switchView('view-quiz');
             loadQuestion();
         }
 
         function loadQuestion() {
-            const q = isReviewingErrors ? errorQueue[qIndex] : currentQuestions[qIndex];
-            document.getElementById('q-meta').innerText = isReviewingErrors ? `REPARANDO ERROR ${qIndex+1}` : `SECUENCIA ${qIndex+1}`;
+            const list = state.isReviewing ? state.errors : DATA[state.currentTier].qs;
+            const q = list[state.qIdx];
             document.getElementById('q-text').innerText = q.q;
-            document.getElementById('ui-errors').innerText = errorsCount;
-            
             const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
+            grid.innerHTML = "";
             q.o.forEach((opt, i) => {
-                const b = document.createElement('button');
-                b.className = 'option';
-                b.innerText = opt;
-                b.onclick = () => checkAnswer(i, q.c, q.i, q);
-                grid.appendChild(b);
+                const btn = document.createElement('button');
+                btn.className = "option";
+                btn.innerText = opt;
+                btn.onclick = () => checkAns(i, q);
+                grid.appendChild(btn);
             });
-            document.getElementById('insight-area').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
         }
 
-        function checkAnswer(idx, correct, info, qObj) {
-            Array.from(document.getElementById('options-grid').children).forEach(b => b.style.pointerEvents = 'none');
-            const area = document.getElementById('insight-area');
-            area.style.display = 'block';
-            const txt = document.getElementById('insight-text');
+        function checkAns(idx, q) {
+            const isCorrect = idx === q.c;
+            const feedback = document.getElementById('feedback');
+            const fText = document.getElementById('feedback-text');
+            feedback.style.display = 'block';
 
-            if(idx === correct) {
-                txt.innerHTML = `<span style="color:var(--signal)">✓ SINCRO COMPLETA:</span> ${info}`;
-                AudioEngine.speak(info, 'xylo-quiz-box');
+            if(isCorrect) {
+                fText.innerHTML = `<span style="color:var(--signal)">✓ ÉXITO:</span> ${q.i}`;
+                xyloSpeak(q.i);
+                updateShield(true);
             } else {
-                errorsCount++;
-                txt.innerHTML = `<span style="color:var(--error)">✗ DISONANCIA:</span> ${info}`;
-                if(!errorQueue.includes(qObj)) errorQueue.push(qObj);
-                AudioEngine.speak("Disonancia. " + info, 'xylo-quiz-box');
+                handleError(q);
+                fText.innerHTML = `<span style="color:var(--error)">✗ DISONANCIA:</span> ${q.i}`;
+                xyloSpeak("Error detectado. " + q.i);
             }
         }
 
-        function processNext() {
-            qIndex++;
-            const target = isReviewingErrors ? errorQueue : currentQuestions;
-            if(qIndex < target.length) {
+        function updateShield(correct) {
+            if(correct) {
+                state.streak++;
+                if(state.streak > 3) state.streak = 3;
+            } else {
+                state.streak = 0;
+            }
+            
+            // Actualizar Barras
+            for(let i=1; i<=3; i++) {
+                document.getElementById(`sb-${i}`).className = `s-bar ${state.streak >= i ? 'on' : ''}`;
+            }
+
+            if(state.streak === 3) {
+                state.hasShield = true;
+                document.getElementById('shield-container').classList.add('shield-active');
+            } else {
+                state.hasShield = false;
+                document.getElementById('shield-container').classList.remove('shield-active');
+            }
+            document.getElementById('streak-val').innerText = state.streak;
+        }
+
+        function handleError(q) {
+            if(state.hasShield) {
+                state.streak = 0;
+                updateShield(false); // Pierde escudo
+                xyloSpeak("Escudo colapsado. Núcleo intacto.");
+            } else {
+                state.lives--;
+                updateLives();
+                if(state.lives <= 0) gameOver();
+            }
+            if(!state.errors.includes(q)) state.errors.push(q);
+        }
+
+        function updateLives() {
+            document.getElementById('life-display').innerText = "❤️".repeat(state.lives);
+        }
+
+        function nextStep() {
+            const list = state.isReviewing ? state.errors : DATA[state.currentTier].qs;
+            state.qIdx++;
+            if(state.qIdx < list.length) {
                 loadQuestion();
-            } else if(errorQueue.length > 0) {
-                isReviewingErrors = true; qIndex = 0;
-                const temp = [...errorQueue]; errorQueue = []; currentQuestions = temp;
-                AudioEngine.speak("Iniciando bucle de restauración.", 'xylo-quiz-box');
+            } else if(state.errors.length > 0) {
+                state.isReviewing = true; state.qIdx = 0;
+                const temp = [...state.errors]; state.errors = [];
+                DATA[state.currentTier].qs = temp; // El bucle se vuelve la lista principal
+                xyloSpeak("Iniciando bucle de restauración.");
                 loadQuestion();
             } else {
-                finishTier();
+                finishLayer();
             }
         }
 
-        function finishTier() {
-            const unlocked = JSON.parse(localStorage.getItem('xylo_layers')) || ['perc'];
-            if(currentTier === 'perc' && !unlocked.includes('sim')) unlocked.push('sim');
-            if(currentTier === 'sim' && !unlocked.includes('rest')) unlocked.push('rest');
-            localStorage.setItem('xylo_layers', JSON.stringify(unlocked));
-            document.getElementById('res-msg').innerText = `Capa purificada con éxito.`;
-            AudioEngine.stop();
-            switchView('view-results');
+        function finishLayer() {
+            state.layersDone.push(state.currentTier);
+            xyloSpeak("Frecuencia purificada. Enviando reporte.");
+            sendReport("COMPLETADO");
+            showMenu();
+        }
+
+        function gameOver() {
+            xyloSpeak("Fallo crítico. Sistema fuera de línea.");
+            sendReport("FALLO CRÍTICO");
+            location.reload();
+        }
+
+        function sendReport(status) {
+            const body = {
+                operador: state.user,
+                estado: status,
+                vidas_restantes: state.lives,
+                capas: state.layersDone.join(', ')
+            };
+            // Simulación de envío directo (EmailJS / Webhook)
+            console.log("REPORTE ENVIADO A erickhschott@gmail.com:", body);
+            // Aquí integrarías: fetch('https://api.emailjs.com/...', {method:'POST', body: JSON.stringify(body)})
         }
 
         function switchView(id) {
