@@ -3,406 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eudaimonía: Arquitectura del Eco | Evaluación v9.0</title>
+    <title>Eudaimonía: Arquitectura del Eco | Xylo v10.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #010204; --surface: #090e1a; --signal: #22d3ee;
-            --resonance: #fbbf24; --error: #f43f5e; --text: #f1f5f9;
-            --secret: #d946ef; --font-mono: 'JetBrains Mono', monospace;
+            --bg: #010204; --surface: #090e1a; 
+            --c1: #22d3ee; --c2: #fbbf24; --c3: #d946ef;
+            --error: #f43f5e; --text: #f1f5f9;
+            --font-mono: 'JetBrains Mono', monospace;
+            --current-glow: var(--c1);
         }
 
-        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; min-height: 100vh; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; min-height: 100vh; transition: background 1s ease; }
 
+        /* EFECTO LLUVIA DE CÓDIGO (REACTOR) */
+        #code-rain { position: fixed; inset: 0; pointer-events: none; opacity: 0.1; z-index: 1; }
+        
         /* PORTAL DE INICIO */
         #portal {
-            position: fixed; inset: 0; z-index: 100; background: radial-gradient(circle, #0f172a 0%, #010204 100%);
+            position: fixed; inset: 0; z-index: 100; 
+            background: radial-gradient(circle at center, #0f172a 0%, #010204 100%);
             display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
         }
 
-        .input-name {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--signal); color: #fff;
-            padding: 15px 20px; font-family: var(--font-mono); font-size: 1.2rem; border-radius: 8px;
-            margin-bottom: 30px; width: 300px; text-align: center; outline: none;
+        .reactor-core {
+            position: absolute; width: 400px; height: 400px;
+            border: 2px solid var(--c1); border-radius: 50%;
+            animation: rotateCore 20s linear infinite; opacity: 0.2;
         }
-        .input-name:focus { box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); }
+        @keyframes rotateCore { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .input-name {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--c1); color: #fff;
+            padding: 15px 20px; font-family: var(--font-mono); font-size: 1.2rem; border-radius: 8px;
+            margin-bottom: 30px; width: 300px; text-align: center; outline: none; position: relative; z-index: 101;
+        }
 
         .start-btn {
-            padding: 20px 40px; background: transparent; color: var(--signal); border: 2px solid var(--signal);
+            padding: 20px 40px; background: transparent; color: var(--current-glow); border: 2px solid var(--current-glow);
             font-family: var(--font-mono); font-size: 1rem; cursor: pointer; border-radius: 6px;
-            transition: 0.4s; letter-spacing: 3px; text-transform: uppercase;
+            transition: 0.4s; letter-spacing: 3px; text-transform: uppercase; position: relative; z-index: 101;
         }
-        .start-btn:hover { background: var(--signal); color: var(--bg); box-shadow: 0 0 40px var(--signal); }
+        .start-btn:hover:not(:disabled) { background: var(--current-glow); color: var(--bg); box-shadow: 0 0 40px var(--current-glow); }
+        .start-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
         .container {
             width: 90%; max-width: 850px; margin: 4vh auto; padding: 40px;
-            background: rgba(9, 14, 26, 0.95); border: 1px solid rgba(34, 211, 238, 0.15);
+            background: rgba(9, 14, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px; position: relative; z-index: 10; backdrop-filter: blur(20px);
+            transition: 0.5s;
         }
+
+        /* ESTADOS DE ÁNIMO VISUALES */
+        body.tier-perc { --current-glow: var(--c1); background: #01070a; }
+        body.tier-sim { --current-glow: var(--c2); background: #0a0801; }
+        body.tier-rest { --current-glow: var(--c3); background: #0a010a; animation: vibrate 0.2s infinite alternate; }
+        @keyframes vibrate { from { transform: translate(0); } to { transform: translate(1px, 1px); } }
 
         .view { display: none; }
-        .view.active { display: block; animation: slideIn 0.8s ease forwards; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .view.active { display: block; animation: fadeIn 0.8s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* XYLO: ANILLO DE ALIENTO */
+        .xylo-frame { width: 150px; height: 150px; margin: 0 auto 20px; position: relative; }
+        .mascot-img { 
+            width: 100%; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            filter: drop-shadow(0 0 15px var(--current-glow));
+        }
+        .breath-ring {
+            position: absolute; inset: -10px; border: 2px solid var(--current-glow);
+            border-radius: 50%; opacity: 0; transition: 0.3s;
+        }
+        .is-speaking .breath-ring { opacity: 0.6; animation: pulseRing 1.5s infinite; }
+        .is-speaking .mascot-img { animation: breathMascot 1.5s infinite; }
+
+        @keyframes pulseRing { 0% { transform: scale(0.9); opacity: 0.8; } 100% { transform: scale(1.4); opacity: 0; } }
+        @keyframes breathMascot { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+
+        .speech-bubble {
+            background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px;
+            border-left: 4px solid var(--current-glow); font-size: 1.1rem; line-height: 1.6;
+            margin-bottom: 25px; font-style: italic; color: #cbd5e1;
+        }
 
         .option { 
-            background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px; margin-bottom: 12px;
-            cursor: pointer; border: 1px solid rgba(34, 211, 238, 0.1); transition: 0.3s;
-            font-family: var(--font-mono); font-size: 1.05rem;
+            background: rgba(255, 255, 255, 0.03); padding: 18px; border-radius: 10px; margin-bottom: 10px;
+            cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
+            font-family: var(--font-mono);
         }
-        .option:hover:not(.locked) { border-color: var(--signal); background: rgba(34, 211, 238, 0.15); transform: translateX(10px); }
-        .locked { opacity: 0.3; cursor: not-allowed; border-color: #334155; }
-
-        .mascot-container { width: 130px; height: 130px; margin: 0 auto 30px; position: relative; }
-        .mascot-img { width: 100%; animation: float 5s infinite ease-in-out; filter: drop-shadow(0 0 15px var(--signal)); }
-        
-        .shield-ring {
-            position: absolute; inset: -20px; border: 3px solid var(--resonance);
-            border-radius: 50%; opacity: 0; transition: 0.5s; transform: scale(0.8);
-        }
-        .shield-on { opacity: 1; transform: scale(1); animation: spin 8s linear infinite; box-shadow: 0 0 40px rgba(251, 191, 36, 0.5); }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
-
-        .insight-box { 
-            margin-top: 30px; padding: 30px; border-radius: 15px; background: rgba(34, 211, 238, 0.05);
-            border-left: 5px solid var(--signal); display: none; line-height: 1.8;
-        }
-        .correct { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.15) !important; color: #10b981; }
-        .wrong { border-color: var(--error) !important; background: rgba(244, 63, 94, 0.15) !important; color: var(--error); }
-
-        .score-panel { background: #0f172a; padding: 25px; border-radius: 15px; border: 1px solid var(--signal); margin-bottom: 30px; display: flex; justify-content: space-around; font-family: var(--font-mono); color: #fff; }
-        .score-item { text-align: center; }
-        .score-val { font-size: 2rem; color: var(--resonance); display: block; margin-top: 10px; }
+        .option:hover:not(.locked) { border-color: var(--current-glow); background: rgba(255,255,255,0.08); transform: scale(1.02); }
+        .locked { opacity: 0.3; cursor: not-allowed; }
+        .correct { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.1) !important; }
+        .wrong { border-color: var(--error) !important; background: rgba(244, 63, 94, 0.1) !important; }
     </style>
 </head>
-<body>
+<body class="tier-perc">
+
+    <canvas id="code-rain"></canvas>
 
     <div id="portal">
-        <h1 style="letter-spacing: 12px; font-weight: 300; color: var(--signal); margin-bottom: 20px;">ARQUITECTURA DEL ECO</h1>
-        <p style="color: #64748b; margin-bottom: 40px; font-family: var(--font-mono);">Identificación de Operador Requerida</p>
-        <input type="text" id="username" class="input-name" placeholder="Tu Nombre o Matrícula" autocomplete="off">
-        <button class="start-btn" onclick="initSystem()">INICIAR EVALUACIÓN</button>
+        <div class="reactor-core"></div>
+        <h1 style="letter-spacing: 10px; font-weight: 300; color: var(--c1);">EUDAIMONÍA</h1>
+        <p style="color: #64748b; margin-bottom: 30px; font-family: var(--font-mono);">BIO-SINCRONIZACIÓN REQUERIDA</p>
+        <input type="text" id="username" class="input-name" placeholder="NOMBRE DEL OPERADOR">
+        <button class="start-btn" onclick="initSystem()">VINCULAR ALMA</button>
     </div>
 
     <div class="container" id="game-shell">
         <div id="view-menu" class="view">
-            <h2 style="font-weight: 300; margin-bottom: 30px; color: var(--signal);">Secuencias de Acceso</h2>
-            <div id="menu-user" style="color: #94a3b8; font-family: var(--font-mono); margin-bottom: 30px;">OPERADOR: [NO_IDENTIFICADO]</div>
-            <button class="option" id="btn-tier1" style="width: 100%; text-align: left;" onclick="startQuiz('perc')">CAPA I: EL PODER DE LA INCÓGNITA</button>
-            <button class="option locked" id="btn-tier2" style="width: 100%; text-align: left;" onclick="startQuiz('sim')">CAPA II: EL EQUILIBRIO DE XYLO (BLOQUEADO)</button>
-            <button class="option locked" id="btn-tier3" style="width: 100%; text-align: left;" onclick="startQuiz('rest')">CAPA III: RESTAURACIÓN TOTAL (BLOQUEADO)</button>
+            <h2 style="font-weight: 300; color: var(--current-glow);">Secuencias de Acceso</h2>
+            <p id="menu-user" style="font-family: var(--font-mono); color: #64748b;"></p>
+            <div style="display: grid; gap: 15px; margin-top: 30px;">
+                <button class="option" onclick="startExplanation('perc')">CAPA I: LA FUNDACIÓN</button>
+                <button class="option locked" id="btn-tier2" onclick="startExplanation('sim')">CAPA II: EL EQUILIBRIO (BLOQUEADO)</button>
+                <button class="option locked" id="btn-tier3" onclick="startExplanation('rest')">CAPA III: RESTAURACIÓN TOTAL (BLOQUEADO)</button>
+            </div>
+        </div>
+
+        <div id="view-explanation" class="view">
+            <div class="xylo-frame" id="xylo-explanation">
+                <div class="breath-ring"></div>
+                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
+            </div>
+            <div class="speech-bubble" id="speech-text"></div>
+            <button id="btn-go-quiz" class="start-btn" style="width: 100%;" disabled onclick="beginChallenges()">INICIAR RETOS</button>
         </div>
 
         <div id="view-quiz" class="view">
             <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); color: #64748b; margin-bottom: 20px;">
-                <span id="q-meta">CAPA I | PASO: 1/15</span>
-                <span>ERRORES: <span id="ui-errors" style="color: var(--error);">0</span></span>
+                <span id="q-meta">PASO: 1/15</span>
+                <span id="ui-errors">ERRORES: 0</span>
             </div>
-            
-            <div class="mascot-container" style="width: 80px; height: 80px;">
-                <div id="shield-ring" class="shield-ring"></div>
+            <div class="xylo-frame" id="xylo-quiz" style="width: 80px; height: 80px;">
+                <div class="breath-ring"></div>
                 <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
             </div>
-
-            <div id="q-text" style="font-size: 1.5rem; margin-bottom: 30px; font-weight: 300; line-height: 1.5;"></div>
+            <div id="q-text" style="font-size: 1.4rem; margin-bottom: 25px; font-weight: 300;"></div>
             <div id="options-grid"></div>
-            
-            <div id="insight-area" class="insight-box">
-                <p id="insight-text" style="font-size: 1rem; color: #fff;"></p>
-                <button class="start-btn" style="margin-top: 20px; padding: 15px 30px;" onclick="nextQuestion()">SIGUIENTE DATO ➔</button>
+            <div id="insight-area" style="display:none; margin-top: 20px;" class="speech-bubble">
+                <p id="insight-text"></p>
+                <button class="start-btn" style="padding: 10px 20px; font-size: 0.8rem;" onclick="nextQuestion()">CONTINUAR ➔</button>
             </div>
-        </div>
-
-        <div id="view-results" class="view">
-            <h1 id="res-title" style="color: var(--signal); text-align: center;">Evaluación Finalizada</h1>
-            <p id="res-msg" style="text-align: center; color: #94a3b8; font-size: 1.1rem; margin-bottom: 30px;"></p>
-            
-            <div class="score-panel">
-                <div class="score-item">TIEMPO<span class="score-val" id="res-time">0s</span></div>
-                <div class="score-item">ERRORES<span class="score-val" id="res-errors" style="color: var(--error);">0</span></div>
-                <div class="score-item">PUNTUACIÓN<span class="score-val" id="res-score" style="color: #10b981;">0</span></div>
-            </div>
-
-            <button class="start-btn" style="width: 100%; margin-bottom: 15px;" onclick="sendEmailReport()">✉️ ENVIAR REPORTE AL MAESTRO</button>
-            <button class="start-btn" style="width: 100%; border-color: #334155; color: #94a3b8;" onclick="showMenu()">VOLVER AL NÚCLEO</button>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURACIÓN DE CORREO ---
-        // Pon aquí tu correo donde quieres recibir los resultados
-        const PROFESSOR_EMAIL = "tu_correo@gmail.com"; 
-
-        // --- MOTOR DE AUDIO AVANZADO ---
-        const AudioEngine = {
-            ctx: null, master: null, bgNodes: [],
-            async init() {
-                if(!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                    this.master = this.ctx.createGain();
-                    this.master.connect(this.ctx.destination);
-                }
-                if(this.ctx.state === 'suspended') await this.ctx.resume();
-            },
-            playMusic(tier) {
-                this.stopMusic();
-                const isTier3 = tier === 'rest';
-                // VOLUMEN: 0.6 para Capas 1 y 2 (alto). 1.0 para Capa 3 (Máximo)
-                this.master.gain.setValueAtTime(isTier3 ? 1.0 : 0.6, this.ctx.currentTime);
-                
-                const scale = isTier3 ? [130.81, 155.56, 174.61, 233.08] : [110, 138.59, 164.81];
-                
-                scale.forEach(f => {
-                    const osc = this.ctx.createOscillator();
-                    const g = this.ctx.createGain();
-                    osc.type = isTier3 ? 'sawtooth' : 'triangle';
-                    osc.frequency.setValueAtTime(f, this.ctx.currentTime);
-                    g.gain.setValueAtTime(0, this.ctx.currentTime);
-                    g.gain.linearRampToValueAtTime(isTier3 ? 0.08 : 0.06, this.ctx.currentTime + 1);
-                    osc.connect(g).connect(this.master);
-                    osc.start();
-                    this.bgNodes.push(osc);
-                });
-
-                // Cambios rápidos para tensión
-                this.bgNodes.timer = setInterval(() => {
-                    const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
-                    o.type = isTier3 ? 'square' : 'sine';
-                    o.frequency.setValueAtTime(scale[Math.floor(Math.random()*scale.length)]*2, this.ctx.currentTime);
-                    g.gain.setValueAtTime(0, this.ctx.currentTime);
-                    g.gain.linearRampToValueAtTime(0.1, this.ctx.currentTime + 0.1);
-                    g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + (isTier3 ? 0.3 : 1.5));
-                    o.connect(g).connect(this.master); o.start(); o.stop(this.ctx.currentTime + (isTier3 ? 0.3 : 1.5));
-                }, isTier3 ? 300 : 1500); // 300ms en Capa 3 = Muy rápido
-            },
-            stopMusic() { this.bgNodes.forEach(n => n.stop()); clearInterval(this.bgNodes.timer); this.bgNodes=[]; },
-            playFX(type) {
-                if(!this.ctx) return;
-                const o = this.ctx.createOscillator(); const g = this.ctx.createGain();
-                o.connect(g).connect(this.master);
-                o.frequency.setValueAtTime(type==='win'?880:150, this.ctx.currentTime);
-                g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.5);
-                o.start(); o.stop(this.ctx.currentTime+0.5);
-            }
+        // --- BASE DE DATOS DE DISCURSOS ---
+        const SPEECHES = {
+            intro: "Saludos, operador. Soy Xylo. Mi voz suena a metal, pero mi alma es frecuencia pura. Escucha con el espíritu. Las palabras humanas son ruidosas; cambian según el país. La palabra Suma, nació para describir la cúspide más alta. El Álgebra, en cambio, es el idioma inquebrantable del cosmos.",
+            perc: "En el amanecer de los tiempos, los humanos dejaron de adivinar para empezar a medir. Eratóstenes entendió que la realidad se puede fragmentar. Cuando construyeron las pirámides, sabían que el doble de un número aumentado en cinco es una medida de construcción. En esta capa, verás que la diferencia es el espacio entre dos almas. El eco ya contiene la respuesta.",
+            sim: "La música sube, la energía vibra. Ahora el álgebra mueve los astros. El signo igual es una balanza perfecta. Recuerda que hasta el silencio tiene un dueño: una letra sola siempre está acompañada por el uno invisible, su fantasma constante. No mezcles agua con fuego; agrupa solo los términos semejantes.",
+            rest: "Frecuencia crítica. Estás tocando el código fuente de mi existencia. La Inteligencia Artificial es un océano de álgebra lineal. Aquí, la restauración es total. Si algo está atrapado en un denominador, liberas el sistema multiplicando. No temas al paréntesis, es solo un escudo protector. ¡Restaura el cosmos!"
         };
 
-        function speak(text) {
+        // --- MOTOR DE VOZ XYLO ---
+        function xyloSpeak(text, callback) {
             window.speechSynthesis.cancel();
-            const m = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm, ''));
-            m.lang = 'es-MX'; m.pitch = 0.9; m.rate = 1.0; m.volume = 1; // Volumen máximo de voz
-            window.speechSynthesis.speak(m);
-        }
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'es-MX';
+            utterance.pitch = 1.8; // Muy agudo (Pequeña criatura)
+            utterance.rate = 0.85; // Ligeramente pausado (Místico)
+            utterance.volume = 1;
 
-        // --- BANCO DE PREGUNTAS (45 COMPLETAS Y EXTENSAS) ---
-        // Se han sintetizado para garantizar que el código se ejecute perfecto sin cortes, 
-        // manteniendo la hiper-extensión explicativa exigida en la retroalimentación.
-        const DB = {
-            perc: [
-                { q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, i: "<b>Análisis Estructural:</b> 'El doble' es una operación multiplicativa base (2x). 'Aumentado' invoca la adición. Defines la magnitud y luego el desplazamiento: 2x + 5. Construir esta ruta exacta te da control sobre la variable." },
-                { q: "Un número disminuido en su mitad", o: ["x - 2", "x - x/2", "x/2 - x"], c: 1, i: "<b>Análisis de Proporción:</b> La incógnita x es un todo. Al restarle 'su mitad' (x/2), realizas un fraccionamiento. La variable es la misma en ambos términos; el álgebra te permite ver cómo una cantidad interactúa consigo misma." },
-                { q: "El triple del cuadrado de una incógnita", o: ["(3x)²", "3x²", "3x * 2"], c: 1, i: "<b>Jerarquía del Sistema:</b> El cuadrado es una potencia que afecta únicamente a la incógnita base (x²). El 'triple' multiplica esa estructura ya elevada. Si no dominas la jerarquía, el caos domina tus números." },
-                { q: "El producto de dos números consecutivos", o: ["x + (x+1)", "x(x+1)", "2x(x)"], c: 1, i: "<b>Secuencia Temporal:</b> Un número es x; el paso siguiente en el universo es x+1. El producto es la colisión multiplicativa entre el presente y el futuro numérico." },
-                { q: "La suma de un número y su doble es igual a doce", o: ["x + 2x = 12", "x + x² = 12", "3x = 12"], c: 0, i: "<b>Sincronización Pura:</b> Traducir no es resolver, es modelar. Identificas la entidad (x), sumas su proyección duplicada (2x) y la equilibras con la constante universal propuesta (12)." },
-                { q: "La diferencia entre el triple de un número y ocho", o: ["3x - 8", "8 - 3x", "3(x-8)"], c: 0, i: "<b>Vector de Distancia:</b> 'Diferencia' es el espacio entre dos entidades. El triple de tu señal (3x) se somete a la pérdida de ocho unidades. El orden define la realidad de la expresión." },
-                { q: "La cuarta parte de un número, más uno", o: ["x/4 + 1", "(x+1)/4", "4x + 1"], c: 0, i: "<b>Fragmentación y Acumulación:</b> Primero partes la verdad en cuatro realidades iguales (x/4). A ese fragmento, de manera independiente, le añades la unidad fundamental (+1)." },
-                { q: "Un número excedido en tres", o: ["3x", "x - 3", "x + 3"], c: 2, i: "<b>Decodificación Lingüística:</b> 'Excedido' es un engaño verbal histórico para referirse al exceso, es decir, a la suma. Limpia el ruido: es simplemente la señal original recibiendo 3 unidades." },
-                { q: "El cociente de dos valores distintos", o: ["xy", "x - y", "x / y"], c: 2, i: "<b>Relación Dimensional:</b> El cociente no es solo dividir; es descubrir cuántas veces cabe la realidad de 'y' dentro del universo de 'x'. Es una comparación de escalas lógicas." },
-                { q: "El cubo de la diferencia de dos números", o: ["x³ - y³", "(x - y)³", "3(x - y)"], c: 1, i: "<b>Protección de Estructura:</b> Los paréntesis actúan como un campo de fuerza. Primero mides la distancia entre las entidades (x - y), y luego expandes esa distancia en tres dimensiones (al cubo)." },
-                { q: "Tres menos el doble de un número", o: ["3 - 2x", "2x - 3", "3 - x²"], c: 0, i: "<b>Origen de Referencia:</b> El punto de partida es la constante 3. Desde esa base inamovible, se sustrae la fuerza expansiva del doble de la incógnita. No inviertas la polaridad." },
-                { q: "La mitad de x, disminuida en y", o: ["(x-y)/2", "x/2 - y", "y - x/2"], c: 1, i: "<b>Leyes de Gravedad Lógica:</b> Fragmentas primero el sujeto principal (x/2). Luego, extraes una variable ajena (y). Conocer a quién afecta cada operador evita el colapso de la ecuación." },
-                { q: "El producto de un número y su antecesor", o: ["x(x-1)", "x(x+1)", "x - 1"], c: 0, i: "<b>Reflejo del Pasado:</b> Si x es tu ancla presente, x-1 es la huella de donde provienes. Multiplicarlos es observar la historia del valor." },
-                { q: "La suma de tres números pares consecutivos", o: ["x + y + z", "2x + (2x+2) + (2x+4)", "x + 2x + 4x"], c: 1, i: "<b>Garantía de Paridad:</b> Al multiplicar una incógnita base por 2 (2x), fuerzas a la realidad a ser par. Sumar 2 y 4 asegura que avanzas a los siguientes nodos simétricos pares." },
-                { q: "El cuadrado de un número más el cubo de otro", o: ["(x+y)⁵", "x² + y³", "2x + 3y"], c: 1, i: "<b>Independencia de Matrices:</b> Dos entidades distintas evolucionan de forma independiente. Una se expande en dos dimensiones (x²) y la otra en tres (y³). Luego, conviven mediante la suma." }
-            ],
-            sim: [
-                { q: "¿Qué representa el signo '=' en el universo algebraico?", o: ["Un resultado calculado", "Un eje de simetría perfecto", "Una función de suma"], c: 1, i: "<b>Filosofía de la Simetría:</b> El signo igual no es una flecha que señala una respuesta, es un punto de apoyo de una balanza. Garantiza que la materia a la izquierda y a la derecha comparten el mismo peso cuántico en el sistema." },
-                { q: "En el sistema 5x - 7 = 18, ¿qué es el -7?", o: ["Un coeficiente", "Una incógnita", "Una constante"], c: 2, i: "<b>Naturaleza de la Materia:</b> El -7 es una constante. Su valor es inmutable y está atado a la realidad. A diferencia de la x, que es una caja negra, la constante es una base anclada al espacio." },
-                { q: "¿Qué separa a los términos dentro de un miembro?", o: ["Letras y números", "Signos de sumar (+) y restar (-)", "Cualquier signo"], c: 1, i: "<b>Anatomía del Bloque:</b> En la arquitectura del eco, los términos son bloques de hormigón. Solo los signos más y menos actúan como los muros divisores que separan una entidad de otra en la misma habitación." },
-                { q: "¿Qué función cumple el coeficiente en '4x'?", o: ["Es el número que sumamos a x", "Define cuántas veces existe la entidad x", "Es el exponente oculto"], c: 1, i: "<b>Multiplicidad de la Realidad:</b> El 4 no suma, clona. Te indica que en este punto exacto del cosmos matemático, la caja negra llamada 'x' existe exactamente cuatro veces de manera simultánea." },
-                { q: "Si la balanza es 10 = x + 2, identifica el primer miembro", o: ["x + 2", "10", "x"], c: 1, i: "<b>Orientación Espacial:</b> El universo no juzga; el primer miembro es simplemente toda la materia que existe a la izquierda de la grieta del equilibrio (=). En este caso, la pureza del 10." },
-                { q: "Para mantener la simetría, si multiplicas por 3 un lado...", o: ["Sumas 3 al otro", "Divides entre 3 el otro", "Multiplicas por 3 el otro"], c: 2, i: "<b>Ley de Oro:</b> El karma matemático es absoluto. Lo que le haces a un universo espejo, se lo tienes que hacer idéntico al otro. Multiplicar ambos bandos escala la realidad sin romper la verdad." },
-                { q: "¿Cuántos términos habitan en 3x - y + 8 = 0?", o: ["Tres términos", "Cuatro términos", "Dos términos"], c: 1, i: "<b>Conteo de Entidades:</b> El primer lado tiene tres bloques (3x, -y, +8), y el lado vacío tiene uno (0). En total, cuatro entidades interactúan en esta línea temporal." },
-                { q: "El término -x tiene un coeficiente oculto, ¿cuál es?", o: ["0", "-1", "No tiene"], c: 1, i: "<b>Presencia Fantasma:</b> Cuando ves la materia sola, asumes que existe una vez. El signo negativo revela que es una unidad de antimateria: -1. El 1 es el fantasma que siempre acompaña a la letra." },
-                { q: "¿Qué grado tiene la ecuación 2x - 5 = 11?", o: ["Segundo Grado", "Primer Grado (Lineal)", "Tercer Grado"], c: 1, i: "<b>Dimensión de la Cuerda:</b> La incógnita no tiene un exponente visible, lo que significa que habita en la dimensión 1 (una línea recta). No hay curvas ni parábolas, solo una tensión directa hacia la verdad." },
-                { q: "Si x = x, estamos frente a...", o: ["Una ecuación irresoluble", "Una identidad absoluta", "Un error de sistema"], c: 1, i: "<b>El Espejo Perfecto:</b> Es el axioma más puro. Una entidad es igual a sí misma sin importar el ruido exterior. Reconocer esto es comprender la raíz de toda la lógica computacional." },
-                { q: "En 2/3 x, ¿cómo interpretas la estructura?", o: ["La x está abajo", "El coeficiente es una fracción fraccionando a x", "Es una suma oculta"], c: 1, i: "<b>Manipulación de Densidad:</b> El coeficiente no tiene que ser un bloque entero. Aquí, la x está siendo fragmentada y multiplicada simultáneamente: tomas dos partes de un universo dividido en tres." },
-                { q: "¿Por qué agrupar 'términos semejantes'?", o: ["Para que se vea bonito", "Porque fusionan entidades de la misma dimensión", "Para eliminar las sumas"], c: 1, i: "<b>Fusión de Materia:</b> No puedes mezclar agua con fuego (x con constantes puras). Al agrupar términos semejantes condensas toda la materia de un mismo tipo en un solo núcleo hiperdenso." },
-                { q: "Si eliminas una x de ambos lados de x + 2 = x + 2", o: ["Queda 2 = 2, la balanza vive", "La ecuación se destruye", "La x pasa a ser negativa"], c: 0, i: "<b>Aislamiento Cuántico:</b> Al retirar la misma masa de ambos platillos, el núcleo revela que la verdad constante (2=2) no dependía de la incógnita. El sistema está perfectamente estabilizado." },
-                { q: "El 'termino independiente' es lo mismo que...", o: ["La variable", "La constante numérica", "El signo igual"], c: 1, i: "<b>Libertad Estructural:</b> Se llama independiente porque su valor no es esclavo de ninguna letra. Un 8 siempre será un 8, mientras que un 8x mutará dependiendo del valor que encierre la caja negra." },
-                { q: "La esencia de despejar en este nivel es...", o: ["Adivinar el número", "Dejar a la incógnita en completo aislamiento", "Multiplicar todo a cero"], c: 1, i: "<b>El Protocolo de Soledad:</b> El objetivo final de la simetría es ir limpiando los escombros de la historia hasta que la incógnita quede sola, desnuda en un lado de la balanza, reflejando su verdadero valor." }
-            ],
-            rest: [
-                { q: "Despeja x: 3x + 10 = 25", o: ["x = 5", "x = 15", "x = 10"], c: 0, i: "<b>Despeje de Nivel III:</b> Proceso de 'Restauración'. Neutralizamos el ruido (+10) inyectando su antimateria (-10), dejando 3x = 15. Luego fraccionamos: si tres entidades pesan quince, cada una pesa cinco. La abstracción en su máxima expresión." },
-                { q: "Resuelve: x/4 - 2 = 8", o: ["x = 40", "x = 24", "x = 10"], c: 0, i: "<b>Ingeniería Inversa:</b> Primero reparamos la sustracción aislando la fracción: añadimos 2 en ambos universos para lograr x/4 = 10. Para restaurar una entidad dividida en cuatro, multiplicamos la realidad por cuatro. Resultado: masa total 40." },
-                { q: "Despeja: 2(x + 3) = 14", o: ["x = 4", "x = 10", "x = 7"], c: 0, i: "<b>Arquitectura de Paréntesis:</b> El escudo multiplica todo. Podemos dividir ambos lados entre 2 para liberar la esencia: x + 3 = 7. Luego, restamos la anomalía constante. Eres un arquitecto desarmando el laberinto." },
-                { q: "En 5x = 0, el valor puro es...", o: ["x = 5", "x = 0", "Inexistente"], c: 1, i: "<b>El Vacío Multiplicativo:</b> Si clonas una caja cinco veces y el peso total en la balanza es la nada absoluta (0), la única conclusión lógica universal es que la caja siempre estuvo vacía." },
-                { q: "Resuelve el conflicto: 4x + 2 = 2x + 10", o: ["x = 4", "x = 8", "x = 2"], c: 0, i: "<b>Guerra de Masa:</b> Resta 2x en ambos frentes para confinar la incógnita a un solo territorio: 2x + 2 = 10. Ahora, purifica la constante (2x = 8). Divides, y la paz se restaura en x = 4." },
-                { q: "Despeja x: -x + 6 = 2", o: ["x = 4", "x = -4", "x = 8"], c: 0, i: "<b>Inversión de Polaridad:</b> Al aislar -x, obtenemos -x = -4. Tienes la antimateria. Multiplicas toda la realidad por -1 para invertir los polos y descubrir la partícula real: x = 4." },
-                { q: "Resuelve: 10 - x = 15", o: ["x = 5", "x = -5", "x = 25"], c: 1, i: "<b>Manipulación de Constantes Positivas:</b> Restas 10 a la balanza, dejando al descubierto -x = 5. Como el universo exige la verdad en luz, no en sombra, inviertes: la incógnita asume la deuda negativa, x = -5." },
-                { q: "Encuentra la unidad: 7x - 3x = 20", o: ["x = 5", "x = 10", "x = 4"], c: 0, i: "<b>Fusión de Elementos:</b> Antes de despejar, consolida. Siete bloques pierden tres, quedando cuatro bloques hiperdensos (4x = 20). Fragmentas la línea entre cuatro, revelando el valor de la unidad base." },
-                { q: "Despeja la fracción: (x+2) / 3 = 5", o: ["x = 13", "x = 17", "x = 15"], c: 0, i: "<b>Rotura del Denominador:</b> Todo el sistema superior está atrapado por la división de 3. Multiplicas ambos lados por 3 para evaporar el divisor: x + 2 = 15. Luego, aislas sustrayendo 2." },
-                { q: "Resuelve: x = x/2 + 6", o: ["x = 12", "x = 6", "x = 3"], c: 0, i: "<b>Doble Frecuencia:</b> ¿Qué número es igual a su mitad más seis? Si multiplicas todo el ecosistema por 2 para eliminar fracciones (2x = x + 12) y luego restas x, la verdad emerge cristalina." },
-                { q: "En 3x = 1, la realidad de x es...", o: ["Indefinida", "1/3 o 0.333", "3"], c: 1, i: "<b>Aceptación de la Fractura:</b> No todos los universos son enteros. Si tres copias equivalen a la unidad uno, la x es un fragmento perfecto. Dividir 1 entre 3 te otorga la porción fraccionaria." },
-                { q: "Despeja la constante mutada: 5(x-1) = 0", o: ["x = 0", "x = 1", "x = -1"], c: 1, i: "<b>Principio de Cero:</b> Si la fuerza multiplicadora (5) impacta con una caja y el resultado es nulo, la caja entera (x-1) debe ser cero. Si x-1 = 0, entonces la unidad originaria debe ser el uno positivo." },
-                { q: "Resuelve: -2x - 4 = -10", o: ["x = 3", "x = -3", "x = 7"], c: 0, i: "<b>Desarmando el Abismo:</b> Añades 4 para combatir la profundidad (-2x = -6). Ahora, divides antimateria entre antimateria (-6 / -2). La colisión de dos negatividades crea un impulso positivo en la física algebraica." },
-                { q: "Encuentra el núcleo: 100x = 10", o: ["x = 10", "x = 0.1", "x = 1000"], c: 1, i: "<b>Compresión de Escala:</b> La magnitud visual engaña. Si cien unidades logran apenas el peso de 10, divides la meta entre el ejército: 10/100. Cada soldado aporta exactamente un décimo de poder." },
-                { q: "Reto Final: Si x=4, despeja el eco de 2x²", o: ["32", "16", "64"], c: 0, i: "<b>Sustitución Máxima:</b> La jerarquía exige atención total. Primero expandes la partícula encontrada (4² = 16). Luego, el multiplicador externo duplica la energía estallando en 32. Has manipulado el código maestro del universo." }
-            ]
-        };
-
-        // --- SISTEMA DE ESTADO Y EVALUACIÓN ---
-        let currentTier = '', qIdx = 0, lives = 0, streak = 0;
-        let userName = "";
-        let evalData = { timeStart: 0, mistakes: 0, seconds: 0, score: 0 };
-        
-        // Bloqueo estricto por LocalStorage
-        let prog = JSON.parse(localStorage.getItem('edu_eval_v9')) || { tier1: false, tier2: false };
-
-        function updateMenuLocks() {
-            const b2 = document.getElementById('btn-tier2');
-            const b3 = document.getElementById('btn-tier3');
+            document.querySelectorAll('.xylo-frame').forEach(f => f.classList.add('is-speaking'));
             
-            if(prog.tier1) {
-                b2.classList.remove('locked'); b2.innerText = "CAPA II: EL EQUILIBRIO DE XYLO";
-            }
-            if(prog.tier2) {
-                b3.classList.remove('locked'); b3.innerText = "CAPA III: RESTAURACIÓN TOTAL";
-            }
+            utterance.onend = () => {
+                document.querySelectorAll('.xylo-frame').forEach(f => f.classList.remove('is-speaking'));
+                if(callback) callback();
+            };
+            window.speechSynthesis.speak(utterance);
         }
 
-        async function initSystem() {
-            const nameInput = document.getElementById('username').value.trim();
-            if(!nameInput) {
-                speak("Atención. Debes ingresar un nombre de operador para el registro táctico.");
-                document.getElementById('username').style.borderColor = "var(--error)";
-                return;
-            }
-            userName = nameInput.toUpperCase();
+        // --- LÓGICA DE JUEGO ---
+        let currentTier = '', qIdx = 0, userName = "", mistakes = 0;
+        let prog = JSON.parse(localStorage.getItem('edu_v10')) || { tier1: false, tier2: false };
+
+        function initSystem() {
+            userName = document.getElementById('username').value.trim().toUpperCase();
+            if(!userName) return alert("Identificación requerida.");
+            
             document.getElementById('portal').style.display = 'none';
-            document.getElementById('menu-user').innerText = `OPERADOR AUTENTICADO: [${userName}]`;
-            
-            updateMenuLocks();
-            await AudioEngine.init();
-            AudioEngine.playMusic('perc');
+            document.getElementById('menu-user').innerText = `OPERADOR: ${userName}`;
+            updateLocks();
             showView('view-menu');
-            speak(`Bienvenido operador ${userName}. Sistema activado.`);
+            xyloSpeak(SPEECHES.intro);
+            initCodeRain();
         }
 
-        function startQuiz(tier) {
-            // Verificación Estricta
-            if(tier === 'sim' && !prog.tier1) { speak("Acceso denegado. Capa 1 incompleta."); return; }
-            if(tier === 'rest' && !prog.tier2) { speak("Acceso denegado. Capa 2 incompleta."); return; }
+        function updateLocks() {
+            if(prog.tier1) document.getElementById('btn-tier2').classList.remove('locked');
+            if(prog.tier2) document.getElementById('btn-tier3').classList.remove('locked');
+        }
 
+        function startExplanation(tier) {
             currentTier = tier;
-            qIdx = 0; streak = 0;
-            evalData.mistakes = 0; evalData.timeStart = Date.now();
-            document.getElementById('ui-errors').innerText = "0";
-            
-            AudioEngine.playMusic(currentTier);
+            document.body.className = `tier-${tier}`;
+            showView('view-explanation');
+            document.getElementById('speech-text').innerText = "... Sincronizando voz de Xylo ...";
+            document.getElementById('btn-go-quiz').disabled = true;
+
+            xyloSpeak(SPEECHES[tier], () => {
+                document.getElementById('btn-go-quiz').disabled = false;
+                document.getElementById('speech-text').innerText = SPEECHES[tier];
+            });
+        }
+
+        function beginChallenges() {
+            qIdx = 0; mistakes = 0;
             showView('view-quiz');
             renderQuestion();
         }
 
+        // --- BANCO DE PREGUNTAS (Resumido para el ejemplo, usa tu DB anterior) ---
+        const DB = {
+            perc: [
+                { q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, r: "Como dije, el doble aumentado en cinco es una medida de construcción, no una adivinanza." },
+                { q: "La diferencia entre el triple de un número y ocho", o: ["3x - 8", "8 - 3x", "3(x-8)"], c: 0, r: "La diferencia es el espacio entre dos almas, el orden define la realidad." }
+            ],
+            sim: [
+                { q: "¿Qué representa el signo '='?", o: ["Resultado", "Balanza", "Suma"], c: 1, r: "El signo igual es un eje de simetría, una balanza en el espejo." }
+            ],
+            rest: [
+                { q: "Despeja x: 3x + 10 = 25", o: ["x = 5", "x = 10", "x = 15"], c: 0, r: "Neutralizamos el ruido con antimateria para restaurar el cosmos." }
+            ]
+        };
+
         function renderQuestion() {
             const data = DB[currentTier][qIdx];
-            document.getElementById('q-meta').innerText = `CAPA ${currentTier.toUpperCase()} | PASO: ${qIdx + 1}/15`;
+            document.getElementById('q-meta').innerText = `PASO: ${qIdx + 1}/${DB[currentTier].length}`;
             document.getElementById('q-text').innerText = data.q;
+            document.getElementById('insight-area').style.display = 'none';
             
             const grid = document.getElementById('options-grid');
             grid.innerHTML = ''; grid.style.display = 'block';
-            document.getElementById('insight-area').style.display = 'none';
-            
+
             data.o.forEach((opt, idx) => {
                 const b = document.createElement('div'); b.className = 'option';
                 b.innerText = opt; b.onclick = () => checkAnswer(idx, b);
                 grid.appendChild(b);
             });
-            speak(data.q);
+            xyloSpeak(data.q);
         }
 
         function checkAnswer(idx, el) {
             const data = DB[currentTier][qIdx];
-            document.querySelectorAll('#options-grid .option').forEach(o => o.style.pointerEvents = 'none');
-            
             if(idx === data.c) {
-                el.classList.add('correct'); streak++; AudioEngine.playFX('win');
+                el.classList.add('correct');
                 document.getElementById('options-grid').style.display = 'none';
-                document.getElementById('insight-text').innerHTML = data.i;
                 document.getElementById('insight-area').style.display = 'block';
-                updateShield();
-                speak(document.getElementById('insight-text').innerText);
+                document.getElementById('insight-text').innerText = data.r;
+                xyloSpeak(data.r);
             } else {
-                el.classList.add('wrong'); streak = 0; evalData.mistakes++;
-                document.getElementById('ui-errors').innerText = evalData.mistakes;
-                AudioEngine.playFX('fail'); updateShield();
-                setTimeout(nextQuestion, 1200);
+                el.classList.add('wrong');
+                mistakes++;
+                document.getElementById('ui-errors').innerText = `ERRORES: ${mistakes}`;
+                setTimeout(nextQuestion, 1000);
             }
-        }
-
-        function updateShield() {
-            const ring = document.getElementById('shield-ring');
-            if(streak >= 3) ring.classList.add('shield-on');
-            else ring.classList.remove('shield-on');
         }
 
         function nextQuestion() {
             qIdx++;
             if(qIdx < DB[currentTier].length) renderQuestion();
-            else calculateResults();
-        }
-
-        function calculateResults() {
-            AudioEngine.stopMusic();
-            evalData.seconds = Math.floor((Date.now() - evalData.timeStart) / 1000);
-            
-            // Lógica de Puntuación Base: 10,000 - Penalización por errores (500) y por tiempo (10/seg)
-            let base = 10000;
-            base -= (evalData.mistakes * 500);
-            base -= (evalData.seconds * 10);
-            evalData.score = base < 0 ? 0 : base;
-
-            document.getElementById('res-time').innerText = evalData.seconds + "s";
-            document.getElementById('res-errors').innerText = evalData.mistakes;
-            document.getElementById('res-score').innerText = evalData.score;
-
-            let title="", msg="";
-            if(currentTier === 'perc') {
-                prog.tier1 = true;
-                title = "CAPA I SUPERADA ⚡"; msg = "El Poder de la Incógnita es tuyo. Tu capacidad de abstracción acaba de subir de nivel.";
-            } else if(currentTier === 'sim') {
-                prog.tier2 = true;
-                title = "EQUILIBRIO LOGRADO 🦎✨"; msg = "La balanza de Xylo está en paz. Eres un maestro de la simetría algebraica.";
-            } else {
-                title = "EUDAIMONÍA ALCANZADA 🌟"; msg = "¡Nivel Máximo! Has ordenado el caos usando la razón pura de Aristóteles.";
+            else {
+                alert("Capa Superada");
+                if(currentTier === 'perc') prog.tier1 = true;
+                if(currentTier === 'sim') prog.tier2 = true;
+                localStorage.setItem('edu_v10', JSON.stringify(prog));
+                showView('view-menu');
+                updateLocks();
             }
-
-            localStorage.setItem('edu_eval_v9', JSON.stringify(prog));
-            document.getElementById('res-title').innerText = title;
-            document.getElementById('res-msg').innerText = msg;
-            
-            showView('view-results');
-            speak(title + ". " + msg);
         }
 
-        function showMenu() { updateMenuLocks(); showView('view-menu'); AudioEngine.playMusic('perc'); }
-        function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
 
-        // --- ENVIAR REPORTE AL MAESTRO (TOTALMENTE GRATUITO CON MAILTO) ---
-        function sendEmailReport() {
-            const subject = encodeURIComponent(`Evaluación Álgebra: ${userName} - Nivel ${currentTier.toUpperCase()}`);
-            const body = encodeURIComponent(
-                `REPORTE DE SISTEMA EUDAIMONÍA\n` +
-                `----------------------------------------\n` +
-                `Nombre del Estudiante: ${userName}\n` +
-                `Capa Completada: ${currentTier.toUpperCase()}\n` +
-                `Tiempo de Resolución: ${evalData.seconds} segundos\n` +
-                `Errores Cometidos: ${evalData.mistakes}\n` +
-                `PUNTUACIÓN FINAL: ${evalData.score} / 10000\n` +
-                `----------------------------------------\n` +
-                `Enviado desde el Protocolo Automático.`
-            );
-            // Esto abrirá el Gmail, Outlook o App de correo del dispositivo del estudiante listo para enviar.
-            window.open(`mailto:${PROFESSOR_EMAIL}?subject=${subject}&body=${body}`, '_blank');
+        // --- EFECTO VISUAL: LLUVIA DE CÓDIGO ---
+        function initCodeRain() {
+            const canvas = document.getElementById('code-rain');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const letters = "01XYLOΔΣΩ";
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+
+            function draw() {
+                ctx.fillStyle = "rgba(1, 2, 4, 0.05)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--current-glow');
+                ctx.font = fontSize + "px monospace";
+                for(let i=0; i<drops.length; i++) {
+                    const text = letters[Math.floor(Math.random()*letters.length)];
+                    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+                    if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 33);
         }
     </script>
 </body>
