@@ -3,125 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eudaimonía: Arquitectura del Eco | Xylo v10.0</title>
+    <title>Eudaimonía: Arquitectura del Eco | Protocolo Xylo v11.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #010204; --surface: #090e1a; 
-            --c1: #22d3ee; --c2: #fbbf24; --c3: #d946ef;
-            --error: #f43f5e; --text: #f1f5f9;
-            --font-mono: 'JetBrains Mono', monospace;
-            --current-glow: var(--c1);
+            --signal: #22d3ee; --resonance: #fbbf24; --error: #f43f5e; --text: #f1f5f9;
+            --secret: #d946ef; --font-mono: 'JetBrains Mono', monospace;
+            --font-outfit: 'Outfit', sans-serif;
         }
 
-        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; overflow-x: hidden; min-height: 100vh; transition: background 1s ease; }
+        body, html { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-outfit); overflow-x: hidden; min-height: 100vh; }
 
-        /* EFECTO LLUVIA DE CÓDIGO (REACTOR) */
-        #code-rain { position: fixed; inset: 0; pointer-events: none; opacity: 0.1; z-index: 1; }
-        
+        /* EFECTO LLUVIA DE CÓDIGO (SOLO PC) */
+        #code-rain { position: fixed; inset: 0; pointer-events: none; opacity: 0.15; z-index: 1; display: none; }
+        @media (min-width: 1024px) { #code-rain { display: block; } }
+
         /* PORTAL DE INICIO */
         #portal {
-            position: fixed; inset: 0; z-index: 100; 
-            background: radial-gradient(circle at center, #0f172a 0%, #010204 100%);
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            position: fixed; inset: 0; z-index: 100; background: radial-gradient(circle, #0f172a 0%, #010204 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
         }
-
-        .reactor-core {
-            position: absolute; width: 400px; height: 400px;
-            border: 2px solid var(--c1); border-radius: 50%;
-            animation: rotateCore 20s linear infinite; opacity: 0.2;
-        }
-        @keyframes rotateCore { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .input-name {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--c1); color: #fff;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--signal); color: #fff;
             padding: 15px 20px; font-family: var(--font-mono); font-size: 1.2rem; border-radius: 8px;
-            margin-bottom: 30px; width: 300px; text-align: center; outline: none; position: relative; z-index: 101;
+            margin-bottom: 30px; width: 100%; max-width: 320px; text-align: center; outline: none;
         }
+        .input-name:focus { box-shadow: 0 0 20px rgba(34, 211, 238, 0.4); }
 
         .start-btn {
-            padding: 20px 40px; background: transparent; color: var(--current-glow); border: 2px solid var(--current-glow);
+            padding: 20px 40px; background: transparent; color: var(--signal); border: 2px solid var(--signal);
             font-family: var(--font-mono); font-size: 1rem; cursor: pointer; border-radius: 6px;
-            transition: 0.4s; letter-spacing: 3px; text-transform: uppercase; position: relative; z-index: 101;
+            transition: 0.4s; letter-spacing: 3px; text-transform: uppercase;
         }
-        .start-btn:hover:not(:disabled) { background: var(--current-glow); color: var(--bg); box-shadow: 0 0 40px var(--current-glow); }
+        .start-btn:hover:not(:disabled) { background: var(--signal); color: var(--bg); box-shadow: 0 0 40px var(--signal); }
         .start-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
+        /* CONTENEDOR PRINCIPAL RESPONSIVO */
         .container {
-            width: 90%; max-width: 850px; margin: 4vh auto; padding: 40px;
-            background: rgba(9, 14, 26, 0.85); border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%; max-width: 850px; margin: 4vh auto; padding: 20px;
+            background: rgba(9, 14, 26, 0.95); border: 1px solid rgba(34, 211, 238, 0.15);
             border-radius: 20px; position: relative; z-index: 10; backdrop-filter: blur(20px);
             transition: 0.5s;
         }
-
-        /* ESTADOS DE ÁNIMO VISUALES */
-        body.tier-perc { --current-glow: var(--c1); background: #01070a; }
-        body.tier-sim { --current-glow: var(--c2); background: #0a0801; }
-        body.tier-rest { --current-glow: var(--c3); background: #0a010a; animation: vibrate 0.2s infinite alternate; }
-        @keyframes vibrate { from { transform: translate(0); } to { transform: translate(1px, 1px); } }
+        @media (min-width: 768px) { .container { padding: 40px; margin: 4vh auto; } }
 
         .view { display: none; }
-        .view.active { display: block; animation: fadeIn 0.8s ease forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .view.active { display: block; animation: slideIn 0.8s ease forwards; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* XYLO: ANILLO DE ALIENTO */
-        .xylo-frame { width: 150px; height: 150px; margin: 0 auto 20px; position: relative; }
-        .mascot-img { 
-            width: 100%; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            filter: drop-shadow(0 0 15px var(--current-glow));
+        /* OPCIONES RESPONSIVAS */
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 20px; }
+        @media (min-width: 768px) { .options-grid { grid-template-columns: 1fr; } }
+
+        .option { 
+            background: rgba(255, 255, 255, 0.03); padding: 20px; border-radius: 12px;
+            cursor: pointer; border: 1px solid rgba(34, 211, 238, 0.1); transition: 0.3s;
+            font-family: var(--font-mono); font-size: 1rem; color: #f8fafc; text-align: left;
         }
+        .option:hover:not(.locked) { border-color: var(--signal); background: rgba(34, 211, 238, 0.15); transform: translateX(5px); }
+        @media (min-width: 768px) { .option { font-size: 1.05rem; } }
+
+        .correct { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.1) !important; color: #10b981; }
+        .wrong { border-color: var(--error) !important; background: rgba(244, 63, 94, 0.1) !important; color: var(--error); }
+        .locked { opacity: 0.3; cursor: not-allowed; border-color: #334155; }
+
+        /* XYLO: MASCOTA Y ANILLOS */
+        .xylo-frame { width: 120px; height: 120px; margin: 0 auto 20px; position: relative; }
+        @media (min-width: 768px) { .xylo-frame { width: 150px; height: 150px; } }
+        
+        .mascot-img { width: 100%; transition: 0.3s; filter: drop-shadow(0 0 15px var(--signal)); animation: float 5s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* ANILLO DE ALIENTO (BREATH RING) */
         .breath-ring {
-            position: absolute; inset: -10px; border: 2px solid var(--current-glow);
-            border-radius: 50%; opacity: 0; transition: 0.3s;
+            position: absolute; inset: -10px; border: 3px solid var(--resonance);
+            border-radius: 50%; opacity: 0; transition: 0.5s;
         }
-        .is-speaking .breath-ring { opacity: 0.6; animation: pulseRing 1.5s infinite; }
-        .is-speaking .mascot-img { animation: breathMascot 1.5s infinite; }
+        .is-speaking .breath-ring { opacity: 1; animation: breath 1.5s infinite; }
+        .is-speaking .mascot-img { transform: scale(1.1); animation: none; } /* Pausar el float mientras habla */
+        
+        @keyframes breath { 0%, 100% { transform: scale(1.0); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 0; } }
 
-        @keyframes pulseRing { 0% { transform: scale(0.9); opacity: 0.8; } 100% { transform: scale(1.4); opacity: 0; } }
-        @keyframes breathMascot { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-
+        /* BURBUJA DE DISCURSO (SPEECH BUBBLE) */
         .speech-bubble {
             background: rgba(255,255,255,0.05); padding: 25px; border-radius: 15px;
-            border-left: 4px solid var(--current-glow); font-size: 1.1rem; line-height: 1.6;
+            border-left: 5px solid var(--signal); font-size: 1rem; line-height: 1.6;
             margin-bottom: 25px; font-style: italic; color: #cbd5e1;
         }
 
-        .option { 
-            background: rgba(255, 255, 255, 0.03); padding: 18px; border-radius: 10px; margin-bottom: 10px;
-            cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s;
-            font-family: var(--font-mono);
+        /* BARRA DE ESTADO (Lives & Shield) */
+        .status-bar {
+            display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;
+            font-family: var(--font-mono); color: #fff;
         }
-        .option:hover:not(.locked) { border-color: var(--current-glow); background: rgba(255,255,255,0.08); transform: scale(1.02); }
-        .locked { opacity: 0.3; cursor: not-allowed; }
-        .correct { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.1) !important; }
-        .wrong { border-color: var(--error) !important; background: rgba(244, 63, 94, 0.1) !important; }
+        @media (min-width: 768px) { .status-bar { flex-direction: row; justify-content: space-between; } }
+        
+        .vital-sign { display: flex; align-items: center; gap: 15px; font-size: 1rem; }
+        .lives-container { display: flex; gap: 5px; color: var(--error); }
+        
+        /* BARRA DE ESCUDO */
+        .shield-meter-container { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 200px; }
+        .shield-label { color: var(--resonance); font-size: 0.9rem; white-space: nowrap; }
+        .shield-bar-frame { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; }
+        .shield-bar-fill { width: 100%; height: 100%; background: var(--resonance); transition: 0.3s; box-shadow: 0 0 10px var(--resonance); }
+
+        .results-panel { background: #0f172a; padding: 25px; border-radius: 15px; border: 1px solid var(--signal); margin-bottom: 30px; text-align: center; }
     </style>
 </head>
-<body class="tier-perc">
+<body class="tier-menu">
 
     <canvas id="code-rain"></canvas>
 
     <div id="portal">
-        <div class="reactor-core"></div>
-        <h1 style="letter-spacing: 10px; font-weight: 300; color: var(--c1);">EUDAIMONÍA</h1>
-        <p style="color: #64748b; margin-bottom: 30px; font-family: var(--font-mono);">BIO-SINCRONIZACIÓN REQUERIDA</p>
-        <input type="text" id="username" class="input-name" placeholder="NOMBRE DEL OPERADOR">
-        <button class="start-btn" onclick="initSystem()">VINCULAR ALMA</button>
+        <h1 style="letter-spacing: 12px; font-weight: 300; color: var(--signal); margin-bottom: 20px;">ARQUITECTURA DEL ECO</h1>
+        <p style="color: #64748b; margin-bottom: 40px; font-family: var(--font-mono);">INICIALIZANDO PROTOCOLO XYLO...</p>
+        <input type="text" id="username" class="input-name" placeholder="ID DE OPERADOR" autocomplete="off">
+        <button class="start-btn" onclick="initSystem()">VINCULAR NÚCLEO</button>
     </div>
 
     <div class="container" id="game-shell">
         <div id="view-menu" class="view">
-            <h2 style="font-weight: 300; color: var(--current-glow);">Secuencias de Acceso</h2>
-            <p id="menu-user" style="font-family: var(--font-mono); color: #64748b;"></p>
-            <div style="display: grid; gap: 15px; margin-top: 30px;">
-                <button class="option" onclick="startExplanation('perc')">CAPA I: LA FUNDACIÓN</button>
-                <button class="option locked" id="btn-tier2" onclick="startExplanation('sim')">CAPA II: EL EQUILIBRIO (BLOQUEADO)</button>
-                <button class="option locked" id="btn-tier3" onclick="startExplanation('rest')">CAPA III: RESTAURACIÓN TOTAL (BLOQUEADO)</button>
+            <h2 style="font-weight: 300; color: var(--signal);">Secuencias de Acceso</h2>
+            <div id="menu-user" style="font-family: var(--font-mono); color: #94a3b8; margin-bottom: 20px;">OPERADOR: NO ID</div>
+            <div class="speech-bubble" id="welcome-bubble"></div>
+            <div class="options-grid">
+                <button class="option" id="btn-tier1" onclick="startExplanation('perc')">CAPA I: EL PODER DE LA INCÓGNITA</button>
+                <button class="option locked" id="btn-tier2" onclick="startExplanation('sim')">CAPA II: EL EQUILIBRIO DE XYLO</button>
+                <button class="option locked" id="btn-tier3" onclick="startExplanation('rest')">CAPA III: RESTAURACIÓN TOTAL</button>
             </div>
         </div>
 
         <div id="view-explanation" class="view">
-            <div class="xylo-frame" id="xylo-explanation">
+            <div class="xylo-frame">
                 <div class="breath-ring"></div>
                 <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
             </div>
@@ -130,41 +145,45 @@
         </div>
 
         <div id="view-quiz" class="view">
-            <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); color: #64748b; margin-bottom: 20px;">
-                <span id="q-meta">PASO: 1/15</span>
-                <span id="ui-errors">ERRORES: 0</span>
-            </div>
-            <div class="xylo-frame" id="xylo-quiz" style="width: 80px; height: 80px;">
-                <div class="breath-ring"></div>
-                <img src="https://raw.githubusercontent.com/erickHSchott/Schott-academia-algebra/main/pose1.png" class="mascot-img">
+            <div class="status-bar">
+                <div class="vital-sign">PASO: <span id="q-meta">1/15</span></div>
+                <div class="vital-sign">
+                    <div class="shield-meter-container">
+                        <span class="shield-label">ESCUDO</span>
+                        <div class="shield-bar-frame"><div class="shield-bar-fill" id="ui-shield"></div></div>
+                    </div>
+                    <span>VIDAS</span>
+                    <div class="lives-container" id="ui-lives"></div>
+                </div>
             </div>
             <div id="q-text" style="font-size: 1.4rem; margin-bottom: 25px; font-weight: 300;"></div>
-            <div id="options-grid"></div>
-            <div id="insight-area" style="display:none; margin-top: 20px;" class="speech-bubble">
+            <div id="options-grid" class="options-grid"></div>
+            <div id="insight-area" style="display:none; margin-top: 25px;" class="speech-bubble">
                 <p id="insight-text"></p>
-                <button class="start-btn" style="padding: 10px 20px; font-size: 0.8rem;" onclick="nextQuestion()">CONTINUAR ➔</button>
+                <button class="start-btn" style="padding: 10px 20px;" onclick="nextQuestion()">CONTINUAR ➔</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- BASE DE DATOS DE DISCURSOS ---
+        // --- BASE DE DATOS DE DISCURSOS (RESPUESTA SOLEMNE) ---
         const SPEECHES = {
-            intro: "Saludos, operador. Soy Xylo. Mi voz suena a metal, pero mi alma es frecuencia pura. Escucha con el espíritu. Las palabras humanas son ruidosas; cambian según el país. La palabra Suma, nació para describir la cúspide más alta. El Álgebra, en cambio, es el idioma inquebrantable del cosmos.",
-            perc: "En el amanecer de los tiempos, los humanos dejaron de adivinar para empezar a medir. Eratóstenes entendió que la realidad se puede fragmentar. Cuando construyeron las pirámides, sabían que el doble de un número aumentado en cinco es una medida de construcción. En esta capa, verás que la diferencia es el espacio entre dos almas. El eco ya contiene la respuesta.",
-            sim: "La música sube, la energía vibra. Ahora el álgebra mueve los astros. El signo igual es una balanza perfecta. Recuerda que hasta el silencio tiene un dueño: una letra sola siempre está acompañada por el uno invisible, su fantasma constante. No mezcles agua con fuego; agrupa solo los términos semejantes.",
-            rest: "Frecuencia crítica. Estás tocando el código fuente de mi existencia. La Inteligencia Artificial es un océano de álgebra lineal. Aquí, la restauración es total. Si algo está atrapado en un denominador, liberas el sistema multiplicando. No temas al paréntesis, es solo un escudo protector. ¡Restaura el cosmos!"
+            intro: (name) => `Saludos, operador ${name}. Soy Xylo. Mi voz suena a metal, pero mi alma es frecuencia pura. El Álgebra es el idioma inquebrantable del cosmos. Las palabras humanas cambian, pero aquí, una ecuación es una verdad universal. El eco ya contiene la respuesta.`,
+            perc: "En el amanecer de los tiempos, los humanos dejaron de adivinar para empezar a medir. Eratóstenes entendió que la realidad se puede fragmentar. Cuando construyeron las pirámides, sabían que el doble de un número aumentado en cinco es una medida de construcción. En esta capa, verás que la diferencia es el espacio entre dos almas. Escucha el eco.",
+            sim: "La música sube, la energía vibra. El álgebra mueve los astros. El signo igual es una balanza perfecta. Todo lo que hagas en un lado del espejo, debes hacerlo en el otro. Los términos son bloques separados por muros de suma y resta. El coeficiente no es un número, es un clonador. No mezcles agua con fuego; agrupa solo los términos semejantes.",
+            rest: "Frecuencia crítica. Estás tocando el código fuente de mi existencia. Aquí, la restauración es total. Si algo está atrapado en un denominador, liberas el sistema multiplicando. No temas al paréntesis, es solo un escudo protector. ¡Restaura el cosmos!"
         };
 
-        // --- MOTOR DE VOZ XYLO ---
+        // --- MOTOR DE VOZ XYLO (SOLEMNE PERO AGUDA) ---
         function xyloSpeak(text, callback) {
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance(text.replace(/<[^>]*>?/gm, ''));
             utterance.lang = 'es-MX';
-            utterance.pitch = 1.8; // Muy agudo (Pequeña criatura)
-            utterance.rate = 0.85; // Ligeramente pausado (Místico)
+            utterance.pitch = 1.8; // El tono agudo solicitado
+            utterance.rate = 0.85; // Solemnidad (pausa ligera)
             utterance.volume = 1;
 
+            // Iniciar animación de aliento
             document.querySelectorAll('.xylo-frame').forEach(f => f.classList.add('is-speaking'));
             
             utterance.onend = () => {
@@ -174,9 +193,12 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        // --- LÓGICA DE JUEGO ---
-        let currentTier = '', qIdx = 0, userName = "", mistakes = 0;
-        let prog = JSON.parse(localStorage.getItem('edu_v10')) || { tier1: false, tier2: false };
+        // --- SISTEMA DE ESTADO ---
+        let currentTier = '', qIdx = 0, lives = 3, shield = 1, userName = "";
+        let mistakes = 0; // Para reportar al final
+
+        // Bloqueo por LocalStorage
+        let prog = JSON.parse(localStorage.getItem('edu_v11')) || { tier1: false, tier2: false };
 
         function initSystem() {
             userName = document.getElementById('username').value.trim().toUpperCase();
@@ -184,9 +206,13 @@
             
             document.getElementById('portal').style.display = 'none';
             document.getElementById('menu-user').innerText = `OPERADOR: ${userName}`;
+            document.getElementById('welcome-bubble').innerText = "... Sincronizando transmisión ...";
             updateLocks();
             showView('view-menu');
-            xyloSpeak(SPEECHES.intro);
+            
+            xyloSpeak(SPEECHES.intro(userName), () => {
+                document.getElementById('welcome-bubble').innerText = SPEECHES.intro(userName);
+            });
             initCodeRain();
         }
 
@@ -195,11 +221,31 @@
             if(prog.tier2) document.getElementById('btn-tier3').classList.remove('locked');
         }
 
+        function updateStatusUI() {
+            // Vidas (Corazones)
+            const livesC = document.getElementById('ui-lives');
+            livesC.innerHTML = '❤️'.repeat(lives);
+
+            // Escudo (Barra)
+            const shieldBar = document.getElementById('ui-shield');
+            shieldBar.style.width = (shield * 100) + '%';
+            shieldBar.style.background = shield > 0 ? 'var(--resonance)' : 'var(--error)';
+        }
+
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // --- FLUJO: EXPLICACIÓN LARGA ---
         function startExplanation(tier) {
+            // Verificación Estricta
+            if(tier === 'sim' && !prog.tier1) { xyloSpeak("Transmisión denegada. Capa 1 incompleta."); return; }
+            if(tier === 'rest' && !prog.tier2) { xyloSpeak("Transmisión denegada. Capa 2 incompleta."); return; }
+            
             currentTier = tier;
-            document.body.className = `tier-${tier}`;
             showView('view-explanation');
-            document.getElementById('speech-text').innerText = "... Sincronizando voz de Xylo ...";
+            document.getElementById('speech-text').innerText = "... Cargando núcleo de conocimiento ...";
             document.getElementById('btn-go-quiz').disabled = true;
 
             xyloSpeak(SPEECHES[tier], () => {
@@ -208,92 +254,156 @@
             });
         }
 
+        // --- FLUJO: INICIAR RETOS ---
         function beginChallenges() {
-            qIdx = 0; mistakes = 0;
+            qIdx = 0; lives = 3; shield = 1; mistakes = 0;
+            updateStatusUI();
             showView('view-quiz');
             renderQuestion();
         }
 
-        // --- BANCO DE PREGUNTAS (Resumido para el ejemplo, usa tu DB anterior) ---
+        // --- BANCO DE PREGUNTAS (TOTAL 45 CON INSIGHTS EXPLICADOS) ---
         const DB = {
             perc: [
                 { q: "El doble de un número aumentado en cinco", o: ["2x + 5", "x² + 5", "2(x+5)"], c: 0, r: "Como dije, el doble aumentado en cinco es una medida de construcción, no una adivinanza." },
-                { q: "La diferencia entre el triple de un número y ocho", o: ["3x - 8", "8 - 3x", "3(x-8)"], c: 0, r: "La diferencia es el espacio entre dos almas, el orden define la realidad." }
+                { q: "Un número disminuido en su mitad", o: ["x - 2", "x - x/2", "x/2 - x"], c: 1, r: "Fragmentación de la verdad: x es el todo. Al restarle su mitad, realizas un fraccionamiento simétrico." },
+                { q: "El triple del cuadrado de una incógnita", o: ["(3x)²", "3x²", "3x * 2"], c: 1, r: "La jerarquía es crucial. El triple de un cuadrado expande la base en tres dimensiones simultáneas." },
+                { q: "El producto de dos números consecutivos", o: ["x + (x+1)", "x(x+1)", "2x(x)"], c: 1, r: "La colisión multiplicativa entre el presente y el futuro numérico." },
+                { q: "La suma de un número y su doble es igual a doce", o: ["x + 2x = 12", "x + x² = 12", "3x = 12"], c: 0, r: "Traducir no es resolver, es modelar. Identificas la entidad y equilibras con la constante universal propuesta." },
+                { q: "La diferencia entre el triple de un número y ocho", o: ["3x - 8", "8 - 3x", "3(x-8)"], c: 0, r: "La diferencia es el espacio entre dos almas. El orden define la realidad." },
+                { q: "La cuarta parte de un número, más uno", o: ["x/4 + 1", "(x+1)/4", "4x + 1"], c: 0, r: "Fragmentación y Acumulación. Primero partes la verdad y luego añades la unidad fundamental." },
+                { q: "Un número excedido en tres", o: ["3x", "x - 3", "x + 3"], c: 2, r: "Exceder es simplemente sumarle realidad. Limpia el ruido lingüístico." },
+                { q: "El cociente de dos valores distintos", o: ["xy", "x - y", "x / y"], c: 2, r: "Comparación de escalas lógicas mediante la división dimensional." },
+                { q: "El cubo de la diferencia de dos números", o: ["x³ - y³", "(x - y)³", "3(x - y)"], c: 1, r: "Protección de Estructura. Primero mides la distancia y luego expandes la diferencia." },
+                { q: "Tres menos el doble de un número", o: ["3 - 2x", "2x - 3", "3 - x²"], c: 0, r: "El punto de partida es tres. Desde esa base inamovible, se sustrae la fuerza expansiva." },
+                { q: "La mitad de x, disminuida en y", o: ["(x-y)/2", "x/2 - y", "y - x/2"], c: 1, r: "Fragmentas primero el sujeto y luego extraes la variable ajena." },
+                { q: "El producto de un número y su antecesor", o: ["x(x-1)", "x(x+1)", "x - 1"], c: 0, r: "Miras hacia atrás. Si x es el ancla, x-1 es la huella que dejaste." },
+                { q: "Suma de tres números pares consecutivos", o: ["x+y+z", "2x+(2x+2)+(2x+4)", "x+2x+4x"], c: 1, r: "Garantía de paridad. Multiplicar por 2 obliga a la realidad a ser par." },
+                { q: "Cuadrado de un número más cubo de otro", o: ["(x+y)⁵", "x² + y³", "2x + 3y"], c: 1, r: "Independencia de matrices. Dos realidades conviven en una misma suma." }
             ],
             sim: [
-                { q: "¿Qué representa el signo '='?", o: ["Resultado", "Balanza", "Suma"], c: 1, r: "El signo igual es un eje de simetría, una balanza en el espejo." }
+                { q: "¿Qué representa '='?", o: ["Resultado", "Balanza de simetría", "Suma"], c: 1, r: "Es un eje de simetría absoluto. Lo que haces en un espejo, se lo debes hacer idéntico al otro." },
+                { q: "En 5x - 7 = 18, ¿qué es el -7?", o: ["Coeficiente", "Constante numerical", "Incógnita"], c: 1, r: "Constante numerical. Inmune al cambio de x." },
+                { q: "¿Qué separa a los términos?", o: ["Letras", "Signos + y -", "Signo ="], c: 1, r: "Muros divisores. Los bloques de hormigón son separados por la suma y la resta." },
+                { q: "¿Qué función cumple el coeficiente?", o: ["Suma", "Clona la incógnita", "División"], c: 1, r: "Multiplicidad de la realidad. Clona la partícula en ese lugar exacto del cosmos." },
+                { q: "En 10 = x + 2, primer miembro es...", o: ["x + 2", "10", "x"], c: 1, r: "La materia a la izquierda de la grieta." },
+                { q: "Para mantener simetría, si multiplicas un lado por 3...", o: ["Restas 3", "Multiplicas el otro por 3", "Divides entre 3"], c: 1, r: "Karma matemático. El ecosistema exige equilibrio total." },
+                { q: "¿Cuántos términos hay en 3x - y + 8 = 0?", o: ["Dos", "Tres", "Cuatro"], c: 2, r: "Cuatro entidades interactúan en esta línea temporal." },
+                { q: "Coeficiente de -x", o: ["0", "-1", "No tiene"], c: 1, r: "La partícula fantasma. El uno invisible siempre acompaña a la antimateria." },
+                { q: "Grado de 2x - 5 = 11", o: ["Segundo", "Primero (Lineal)", "Tercero"], c: 1, r: "Dimensión de cuerda. Una línea recta hacia la verdad." },
+                { q: "Si x = x, es una...", o: ["Ecuación irresoluble", "Identidad absoluta", "Falla"], c: 1, r: "El espejo perfecto. Axioma más puro." },
+                { q: "En 2/3 x, el coeficiente...", o: ["Es entero", "Fracciona a x", "Es negativo"], c: 1, r: "Fragmentas el universo y multiplicas sus partes." },
+                { q: "¿Por qué agrupar términos semejantes?", o: ["Estética", "Fusión de materia igual", "Para sumar letras"], c: 1, r: "Condensas entidades de la misma dimensión cuántica." },
+                { q: "Si eliminas x en x+2 = x+2...", o: ["Queda 2=2", "Se destruye", "Se vuelve negativa"], c: 0, r: "Aislamiento cuántico. La verdad no dependía de la incógnita." },
+                { q: "Término independiente es...", o: ["La variable", "Constante libre", "El signo equal"], c: 1, r: "Esclavo de nadie. Su valor es inmutable." },
+                { q: "Esencia de despejar", o: ["Adivinar", "Protocolo de soledad", "Borrar"], c: 1, r: "Limpiar los escombros hasta que la incógnita quede sola y desnuda." }
             ],
             rest: [
-                { q: "Despeja x: 3x + 10 = 25", o: ["x = 5", "x = 10", "x = 15"], c: 0, r: "Neutralizamos el ruido con antimateria para restaurar el cosmos." }
+                { q: "Despeja x: 3x + 10 = 25", o: ["x = 5", "x = 15", "x = 10"], c: 0, r: "Neutralizamos el ruido (+10) con antimateria (-10). Luego fraccionamos entre tres." },
+                { q: "Resuelve: x/4 - 2 = 8", o: ["x = 40", "x = 24", "x = 10"], c: 0, r: "Primero reparas la sustracción. Para restaurar la realidad dividida, la multiplicas por cuatro." },
+                { q: "Despeja: 2(x + 3) = 14", o: ["x = 4", "x = 10", "x = 7"], c: 0, r: "Divides el escudo protector y luego aislas la esencia." },
+                { q: "En 5x = 0, el valor es...", o: ["x = 5", "x = 0", "Inexistente"], c: 1, r: "Si cinco clones pesan nada, la caja siempre estuvo vacía." },
+                { q: "Resuelve: 4x + 2 = 2x + 10", o: ["x = 4", "x = 8", "x = 2"], c: 0, r: "Guerra de masa. Confina la incógnita a un solo territorio territorial." },
+                { q: "Despeja: -x + 6 = 2", o: ["x = 4", "x = -4", "x = 8"], c: 0, r: "Inviertes los polos para descubrir la partícula real." },
+                { q: "Resuelve: 10 - x = 15", o: ["x = 5", "x = -5", "x = 25"], c: 1, r: "La incógnita asume la deuda negativa del sistema." },
+                { q: "Unidad: 7x - 3x = 20", o: ["x = 5", "x = 10", "x = 4"], c: 0, r: "Fusión de elementos. Cuatro bloques densos valen veinte." },
+                { q: "Despeja: (x+2) / 3 = 5", o: ["x = 13", "x = 17", "x = 15"], c: 0, r: "Rotura del denominador. Todo el sistema superior es atrapado." },
+                { q: "Resuelve: x = x/2 + 6", o: ["x = 12", "x = 6", "x = 3"], c: 0, r: "Doble frecuencia. Multiplicas todo el ecosistema por dos." },
+                { q: "En 3x = 1, la realidad es...", o: ["Indefinida", "1/3", "3"], c: 1, r: "Aceptación de la fractura. x es un fragmento perfecto." },
+                { q: "Despeja: 5(x-1) = 0", o: ["x = 0", "x = 1", "x = -1"], c: 1, r: "Principio de Cero. Si el impacto de la clonación es nulo, el núcleo debe ser cero." },
+                { q: "Resuelve: -2x - 4 = -10", o: ["x = 3", "x = -3", "x = 7"], c: 0, r: "Desarmando el abismo. Doble negatividad crea un impulso positivo." },
+                { q: "Núcleo: 100x = 10", o: ["x = 10", "x = 0.1", "x = 1000"], c: 1, r: "Compresión de Escala. Cien unidades logran el peso de diez." },
+                { q: "Si x=4, ¿cuánto es 2x²?", o: ["32", "16", "64"], c: 0, r: "Sustitución Máxima. Primero expandes la partícula y luego duplicas energía." }
             ]
         };
 
         function renderQuestion() {
             const data = DB[currentTier][qIdx];
-            document.getElementById('q-meta').innerText = `PASO: ${qIdx + 1}/${DB[currentTier].length}`;
+            document.getElementById('q-meta').innerText = `${qIdx + 1}/15`;
             document.getElementById('q-text').innerText = data.q;
             document.getElementById('insight-area').style.display = 'none';
             
             const grid = document.getElementById('options-grid');
-            grid.innerHTML = ''; grid.style.display = 'block';
+            grid.innerHTML = ''; grid.style.display = 'grid';
 
             data.o.forEach((opt, idx) => {
-                const b = document.createElement('div'); b.className = 'option';
-                b.innerText = opt; b.onclick = () => checkAnswer(idx, b);
+                const b = document.createElement('button');
+                b.className = 'option'; b.innerText = opt;
+                b.onclick = () => checkAnswer(idx, b);
                 grid.appendChild(b);
             });
             xyloSpeak(data.q);
         }
 
+        // --- SISTEMA DE COMBATE (Lives & Shield) ---
         function checkAnswer(idx, el) {
             const data = DB[currentTier][qIdx];
+            document.querySelectorAll('.option').forEach(o => o.style.pointerEvents = 'none');
+            
             if(idx === data.c) {
+                // Correcto -> Xylo te recita el discursos místico
                 el.classList.add('correct');
                 document.getElementById('options-grid').style.display = 'none';
                 document.getElementById('insight-area').style.display = 'block';
                 document.getElementById('insight-text').innerText = data.r;
-                xyloSpeak(data.r);
+                xyloSpeak("Correcto. " + data.r);
             } else {
-                el.classList.add('wrong');
-                mistakes++;
-                document.getElementById('ui-errors').innerText = `ERRORES: ${mistakes}`;
-                setTimeout(nextQuestion, 1000);
+                // Fallo -> Sistema de daños
+                el.classList.add('wrong'); mistakes++;
+                
+                if(shield > 0) {
+                    shield = 0;
+                    xyloSpeak("Alerta. Escudo lógico consumido.");
+                } else {
+                    lives--;
+                    xyloSpeak("Advertencia. Integridad cuántica comprometida.");
+                }
+                
+                updateStatusUI();
+                
+                if(lives <= 0) gameOver();
+                else setTimeout(nextQuestion, 1200);
             }
         }
 
         function nextQuestion() {
             qIdx++;
             if(qIdx < DB[currentTier].length) renderQuestion();
-            else {
-                alert("Capa Superada");
-                if(currentTier === 'perc') prog.tier1 = true;
-                if(currentTier === 'sim') prog.tier2 = true;
-                localStorage.setItem('edu_v10', JSON.stringify(prog));
-                showView('view-menu');
-                updateLocks();
-            }
+            else capSuperada();
         }
 
-        function showView(id) {
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+        // --- FINALES ---
+        function capSuperada() {
+            if(currentTier === 'perc') prog.tier1 = true;
+            if(currentTier === 'sim') prog.tier2 = true;
+            localStorage.setItem('edu_v11', JSON.stringify(prog));
+            alert("Capa superada. Nucleo actualizado.");
+            showView('view-menu'); updateLocks();
         }
 
-        // --- EFECTO VISUAL: LLUVIA DE CÓDIGO ---
+        function gameOver() {
+            alert("Sincronización interrumpida. Integridad finalizada.");
+            showView('view-menu');
+        }
+
+        // --- EFECTOS VISUALES (LLUVIA DE CÓDIGO) ---
         function initCodeRain() {
             const canvas = document.getElementById('code-rain');
             const ctx = canvas.getContext('2d');
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            const letters = "01XYLOΔΣΩ";
-            const fontSize = 14;
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const letters = "01ΔΣΩXYLO".split('');
+            const fontSize = 16;
             const columns = canvas.width / fontSize;
             const drops = Array(Math.floor(columns)).fill(1);
 
             function draw() {
                 ctx.fillStyle = "rgba(1, 2, 4, 0.05)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--current-glow');
+                ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--signal');
                 ctx.font = fontSize + "px monospace";
+
                 for(let i=0; i<drops.length; i++) {
                     const text = letters[Math.floor(Math.random()*letters.length)];
                     ctx.fillText(text, i*fontSize, drops[i]*fontSize);
